@@ -17,6 +17,10 @@ Canvas uses a straightforward relational model centred on the VBU → Canvas 1:1
 | password_hash | VARCHAR(255) | NOT NULL | bcrypt hash |
 | name | VARCHAR(255) | NOT NULL | Display name |
 | role | ENUM('admin','gm','viewer') | NOT NULL, default 'viewer' | Access level |
+| is_active | BOOLEAN | NOT NULL, default True | Account active flag |
+| last_login_at | TIMESTAMPTZ | NULLABLE | Last successful login |
+| failed_login_attempts | INTEGER | NOT NULL, default 0 | Consecutive failed logins |
+| locked_until | TIMESTAMPTZ | NULLABLE | Account lock expiry |
 | created_at | TIMESTAMPTZ | NOT NULL, server default now() | Creation timestamp |
 | updated_at | TIMESTAMPTZ | NOT NULL, server default now(), on update now() | Last update |
 
@@ -57,7 +61,7 @@ Canvas uses a straightforward relational model centred on the VBU → Canvas 1:1
 | id | UUID | PK, default uuid4 | Primary key |
 | vbu_id | UUID | FK → vbus.id, UNIQUE, NOT NULL | 1:1 with VBU |
 | product_name | VARCHAR(255) | NULLABLE | Optional product name |
-| lifecycle_lane | ENUM('build','sell','milk','reframe') | NOT NULL | Current lane |
+| lifecycle_lane | ENUM('build','sell','milk','reframe') | NOT NULL, default 'build' | Current lane |
 | success_description | TEXT | NULLABLE | "In this lane, success over 12-24 months means..." |
 | future_state_intent | TEXT | NULLABLE | 3-5 year vision statement |
 | primary_focus | VARCHAR(255) | NULLABLE | Learning / Replication / Cash & Risk |
@@ -165,7 +169,7 @@ Canvas uses a straightforward relational model centred on the VBU → Canvas 1:1
 |-------|------|-------------|-------------|
 | id | UUID | PK, default uuid4 | Primary key |
 | monthly_review_id | UUID | FK → monthly_reviews.id, NOT NULL | Parent review |
-| text | TEXT | NOT NULL | Commitment text |
+| text | TEXT | NOT NULL, CHECK(length(text) BETWEEN 1 AND 1000) | Commitment text |
 | order | INTEGER | NOT NULL, CHECK(1-3) | Display order |
 
 **Relationships:**
@@ -186,9 +190,9 @@ Canvas uses a straightforward relational model centred on the VBU → Canvas 1:1
 | proof_point_id | UUID | FK → proof_points.id, NULLABLE | Attached to proof point |
 | monthly_review_id | UUID | FK → monthly_reviews.id, NULLABLE | Attached to review |
 | filename | VARCHAR(255) | NOT NULL | Original filename |
-| storage_path | VARCHAR(1024) | NOT NULL | Path on disk |
-| content_type | VARCHAR(128) | NOT NULL | MIME type |
-| size_bytes | INTEGER | NOT NULL | File size |
+| storage_path | VARCHAR(1024) | UNIQUE, NOT NULL | Path on disk |
+| content_type | VARCHAR(128) | NOT NULL, CHECK(content_type IN ('image/jpeg','image/png','image/gif','application/pdf','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','application/vnd.openxmlformats-officedocument.wordprocessingml.document','application/vnd.openxmlformats-officedocument.presentationml.presentation')) | MIME type |
+| size_bytes | INTEGER | NOT NULL, CHECK(size_bytes BETWEEN 1 AND 10485760) | File size (max 10MB) |
 | label | VARCHAR(255) | NULLABLE | User-provided label |
 | uploaded_by | UUID | FK → users.id, NOT NULL | Uploader |
 | created_at | TIMESTAMPTZ | NOT NULL, server default now() | Upload timestamp |

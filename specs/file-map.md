@@ -15,9 +15,9 @@
 | backend/tests/test_user_model.py | 001-auth | T-008 | CREATE |
 | tests/test_auth_service_unit.py | 001-auth | T-009 | CREATE |
 | backend/tests/auth/test_user_service.py | 001-auth | T-010 | CREATE |
-| backend/canvas/models/user.py | 001-auth | T-011 | CREATE |
+| backend/canvas/models/user.py | 001-auth | T-011 | MODIFY |
 | backend/alembic/versions/001_create_users_table.py | 001-auth | T-012 | CREATE |
-| backend/canvas/auth/service.py | 001-auth | T-013 | CREATE |
+| backend/canvas/auth/service.py | 001-auth | T-013 | MODIFY |
 | backend/canvas/auth/user_service.py | 001-auth | T-014 | MODIFY |
 | backend/canvas/auth/dependencies.py | 001-auth | T-015 | CREATE |
 | backend/canvas/auth/routes.py | 001-auth | T-016 | CREATE |
@@ -58,7 +58,7 @@
 | backend/tests/test_thesis_service.py | 002-canvas-management | T-009 | CREATE |
 | backend/tests/test_proof_point_service.py | 002-canvas-management | T-010 | CREATE |
 | backend/tests/unit/test_attachment_service.py | 002-canvas-management | T-011 | CREATE |
-| backend/canvas/services/canvas_service.py | 002-canvas-management | T-012 | CREATE |
+| backend/canvas/services/canvas_service.py | 002-canvas-management | T-012 | MODIFY |
 | backend/canvas/services/attachment_service.py | 002-canvas-management | T-013 | CREATE |
 | backend/canvas/routes/vbu.py | 002-canvas-management | T-014 | CREATE |
 | backend/canvas/routes/canvas.py | 002-canvas-management | T-015 | CREATE |
@@ -94,7 +94,7 @@
 | frontend/src/dashboard/VBUTable.tsx | 003-portfolio-dashboard | T-015 | CREATE |
 | frontend/src/dashboard/HealthIndicator.tsx | 003-portfolio-dashboard | T-016 | CREATE |
 | frontend/src/dashboard/PortfolioNotes.tsx | 003-portfolio-dashboard | T-017 | CREATE |
-| frontend/src/dashboard/HealthIndicator.tsx | 003-portfolio-dashboard | T-018 | CREATE |
+| frontend/src/dashboard/HealthIndicator.tsx | 003-portfolio-dashboard | T-018 | MODIFY |
 | backend/canvas/models/monthly_review.py | 004-monthly-review | T-001 | CREATE |
 | backend/canvas/models/commitment.py | 004-monthly-review | T-002 | CREATE |
 | backend/canvas/reviews/service.py | 004-monthly-review | T-003 | CREATE |
@@ -121,3 +121,4 @@
 | frontend/src/App.tsx | 004-monthly-review | T-018 | MODIFY |
 | frontend/src/canvas/CanvasPage.tsx | 004-monthly-review | T-018 | MODIFY |
 | frontend/src/reviews/index.ts | 004-monthly-review | T-018 | CREATE |
+| frontend/src/App.tsx | 003-portfolio-dashboard | T-014 | MODIFY |
