@@ -49,6 +49,32 @@ See `specs/cross-cutting.md` — all variables owned by 001A-infrastructure:
 - POSTGRES_PASSWORD
 - POSTGRES_DB
 
+## Security Requirements
+
+- SEC-INFRA-001: `.env.dev` and `.env.prod` must NOT be committed to git (add to .gitignore)
+- SEC-INFRA-002: CANVAS_SECRET_KEY must use a strong random value in production (not the dev default)
+- SEC-INFRA-003: CORS origins restricted to known frontend URLs (no wildcard in prod)
+- SEC-INFRA-004: PostgreSQL credentials use non-default values in production
+- SEC-INFRA-005: Docker containers run as non-root user in production Dockerfiles
+- SEC-INFRA-006: Health endpoint does NOT expose version, dependency status, or internal details
+- SEC-INFRA-007: Structured logging must NOT log request bodies containing passwords or tokens
+- SEC-INFRA-008: Request ID middleware adds `X-Request-ID` header for traceability
+
+## Testing Strategy
+
+### Infrastructure Tests
+- `test_health_endpoint()`: GET /api/health returns 200 with `{"status": "ok"}`
+- `test_cors_headers()`: OPTIONS request returns correct CORS headers
+- `test_request_id_header()`: Response includes X-Request-ID header
+- `test_error_envelope()`: Invalid routes return standard error envelope format
+- `test_db_connection()`: AsyncSession can execute a simple query
+- `test_seed_idempotent()`: Running seed script twice produces no errors or duplicates
+
+### Docker Tests (manual verification)
+- Dev profile starts all 3 services with health checks passing
+- Prod profile builds and serves frontend via Nginx, proxies /api to backend
+- Database volume persists data across container restarts
+
 ## Acceptance Criteria
 
 - AC-INFRA-01: `docker compose --profile dev up` starts all 3 services, backend passes health check
