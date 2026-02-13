@@ -150,7 +150,7 @@ class MonthlyReview(Base, TimestampMixin):
     what_moved = Column(Text, nullable=True)
     what_learned = Column(Text, nullable=True) 
     what_threatens = Column(Text, nullable=True)
-    currently_testing_type = Column(Enum("thesis", "proof_point", name="testing_type"), nullable=True)
+    currently_testing_type = Column(Enum('thesis','proof_point', name='testing_type_enum'), nullable=True)
     currently_testing_id = Column(UUID(as_uuid=True), nullable=True)
     created_by = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="RESTRICT"), nullable=False)
     
@@ -176,7 +176,7 @@ class Commitment(Base, TimestampMixin):
     __tablename__ = "commitments"
     
     monthly_review_id = Column(UUID(as_uuid=True), ForeignKey("monthly_reviews.id", ondelete="CASCADE"), nullable=False)
-    text = Column(Text, nullable=False, CheckConstraint("length(text) > 0 AND length(text) <= 1000"))
+    text = Column(Text, nullable=False, CheckConstraint("length(text) BETWEEN 1 AND 1000"))
     order = Column(Integer, nullable=False, CheckConstraint("order >= 1 AND order <= 3"))
     
     # Relationships

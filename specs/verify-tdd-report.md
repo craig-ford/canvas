@@ -3,40 +3,47 @@
 ## Summary
 | Feature | Tasks | 3E Order | 3G Stubs | Status |
 |---------|-------|----------|----------|--------|
-| 001A-infrastructure | 12 | ✗ | ✓ | FAIL |
+| 001A-infrastructure | 12 | ❌ | ✓ | FAIL |
 | 001-auth | 16 | ✓ | ✓ | PASS |
-| 002-canvas-management | 20 | ✗ | ✗ | FAIL |
-| 003-portfolio-dashboard | 18 | ✗ | ✓ | FAIL |
+| 002-canvas-management | 20 | ❌ | ✓ | FAIL |
+| 003-portfolio-dashboard | 18 | ❌ | ✓ | FAIL |
 | 004-monthly-review | 18 | ✓ | ✓ | PASS |
 
 ## TDD Ordering Issues (3E)
 | Feature | Issue | Tasks Affected |
 |---------|-------|----------------|
-| 001A-infrastructure | Implementation before tests | T-003 (contract-test) should precede T-006 (implementation), but T-006 comes first in dependency order |
-| 002-canvas-management | Implementation before tests | T-003 (implementation) comes before T-007-T-011 (unit-test) |
-| 003-portfolio-dashboard | Implementation before tests | T-004-T-007 (implementation) come before T-009-T-013 (unit-test) |
+| 001A-infrastructure | Implementation without test dependency | T-011 (Frontend Scaffolding) |
+| 002-canvas-management | Implementation without test dependency | T-003 (SQLAlchemy Models), T-004 (Pydantic Schemas) |
+| 003-portfolio-dashboard | Implementation without test dependency | T-004 (Health Indicator Database Schema), T-005 (Portfolio Service Implementation), T-006 (PDF Service Implementation), T-007 (Portfolio API Routes), T-014 (Dashboard Page Implementation) |
 
 ## Stubs Found (3G)
-| Feature | Task | Section | Method | Issue |
-|---------|------|---------|--------|-------|
-| 002-canvas-management | T-001 | Contract | All CanvasService methods | Methods have only `...` (ellipsis) in Contract section - these are interface signatures, not stubs |
+None
 
 ## Overall: 2 PASS, 3 FAIL
 
-### Analysis Details
+### Detailed Analysis
 
-**3E TDD Ordering Violations:**
+**001A-infrastructure (FAIL - 3E violation):**
+- Task Types: T-001 to T-004 (contract-test), T-005 (integration-test), T-006 to T-012 (implementation)
+- TDD Ordering: T-011 (Frontend Scaffolding) is implementation type with no test dependency
+- Stub Detection: All Logic sections contain numbered steps, no stub methods found
 
-1. **001A-infrastructure**: The task numbering suggests proper ordering, but T-006 (implementation) has dependencies on T-001, T-002 (contract-tests), which is correct. However, T-003 (contract-test) should precede T-007 (implementation), but the dependency chain shows proper TDD ordering.
+**001-auth (PASS):**
+- Task Types: T-001 to T-004 (contract-test), T-005 to T-007 (integration-test), T-008 to T-010 (unit-test), T-011 to T-016 (implementation)
+- TDD Ordering: All implementation tasks have proper test dependencies
+- Stub Detection: All Logic sections contain numbered steps, no stub methods found
 
-2. **002-canvas-management**: Clear TDD violation - T-003 and T-004 are implementation tasks that come before the unit-test tasks T-007-T-011. Implementation should follow tests.
+**002-canvas-management (FAIL - 3E violations):**
+- Task Types: T-001, T-002 (contract-test), T-003, T-004 (implementation), T-005, T-006 (integration-test), T-007 to T-011 (unit-test), T-012 to T-020 (implementation)
+- TDD Ordering: T-003 (SQLAlchemy Models) and T-004 (Pydantic Schemas) are implementation tasks without test dependencies
+- Stub Detection: All Logic sections contain numbered steps, no stub methods found
 
-3. **003-portfolio-dashboard**: TDD violation - T-004-T-007 are implementation tasks that come before unit-test tasks T-009-T-013.
+**003-portfolio-dashboard (FAIL - 3E violations):**
+- Task Types: T-001 to T-003 (contract-test), T-004 to T-008 (implementation), T-009 to T-013 (unit-test), T-014 to T-018 (implementation)
+- TDD Ordering: Multiple implementation tasks without test dependencies: T-004, T-005, T-006, T-007, T-014
+- Stub Detection: All Logic sections contain numbered steps, no stub methods found
 
-**3G Stub Detection:**
-
-All Logic sections examined contain proper implementation steps or test specifications. The `...` (ellipsis) found in Contract sections are interface signatures, not stubs, which is correct per the specification.
-
-**Correct TDD Ordering Examples:**
-- **001-auth**: Follows proper hierarchy: T-001-T-004 (contract-test), T-005-T-007 (integration-test), T-008-T-010 (unit-test), T-011-T-016 (implementation)
-- **004-monthly-review**: Follows proper hierarchy: T-001-T-006 (contract-test), T-007-T-009 (integration-test), T-010-T-012 (unit-test), T-013-T-018 (implementation)
+**004-monthly-review (PASS):**
+- Task Types: T-001 to T-006 (contract-test), T-007 to T-009 (integration-test), T-010 to T-012 (unit-test), T-013 to T-018 (implementation)
+- TDD Ordering: All implementation tasks have proper test dependencies
+- Stub Detection: All Logic sections contain numbered steps, no stub methods found

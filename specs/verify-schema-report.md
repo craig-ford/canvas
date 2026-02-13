@@ -12,17 +12,10 @@
 ## Entity Mismatches (1C)
 | Feature | Entity | Field | Spec Says | Schema Says |
 |---------|--------|-------|-----------|-------------|
-| 001-auth | User | is_active | Boolean, NOT NULL, default=True | Not defined |
-| 001-auth | User | last_login_at | DateTime(timezone=True), nullable=True | Not defined |
-| 001-auth | User | failed_login_attempts | Integer, NOT NULL, default=0 | Not defined |
-| 001-auth | User | locked_until | DateTime(timezone=True), nullable=True | Not defined |
-| 002-canvas-management | Canvas | lifecycle_lane | default=LifecycleLane.BUILD | NOT NULL (no default specified) |
-| 002-canvas-management | Attachment | storage_path | unique=True | NOT NULL (no unique constraint) |
-| 002-canvas-management | Attachment | content_type | CheckConstraint with specific MIME types | VARCHAR(128), NOT NULL (no constraint) |
-| 002-canvas-management | Attachment | size_bytes | CheckConstraint(1 to 10485760) | INTEGER, NOT NULL (no constraint) |
-| 004-monthly-review | MonthlyReview | currently_testing_type | Enum("thesis", "proof_point") | ENUM('thesis','proof_point') |
-| 004-monthly-review | Commitment | text | CheckConstraint(length 1-1000) | TEXT, NOT NULL (no length constraint) |
-| 004-monthly-review | Commitment | order | CheckConstraint(1-3) | INTEGER, NOT NULL, CHECK(1-3) |
+| 001-auth | User | role | ENUM(UserRole), default=UserRole.VIEWER | ENUM('admin','gm','viewer'), default 'viewer' |
+| 002-canvas-management | Attachment | content_type | CHECK content_type IN ('image/png','image/jpeg','image/gif','application/pdf','text/csv','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') | CHECK content_type IN ('image/jpeg','image/png','image/gif','application/pdf','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','application/vnd.openxmlformats-officedocument.wordprocessingml.document','application/vnd.openxmlformats-officedocument.presentationml.presentation') |
+| 004-monthly-review | MonthlyReview | currently_testing_type | ENUM("thesis", "proof_point", name="testing_type") | ENUM('thesis','proof_point') |
+| 004-monthly-review | Commitment | text | CHECK(length(text) > 0 AND length(text) <= 1000) | CHECK(length(text) BETWEEN 1 AND 1000) |
 
 ## Contradictions Found (1D)
 None
