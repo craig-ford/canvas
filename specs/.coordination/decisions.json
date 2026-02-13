@@ -1,0 +1,111 @@
+{
+  "phase": "tasks-detail",
+  "timestamp": "2026-02-13T14:00:00Z",
+  "batch_items": ["004-monthly-review: T-001→T-018"],
+  "file_ownership": {
+    "backend/canvas/models/monthly_review.py": {
+      "owner": "T-001",
+      "action": "CREATE",
+      "importers": ["T-002", "T-003", "T-005", "T-007", "T-013"]
+    },
+    "backend/canvas/models/commitment.py": {
+      "owner": "T-002", 
+      "action": "CREATE",
+      "importers": ["T-003", "T-005", "T-007", "T-013"]
+    },
+    "backend/canvas/reviews/service.py": {
+      "owner": "T-003",
+      "action": "CREATE", 
+      "importers": ["T-007", "T-008", "T-013", "T-014"]
+    },
+    "backend/canvas/reviews/schemas.py": {
+      "owner": "T-004",
+      "action": "CREATE",
+      "importers": ["T-009", "T-012", "T-014"]
+    },
+    "alembic/versions/004_monthly_reviews.py": {
+      "owner": "T-005",
+      "action": "CREATE",
+      "importers": []
+    },
+    "backend/canvas/reviews/router.py": {
+      "owner": "T-014",
+      "action": "CREATE",
+      "importers": ["T-018"]
+    },
+    "frontend/src/reviews/ReviewWizard.tsx": {
+      "owner": "T-015",
+      "action": "CREATE",
+      "importers": ["T-017", "T-018"]
+    },
+    "frontend/src/reviews/ReviewHistory.tsx": {
+      "owner": "T-016", 
+      "action": "CREATE",
+      "importers": ["T-018"]
+    }
+  },
+  "interfaces": {
+    "MonthlyReview.model": {
+      "location": "backend/canvas/models/monthly_review.py",
+      "signature": "class MonthlyReview(Base, TimestampMixin)",
+      "defined_by": "T-001",
+      "consumed_by": ["T-002", "T-003", "T-005", "T-007", "T-013"]
+    },
+    "Commitment.model": {
+      "location": "backend/canvas/models/commitment.py", 
+      "signature": "class Commitment(Base, TimestampMixin)",
+      "defined_by": "T-002",
+      "consumed_by": ["T-003", "T-005", "T-007", "T-013"]
+    },
+    "ReviewService.list_reviews": {
+      "location": "backend/canvas/reviews/service.py",
+      "signature": "async def list_reviews(self, canvas_id: UUID) -> List[MonthlyReview]",
+      "defined_by": "T-003",
+      "consumed_by": ["T-007", "T-008", "T-013", "T-014"]
+    },
+    "ReviewService.create_review": {
+      "location": "backend/canvas/reviews/service.py",
+      "signature": "async def create_review(self, canvas_id: UUID, review_data: dict, created_by: UUID) -> MonthlyReview",
+      "defined_by": "T-003", 
+      "consumed_by": ["T-007", "T-008", "T-013", "T-014"]
+    },
+    "ReviewService.get_review": {
+      "location": "backend/canvas/reviews/service.py",
+      "signature": "async def get_review(self, review_id: UUID) -> MonthlyReview",
+      "defined_by": "T-003",
+      "consumed_by": ["T-007", "T-008", "T-013", "T-014"]
+    },
+    "ReviewCreateSchema": {
+      "location": "backend/canvas/reviews/schemas.py",
+      "signature": "class ReviewCreateSchema(BaseModel)",
+      "defined_by": "T-004",
+      "consumed_by": ["T-009", "T-012", "T-014"]
+    },
+    "ReviewResponse": {
+      "location": "backend/canvas/reviews/schemas.py", 
+      "signature": "class ReviewResponse(BaseModel)",
+      "defined_by": "T-004",
+      "consumed_by": ["T-009", "T-012", "T-014"]
+    }
+  },
+  "naming": {
+    "table_names": "plural",
+    "module_pattern": "backend/canvas/reviews/ for review-specific code",
+    "import_base": "from canvas.{module} import {class}"
+  },
+  "conventions": {
+    "model_relationships": "Use SQLAlchemy relationship() with back_populates for bidirectional relationships",
+    "service_methods": "All service methods async, return domain models not dicts",
+    "schema_validation": "Pydantic v2 with Field() constraints and custom validators",
+    "database_trigger": "PostgreSQL trigger function update_canvas_currently_testing() for atomic canvas updates",
+    "file_attachments": "Use AttachmentService.upload() with monthly_review_id linkage",
+    "authorization": "Use get_current_user and require_role from canvas.auth.dependencies",
+    "response_format": "Use success_response and list_response from canvas.__init__"
+  },
+  "deferred": [],
+  "warnings": [
+    "T-006 database trigger must be created before T-007 integration tests run",
+    "T-013 ReviewService implementation depends on AttachmentService interface stability",
+    "T-017 auto-save functionality requires careful state management to avoid conflicts"
+  ]
+}
