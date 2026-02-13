@@ -122,3 +122,5 @@
 | frontend/src/canvas/CanvasPage.tsx | 004-monthly-review | T-018 | MODIFY |
 | frontend/src/reviews/index.ts | 004-monthly-review | T-018 | CREATE |
 | frontend/src/App.tsx | 003-portfolio-dashboard | T-014 | MODIFY |
+| .env.dev | 001A-infrastructure | T-010 | CREATE |
+| .env.prod | 001A-infrastructure | T-010 | CREATE |
