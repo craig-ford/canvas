@@ -426,3 +426,4 @@ const CanvasPage: React.FC = () => {
 };
 
 export default CanvasPage;
+export { CanvasPage };

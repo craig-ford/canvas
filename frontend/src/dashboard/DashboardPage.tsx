@@ -1,4 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useAuth } from '../auth/useAuth';
+import { usePortfolio } from './hooks/usePortfolio';
+import { DashboardFilters } from './DashboardFilters';
+import VBUTable from './VBUTable';
+import { PortfolioNotes } from './PortfolioNotes';
+
+interface FilterState {
+  lanes: string[];
+  gmIds: string[];
+  healthStatuses: string[];
+}
 
 interface VBUSummary {
   id: string;
@@ -13,52 +25,34 @@ interface VBUSummary {
   portfolio_notes?: string;
 }
 
-interface FilterState {
-  lanes: string[];
-  gmIds: string[];
-  healthStatuses: string[];
-}
-
 export const DashboardPage: React.FC = () => {
-  const [vbus, setVBUs] = useState<VBUSummary[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  
   const [filters, setFilters] = useState<FilterState>({
-    lanes: [],
-    gmIds: [],
-    healthStatuses: []
+    lanes: searchParams.get('lanes')?.split(',').filter(Boolean) || [],
+    gmIds: searchParams.get('gmIds')?.split(',').filter(Boolean) || [],
+    healthStatuses: searchParams.get('healthStatuses')?.split(',').filter(Boolean) || []
   });
 
-  // Mock useAuth hook result
-  const user = { id: '1', name: 'Test User', role: 'viewer' };
+  const { vbus, loading, error, refetch } = usePortfolio(filters);
 
+  // Sync filters with URL parameters
   useEffect(() => {
-    const fetchPortfolio = async () => {
-      setLoading(true);
-      setError(null);
-      
-      try {
-        // Mock API call - will be replaced with actual implementation
-        const params = new URLSearchParams();
-        if (filters.lanes.length) params.set('lane', filters.lanes.join(','));
-        if (filters.gmIds.length) params.set('gm_id', filters.gmIds.join(','));
-        if (filters.healthStatuses.length) params.set('health_status', filters.healthStatuses.join(','));
-        
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 100));
-        setVBUs([]);
-      } catch (err) {
-        setError('Error loading portfolio data');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPortfolio();
-  }, [filters]);
+    const params = new URLSearchParams();
+    if (filters.lanes.length) params.set('lanes', filters.lanes.join(','));
+    if (filters.gmIds.length) params.set('gmIds', filters.gmIds.join(','));
+    if (filters.healthStatuses.length) params.set('healthStatuses', filters.healthStatuses.join(','));
+    setSearchParams(params);
+  }, [filters, setSearchParams]);
 
   const handleFiltersChange = (newFilters: FilterState) => {
     setFilters(newFilters);
+  };
+
+  const handleClearFilters = () => {
+    setFilters({ lanes: [], gmIds: [], healthStatuses: [] });
   };
 
   const handleExportPDF = (vbuId: string) => {
@@ -67,19 +61,25 @@ export const DashboardPage: React.FC = () => {
   };
 
   const handleViewVBU = (vbuId: string) => {
-    // Navigation functionality will be implemented
-    console.log('View VBU:', vbuId);
-  };
-
-  const handleClearFilters = () => {
-    setFilters({ lanes: [], gmIds: [], healthStatuses: [] });
+    navigate(`/vbus/${vbuId}`);
   };
 
   if (loading) {
     return (
       <main className="p-6" aria-label="Portfolio Dashboard">
-        <h1 className="text-2xl font-bold mb-6">Portfolio Dashboard</h1>
-        <div data-testid="loading-state">Loading...</div>
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-2xl font-bold text-gray-900 mb-6">Portfolio Dashboard</h1>
+          <div data-testid="loading-state" className="flex items-center justify-center h-64">
+            <div className="animate-pulse space-y-4 w-full">
+              <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+              <div className="space-y-2">
+                <div className="h-4 bg-gray-200 rounded"></div>
+                <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+                <div className="h-4 bg-gray-200 rounded w-4/6"></div>
+              </div>
+            </div>
+          </div>
+        </div>
       </main>
     );
   }
@@ -87,10 +87,23 @@ export const DashboardPage: React.FC = () => {
   if (error) {
     return (
       <main className="p-6" aria-label="Portfolio Dashboard">
-        <h1 className="text-2xl font-bold mb-6">Portfolio Dashboard</h1>
-        <div data-testid="error-state">
-          <p>Error loading portfolio data</p>
-          <button onClick={() => window.location.reload()}>Retry</button>
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-2xl font-bold text-gray-900 mb-6">Portfolio Dashboard</h1>
+          <div data-testid="error-state" className="text-center py-12">
+            <div className="text-red-600 mb-4">
+              <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+            </div>
+            <p className="text-gray-900 font-medium mb-2">Error loading portfolio data</p>
+            <p className="text-gray-500 mb-4">Please try again or contact support if the problem persists.</p>
+            <button
+              onClick={refetch}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Retry
+            </button>
+          </div>
         </div>
       </main>
     );
@@ -99,10 +112,28 @@ export const DashboardPage: React.FC = () => {
   if (vbus.length === 0) {
     return (
       <main className="p-6" aria-label="Portfolio Dashboard">
-        <h1 className="text-2xl font-bold mb-6">Portfolio Dashboard</h1>
-        <div data-testid="empty-state">
-          <p>No VBUs found</p>
-          <button onClick={handleClearFilters}>Clear Filters</button>
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-2xl font-bold text-gray-900 mb-6">Portfolio Dashboard</h1>
+          
+          <div className="space-y-6">
+            <DashboardFilters filters={filters} onFiltersChange={handleFiltersChange} />
+            
+            <div data-testid="empty-state" className="text-center py-12">
+              <div className="text-gray-400 mb-4">
+                <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+              </div>
+              <p className="text-gray-900 font-medium mb-2">No VBUs found</p>
+              <p className="text-gray-500 mb-4">Try adjusting your filters or check back later.</p>
+              <button
+                onClick={handleClearFilters}
+                className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                Clear Filters
+              </button>
+            </div>
+          </div>
         </div>
       </main>
     );
@@ -110,34 +141,22 @@ export const DashboardPage: React.FC = () => {
 
   return (
     <main className="p-6" aria-label="Portfolio Dashboard">
-      <h1 className="text-2xl font-bold mb-6">Portfolio Dashboard</h1>
-      
-      <div data-testid="dashboard-content" className="space-y-6">
-        <div data-testid="dashboard-filters">
-          <button onClick={() => handleFiltersChange({ lanes: ['build'], gmIds: [], healthStatuses: [] })}>
-            Apply Filter
-          </button>
-          <button onClick={() => handleFiltersChange({ lanes: [], gmIds: [], healthStatuses: [] })}>
-            Clear Filters
-          </button>
-        </div>
-
-        <div role="region" aria-label="VBU list">
-          <div data-testid="vbu-table">
-            <div>VBU Count: {vbus.length}</div>
-            {vbus.map((vbu) => (
-              <div key={vbu.id} data-testid={`vbu-${vbu.id}`}>
-                {vbu.name}
-                <button onClick={() => handleExportPDF(vbu.id)}>Export PDF</button>
-                <button onClick={() => handleViewVBU(vbu.id)}>View VBU</button>
-              </div>
-            ))}
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">Portfolio Dashboard</h1>
+        
+        <div data-testid="dashboard-content" className="space-y-6">
+          <DashboardFilters filters={filters} onFiltersChange={handleFiltersChange} />
+          
+          <div role="region" aria-label="VBU list" className="bg-white rounded-lg border">
+            <VBUTable 
+              vbus={vbus}
+              onExportPDF={handleExportPDF}
+              onViewVBU={handleViewVBU}
+            />
           </div>
-        </div>
 
-        {user.role === 'admin' && (
-          <div data-testid="portfolio-notes">Portfolio Notes</div>
-        )}
+          {user?.role === 'admin' && <PortfolioNotes />}
+        </div>
       </div>
     </main>
   );

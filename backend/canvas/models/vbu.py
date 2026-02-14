@@ -11,6 +11,7 @@ class VBU(Base, TimestampMixin):
     updated_by = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
     
     # Relationships
+    gm = relationship("User", foreign_keys=[gm_id])
     canvas = relationship("Canvas", back_populates="vbu", uselist=False, cascade="all, delete-orphan")
     
     __table_args__ = (

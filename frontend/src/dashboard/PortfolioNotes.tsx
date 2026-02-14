@@ -1,37 +1,14 @@
 import React, { useState, useCallback } from 'react';
+import { useAuth } from '../auth/useAuth';
+import { apiClient } from '../api/client';
 
-interface User {
-  id: string;
-  name: string;
-  role: string;
-}
-
-interface UseAuthResult {
-  user: User | null;
-  isAuthenticated: boolean;
-}
-
-// Mock useAuth hook - will be replaced with actual implementation
-const useAuth = (): UseAuthResult => ({
-  user: { id: '1', name: 'Test User', role: 'viewer' },
-  isAuthenticated: true
-});
-
-// Mock debounce function - will be replaced with actual lodash.debounce
+// Simple debounce utility since lodash is not available
 const debounce = (fn: Function, delay: number) => {
   let timeoutId: NodeJS.Timeout;
   return (...args: any[]) => {
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => fn(...args), delay);
   };
-};
-
-// Mock API client - will be replaced with actual implementation
-const api = {
-  patch: async (url: string, data: any) => {
-    // Simulate API call
-    return { data: { success: true } };
-  }
 };
 
 type SaveStatus = 'saved' | 'saving' | 'error';
@@ -48,7 +25,7 @@ export const PortfolioNotes: React.FC = () => {
 
       setSaveStatus('saving');
       try {
-        await api.patch('/portfolio/notes', { notes: value });
+        await apiClient.patch('/portfolio/notes', { notes: value });
         setSaveStatus('saved');
       } catch (error) {
         setSaveStatus('error');

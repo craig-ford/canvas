@@ -1,7 +1,7 @@
 """Pydantic schemas for canvas management API."""
 
-from datetime import date
-from typing import Optional
+from datetime import date, datetime
+from typing import Optional, List
 from uuid import UUID
 from pydantic import BaseModel, Field
 from canvas.models.canvas import LifecycleLane, CurrentlyTestingType
@@ -54,3 +54,65 @@ class ProofPointUpdate(BaseModel):
     status: Optional[ProofPointStatus] = None
     evidence_note: Optional[str] = None
     target_review_month: Optional[date] = None
+
+
+# Response schemas
+class AttachmentResponse(BaseModel):
+    id: UUID
+    filename: str
+    content_type: str
+    size_bytes: int
+    label: Optional[str]
+    uploaded_by: UUID
+    created_at: datetime
+
+
+class ProofPointResponse(BaseModel):
+    id: UUID
+    description: str
+    status: ProofPointStatus
+    evidence_note: Optional[str]
+    target_review_month: Optional[date]
+    attachments: List[AttachmentResponse]
+    created_at: datetime
+    updated_at: datetime
+
+
+class ThesisResponse(BaseModel):
+    id: UUID
+    order: int
+    text: str
+    proof_points: List[ProofPointResponse]
+    created_at: datetime
+    updated_at: datetime
+
+
+class CanvasResponse(BaseModel):
+    id: UUID
+    vbu_id: UUID
+    product_name: Optional[str]
+    lifecycle_lane: LifecycleLane
+    success_description: Optional[str]
+    future_state_intent: Optional[str]
+    primary_focus: Optional[str]
+    resist_doing: Optional[str]
+    good_discipline: Optional[str]
+    primary_constraint: Optional[str]
+    currently_testing_type: Optional[CurrentlyTestingType]
+    currently_testing_id: Optional[UUID]
+    portfolio_notes: Optional[str]
+    theses: List[ThesisResponse]
+    created_at: datetime
+    updated_at: datetime
+    updated_by: Optional[UUID]
+
+
+# Response schemas
+class VBUResponse(BaseModel):
+    id: UUID
+    name: str
+    gm_id: UUID
+    gm_name: str
+    created_at: datetime
+    updated_at: datetime
+    updated_by: Optional[UUID]

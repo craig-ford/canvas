@@ -50,7 +50,7 @@ class CanvasService:
 
     async def list_vbus(self, current_user: User, db: AsyncSession) -> List[VBU]:
         """List VBUs filtered by user role"""
-        query = select(VBU)
+        query = select(VBU).options(selectinload(VBU.gm))
         if current_user.role == UserRole.GM:
             query = query.where(VBU.gm_id == current_user.id)
         
@@ -182,3 +182,77 @@ class CanvasService:
         
         await db.delete(proof_point)
         await db.commit()
+
+    async def get_canvas_by_vbu_id_for_auth(self, canvas_id: UUID, current_user: User, db: AsyncSession) -> Canvas:
+        """Get canvas with authorization check"""
+        result = await db.execute(
+            select(Canvas)
+            .join(VBU, Canvas.vbu_id == VBU.id)
+            .where(Canvas.id == canvas_id)
+        )
+        canvas = result.scalar_one_or_none()
+        if not canvas:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Canvas not found")
+        
+        # Authorization check
+        if current_user.role == UserRole.GM:
+            vbu_result = await db.execute(select(VBU).where(VBU.id == canvas.vbu_id))
+            vbu = vbu_result.scalar_one()
+            if vbu.gm_id != current_user.id:
+                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+        
+        return canvas
+
+    async def get_theses_by_canvas(self, canvas_id: UUID, db: AsyncSession) -> List[Thesis]:
+        """Get theses for canvas ordered by order"""
+        result = await db.execute(
+            select(Thesis)
+            .where(Thesis.canvas_id == canvas_id)
+            .order_by(Thesis.order)
+        )
+        return list(result.scalars().all())
+
+    async def verify_canvas_ownership(self, canvas_id: UUID, current_user: User, db: AsyncSession) -> None:
+        """Verify user can modify canvas"""
+        if current_user.role == UserRole.ADMIN:
+            return
+        
+        result = await db.execute(
+            select(Canvas)
+            .join(VBU, Canvas.vbu_id == VBU.id)
+            .where(Canvas.id == canvas_id)
+        )
+        canvas = result.scalar_one_or_none()
+        if not canvas:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Canvas not found")
+        
+        vbu_result = await db.execute(select(VBU).where(VBU.id == canvas.vbu_id))
+        vbu = vbu_result.scalar_one()
+        if vbu.gm_id != current_user.id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
+    async def verify_thesis_ownership(self, thesis_id: UUID, current_user: User, db: AsyncSession) -> None:
+        """Verify user can modify thesis"""
+        if current_user.role == UserRole.ADMIN:
+            return
+        
+        result = await db.execute(
+            select(Thesis)
+            .join(Canvas, Thesis.canvas_id == Canvas.id)
+            .join(VBU, Canvas.vbu_id == VBU.id)
+            .where(Thesis.id == thesis_id)
+        )
+        thesis = result.scalar_one_or_none()
+        if not thesis:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Thesis not found")
+        
+        canvas_result = await db.execute(
+            select(Canvas)
+            .join(VBU, Canvas.vbu_id == VBU.id)
+            .where(Canvas.id == thesis.canvas_id)
+        )
+        canvas = canvas_result.scalar_one()
+        vbu_result = await db.execute(select(VBU).where(VBU.id == canvas.vbu_id))
+        vbu = vbu_result.scalar_one()
+        if vbu.gm_id != current_user.id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
