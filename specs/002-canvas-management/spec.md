@@ -231,14 +231,14 @@ class Canvas(TimestampMixin, Base):
     
     vbu_id = Column(UUID(as_uuid=True), ForeignKey("vbus.id", ondelete="CASCADE"), unique=True, nullable=False)
     product_name = Column(String(255), CheckConstraint("product_name IS NULL OR LENGTH(TRIM(product_name)) > 0"))
-    lifecycle_lane = Column(Enum(LifecycleLane), nullable=False, default=LifecycleLane.BUILD)
+    lifecycle_lane = Column(ENUM('build','sell','milk','reframe', name='lifecycle_lane_enum'), nullable=False, server_default='build')  # ENUM, default 'build'
     success_description = Column(Text)
     future_state_intent = Column(Text)
     primary_focus = Column(String(255))
     resist_doing = Column(Text)
     good_discipline = Column(Text)
     primary_constraint = Column(Text)
-    currently_testing_type = Column(Enum(CurrentlyTestingType))
+    currently_testing_type = Column(ENUM('thesis','proof_point', name='currently_testing_type_enum'))  # NULLABLE
     currently_testing_id = Column(UUID(as_uuid=True))
     portfolio_notes = Column(Text)  # Admin-only field
     updated_by = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"))
@@ -310,7 +310,7 @@ class Attachment(TimestampMixin, Base):
     monthly_review_id = Column(UUID(as_uuid=True), ForeignKey("monthly_reviews.id", ondelete="CASCADE"))
     filename = Column(String(255), nullable=False, CheckConstraint("LENGTH(TRIM(filename)) > 0"))
     storage_path = Column(String(1024), nullable=False, unique=True, CheckConstraint("LENGTH(TRIM(storage_path)) > 0"))
-    content_type = Column(String(128), nullable=False, CheckConstraint("content_type IN ('image/jpeg','image/png','image/gif','application/pdf','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','application/vnd.openxmlformats-officedocument.wordprocessingml.document','application/vnd.openxmlformats-officedocument.presentationml.presentation')"))
+    content_type = Column(String(128), nullable=False, CheckConstraint("content_type IN ('image/jpeg','image/png','image/gif','application/pdf','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','application/vnd.openxmlformats-officedocument.wordprocessingml.document','application/vnd.openxmlformats-officedocument.presentationml.presentation')"))  # CHECK(content_type IN (...))
     size_bytes = Column(Integer, nullable=False, CheckConstraint("size_bytes BETWEEN 1 AND 10485760"))
     label = Column(String(255), CheckConstraint("label IS NULL OR LENGTH(TRIM(label)) > 0"))
     uploaded_by = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="RESTRICT"), nullable=False)

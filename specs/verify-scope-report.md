@@ -4,64 +4,56 @@
 | Feature | FRs | 3A Coverage | 3I Conflicts | Status |
 |---------|-----|-------------|--------------|--------|
 | 001A-infrastructure | 15 | ✓ | ✓ | PASS |
-| 001-auth | 6 | ✓ | ✓ | PASS |
-| 002-canvas-management | 8 | ✓ | ✓ | PASS |
+| 001-auth | 6 | ✓ | ✗ | FAIL |
+| 002-canvas-management | 8 | ✓ | ✗ | FAIL |
 | 003-portfolio-dashboard | 5 | ✓ | ✓ | PASS |
-| 004-monthly-review | 6 | ✓ | ✓ | PASS |
+| 004-monthly-review | 6 | ✓ | ✗ | FAIL |
 
 ## Coverage Gaps (3A)
 None
 
 ## Scope Conflicts (3I)
-None
+| Feature | File | Issue | Tasks |
+|---------|------|-------|-------|
+| 001-auth | backend/canvas/auth/dependencies.py | CREATE/CREATE conflict | T-004, T-015 |
+| 002-canvas-management | backend/canvas/services/attachment_service.py | CREATE/CREATE conflict | T-002, T-013 |
+| 004-monthly-review | backend/canvas/reviews/service.py | CREATE/CREATE conflict | T-003, T-013 |
 
-## Additional Checks
+## File-Map Consistency Issues
+None - all task scope files match file-map.md entries
 
-### Path Consistency
-All features maintain consistent path prefixes:
-- Backend files use `backend/` prefix consistently
-- Frontend files use `frontend/src/` prefix consistently
-- No bare files without proper directory structure
+## Path Consistency Issues
+None - all features maintain consistent path prefixes
 
-### Orphaned Preparations
-No orphaned preparation tasks found. All placeholder/TODO references have corresponding implementation tasks.
+## Orphaned Preparations
+None - no dangling placeholder/TODO preparations found
 
-### Wiring Completeness
-All component creation tasks have corresponding wiring:
-- 003-portfolio-dashboard/T-014 creates DashboardPage.tsx and wires it to App.tsx
-- 004-monthly-review/T-018 creates ReviewWizard and wires it to App.tsx
-- All frontend components properly integrated into routing
+## Wiring Completeness
+✓ PASS - App.tsx properly modified by features creating components:
+- 003-portfolio-dashboard/T-014 modifies App.tsx for DashboardPage
+- 004-monthly-review/T-018 modifies App.tsx for ReviewWizard
 
-## File-Map Consistency
-All task Scope sections match the entries in specs/file-map.md. No discrepancies found between planned file operations and actual task scopes.
+## Additional Findings
 
-## Overall: 5 PASS, 0 FAIL
+### CREATE/CREATE Conflicts Detail
+1. **001-auth dependencies.py**: T-004 creates the file, T-015 should MODIFY it instead of CREATE
+2. **002-canvas-management attachment_service.py**: T-002 creates the file, T-013 should MODIFY it instead of CREATE  
+3. **004-monthly-review service.py**: T-003 creates the file, T-013 should MODIFY it instead of CREATE
 
-All features pass both 3A (FR coverage) and 3I (scope conflicts) checks. The project maintains good architectural consistency with proper file organization, complete wiring, and comprehensive functional requirement coverage.
+### FR Coverage Analysis
+All functional requirements from spec.md files have implementing tasks:
 
-## Detailed Analysis
+**001A-infrastructure (15 FRs)**: All covered by T-001 through T-012
+**001-auth (6 FRs)**: All covered by T-001 through T-016  
+**002-canvas-management (8 FRs)**: All covered by T-001 through T-020
+**003-portfolio-dashboard (5 FRs)**: All covered by T-001 through T-018
+**004-monthly-review (6 FRs)**: All covered by T-001 through T-018
 
-### 001A-infrastructure
-- **FRs Covered**: All 15 functional requirements (FR-INFRA-001 through FR-INFRA-015) are covered by tasks T-001 through T-012
-- **Key Coverage**: Docker setup (T-010), database configuration (T-007), health endpoints (T-009), frontend scaffolding (T-011)
-- **File Operations**: All CREATE operations, no conflicts
+### Cross-Feature Dependencies
+✓ All cross-feature dependencies properly declared in task predecessor tables
+✓ No circular dependencies detected
+✓ Proper import statements specified in task contracts
 
-### 001-auth
-- **FRs Covered**: All 6 functional requirements (FR-001 through FR-006) covered by comprehensive task set
-- **Key Coverage**: User registration (T-002), authentication (T-013), JWT tokens (T-013), role-based access (T-015)
-- **File Operations**: Proper CREATE/MODIFY sequence, no conflicts
+## Overall: 2 PASS, 3 FAIL
 
-### 002-canvas-management
-- **FRs Covered**: All 8 functional requirements (FR-001 through FR-008) covered by tasks T-001 through T-020
-- **Key Coverage**: VBU management, canvas CRUD, thesis/proof point management, file attachments
-- **File Operations**: Complex file structure properly managed, no conflicts
-
-### 003-portfolio-dashboard
-- **FRs Covered**: All 5 functional requirements (FR-001 through FR-005) covered by tasks T-001 through T-018
-- **Key Coverage**: Portfolio summary API, filtering, PDF export, dashboard UI
-- **File Operations**: Frontend components properly created and wired
-
-### 004-monthly-review
-- **FRs Covered**: All 6 functional requirements (FR-001 through FR-006) covered by tasks T-001 through T-018
-- **Key Coverage**: Review wizard, commitments, currently testing selection, review history
-- **File Operations**: Complete end-to-end integration with proper wiring
+**Recommendation**: Fix the 3 CREATE/CREATE conflicts by changing the second CREATE operations to MODIFY operations in the affected tasks.

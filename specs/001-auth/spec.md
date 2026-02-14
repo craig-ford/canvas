@@ -244,11 +244,11 @@ class User(Base, TimestampMixin):
     email = Column(String(255), unique=True, nullable=False, index=True)
     password_hash = Column(String(255), nullable=False)
     name = Column(String(255), nullable=False)
-    role = Column(Enum('admin','gm','viewer', name='user_role_enum'), nullable=False, server_default='viewer')
-    is_active = Column(Boolean, nullable=False, default=True)
-    last_login_at = Column(DateTime(timezone=True), nullable=True)
-    failed_login_attempts = Column(Integer, nullable=False, default=0)
-    locked_until = Column(DateTime(timezone=True), nullable=True)
+    role = Column(ENUM('admin','gm','viewer', name='user_role_enum'), nullable=False, server_default='viewer')  # ENUM('admin','gm','viewer')
+    is_active = Column(Boolean, nullable=False, server_default=text('true'))  # NOT NULL, default True
+    last_login_at = Column(TIMESTAMPTZ, nullable=True)  # TIMESTAMPTZ, NULLABLE
+    failed_login_attempts = Column(Integer, nullable=False, server_default=text('0'))
+    locked_until = Column(TIMESTAMPTZ, nullable=True)  # TIMESTAMPTZ, NULLABLE
 
 class UserRole(str, Enum):
     ADMIN = "admin"

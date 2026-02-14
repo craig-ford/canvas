@@ -19,7 +19,7 @@
 | backend/alembic/versions/001_create_users_table.py | 001-auth | T-012 | CREATE |
 | backend/canvas/auth/service.py | 001-auth | T-013 | MODIFY |
 | backend/canvas/auth/user_service.py | 001-auth | T-014 | MODIFY |
-| backend/canvas/auth/dependencies.py | 001-auth | T-015 | CREATE |
+| backend/canvas/auth/dependencies.py | 001-auth | T-015 | MODIFY |
 | backend/canvas/auth/routes.py | 001-auth | T-016 | CREATE |
 | backend/tests/test_models_contract.py | 001A-infrastructure | T-001 | CREATE |
 | backend/tests/test_responses_contract.py | 001A-infrastructure | T-001 | CREATE |
@@ -59,7 +59,7 @@
 | backend/tests/test_proof_point_service.py | 002-canvas-management | T-010 | CREATE |
 | backend/tests/unit/test_attachment_service.py | 002-canvas-management | T-011 | CREATE |
 | backend/canvas/services/canvas_service.py | 002-canvas-management | T-012 | MODIFY |
-| backend/canvas/services/attachment_service.py | 002-canvas-management | T-013 | CREATE |
+| backend/canvas/services/attachment_service.py | 002-canvas-management | T-013 | MODIFY |
 | backend/canvas/routes/vbu.py | 002-canvas-management | T-014 | CREATE |
 | backend/canvas/routes/canvas.py | 002-canvas-management | T-015 | CREATE |
 | backend/canvas/routes/thesis.py | 002-canvas-management | T-016 | CREATE |
@@ -107,7 +107,7 @@
 | backend/tests/reviews/test_service_unit.py | 004-monthly-review | T-010 | CREATE |
 | backend/tests/models/test_monthly_review_relationships.py | 004-monthly-review | T-011 | CREATE |
 | backend/tests/schemas/test_commitment_validation.py | 004-monthly-review | T-012 | CREATE |
-| backend/canvas/reviews/service.py | 004-monthly-review | T-013 | CREATE |
+| backend/canvas/reviews/service.py | 004-monthly-review | T-013 | MODIFY |
 | backend/canvas/reviews/router.py | 004-monthly-review | T-014 | CREATE |
 | backend/canvas/reviews/schemas.py | 004-monthly-review | T-014 | MODIFY |
 | frontend/src/reviews/ReviewWizard.tsx | 004-monthly-review | T-015 | CREATE |

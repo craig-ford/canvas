@@ -11,20 +11,16 @@
 ## Summary
 | Feature | 3F Ambig | 3J URLs | Status |
 |---------|----------|---------|--------|
-| 001A-infrastructure | ✗ | ✓ | FAIL |
+| 001A-infrastructure | ✓ | ✓ | PASS |
 | 001-auth | ✓ | ✓ | PASS |
 | 002-canvas-management | ✓ | ✓ | PASS |
 | 003-portfolio-dashboard | ✓ | ✓ | PASS |
-| 004-monthly-review | ✗ | ✓ | FAIL |
+| 004-monthly-review | ✓ | ✓ | PASS |
 
 ## Ambiguities Found (3F)
-| Feature | Task | Section | Text |
-|---------|------|---------|------|
-| 001A-infrastructure | T-008 | Logic | Add exception handler for HTTPException that returns error envelope format |
-| 001A-infrastructure | T-008 | Logic | Add exception handler for general Exception that returns 500 error envelope |
-| 004-monthly-review | T-016 | Logic | Handle loading and error states |
+None
 
 ## URL Violations (3J)
 None
 
-## Overall: 3 PASS, 2 FAIL
+## Overall: 5 PASS, 0 FAIL
