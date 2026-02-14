@@ -20,43 +20,47 @@ None
 ## Detailed Analysis
 
 ### 001A-infrastructure
-- **Data Model Section:** Not found (no entities defined)
-- **Check 1C:** PASS (no entities to verify)
-- **Check 1D:** PASS (no contradictions possible)
+- No Data Model section found in spec.md (infrastructure feature)
+- CHECK 1C: PASS (no entities to verify)
+- CHECK 1D: PASS (no contradictions possible)
 
 ### 001-auth
-- **Entities Found:** User
-- **Check 1C:** PASS - All User entity fields match schema.md exactly:
-  - Field names, types, constraints, and nullability all consistent
-  - ENUM values match: ('admin','gm','viewer')
-  - All timestamp fields use TIMESTAMPTZ as required
-- **Check 1D:** PASS - No contradictions found within User entity definition
+- Entity: User
+- All fields match schema.md exactly:
+  - Field names: ✓ (id, email, password_hash, name, role, is_active, last_login_at, failed_login_attempts, locked_until, created_at, updated_at)
+  - Types: ✓ (UUID, VARCHAR(255), BOOLEAN, TIMESTAMPTZ, INTEGER, ENUM('admin','gm','viewer'))
+  - Constraints: ✓ (PK, UNIQUE, NOT NULL, NULLABLE, defaults match)
+- CHECK 1C: PASS
+- CHECK 1D: PASS (no contradictions found)
 
 ### 002-canvas-management
-- **Entities Found:** VBU, Canvas, Thesis, ProofPoint, Attachment
-- **Check 1C:** PASS - All entity fields match schema.md exactly:
-  - VBU: All fields consistent with schema
-  - Canvas: All fields including ENUM values match
-  - Thesis: All fields and constraints match
-  - ProofPoint: All fields including status ENUM match
-  - Attachment: All fields including content_type constraint match
-- **Check 1D:** PASS - No contradictions found in any entity definitions
+- Entities: VBU, Canvas, Thesis, ProofPoint, Attachment
+- All entities match schema.md exactly:
+  - VBU: All fields and constraints match
+  - Canvas: All fields and constraints match (including ENUM values for lifecycle_lane and currently_testing_type)
+  - Thesis: All fields and constraints match (including CHECK(order BETWEEN 1 AND 5))
+  - ProofPoint: All fields and constraints match (including ENUM values for status)
+  - Attachment: All fields and constraints match (including content_type CHECK constraint with all MIME types)
+- CHECK 1C: PASS
+- CHECK 1D: PASS (no contradictions found)
 
 ### 003-portfolio-dashboard
-- **Data Model Section:** Contains response models and frontend components, no database entities
-- **Check 1C:** PASS (no database entities to verify against schema.md)
-- **Check 1D:** PASS (no entity contradictions possible)
+- No entity tables in Data Model section (only response models and frontend components)
+- CHECK 1C: PASS (no entities to verify)
+- CHECK 1D: PASS (no contradictions possible)
 
 ### 004-monthly-review
-- **Entities Found:** MonthlyReview, Commitment
-- **Check 1C:** PASS - All entity fields match schema.md exactly:
-  - MonthlyReview: All fields, types, and constraints consistent
-  - Commitment: All fields including CHECK constraints match
-- **Check 1D:** PASS - No contradictions found within entity definitions
+- Entities: MonthlyReview, Commitment
+- All entities match schema.md exactly:
+  - MonthlyReview: All fields and constraints match (including ENUM('thesis','proof_point') for currently_testing_type)
+  - Commitment: All fields and constraints match (including CHECK(length(text) BETWEEN 1 AND 1000) and CHECK(order BETWEEN 1 AND 3))
+- CHECK 1C: PASS
+- CHECK 1D: PASS (no contradictions found)
 
 ## Notes
-- All spec.md files use proper SQL DDL format with markdown tables as expected from run 7 rewrite
-- No SQLAlchemy Column() syntax found (which would have been flagged as an issue)
-- All ENUM definitions use inline values matching schema.md format
-- All timestamp fields consistently use TIMESTAMPTZ type
-- All constraint definitions match between spec.md and schema.md
+- All spec.md Data Model sections now use canonical SQL DDL types matching schema.md exactly
+- No SQLAlchemy Column() syntax found (previous issue resolved)
+- All ENUM types use inline values format: ENUM('value1','value2','value3')
+- All constraint syntax matches schema.md format
+- No field name, type, or constraint mismatches detected
+- No internal contradictions found in any entity definitions

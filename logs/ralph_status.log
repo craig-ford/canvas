@@ -2,11 +2,11 @@
 EXIT_SIGNAL: false
 CURRENT_MODE: verify
 CURRENT_FEATURE: all
-ACTION_COMPLETED: Verify run 10 complete. 4/7 agents PASS, 3 FAIL. Fixed: 14 empty test bodies in 004-monthly-review (T-007,T-008,T-009,T-011,T-012), /api prefix on 003 portfolio router (T-003,T-007). 2 ambiguity flags assessed as false positives (text not in files). 3 scope PARTIAL flags assessed as false positives (FRs have coverage). Counter reset to 0.
+ACTION_COMPLETED: Verify run 11 complete. 6/7 agents PASS, 1 FAIL (verify-contracts: 5 wrong import patterns in 002-canvas-management T-006,T-007,T-008,T-009,T-010). Fixed: corrected all predecessor table entries and Contract section imports from auth.dependencies/backend.auth.dependencies to canvas.auth.dependencies. Counter reset to 0.
 FEATURES_TOTAL: 5
 FEATURES_WITH_SPECS: 5
 FEATURES_WITH_PLANS: 5
 FEATURES_WITH_TASKS: 5
 FEATURES_VERIFIED: 0 (counter at 0, need 2 clean passes)
-RECOMMENDATION: Run verify again (run 11). The real fixes were test body stubs and URL prefix. Ambiguity and scope flags were false positives. Next run should be cleaner.
+RECOMMENDATION: Run verify again (run 12). Only 1 real issue found this run (wrong import pattern that was missed in earlier runs). All other 6 agents passed clean. Next run should be fully clean — if so, counter goes to 1.
 ---END_RALPH_STATUS---
