@@ -8,8 +8,8 @@ Total: 16 tasks | Complete: 4 | Remaining: 12
 - [x] **T-002: AuthService Contract Tests** - Define authentication service interface with JWT and bcrypt | deps: T-001
 - [x] **T-003: UserService Contract Tests** - Define user management service interface for CRUD operations | deps: T-001
 - [x] **T-004: Auth Dependencies Contract Tests** - Define get_current_user and require_role dependency functions | deps: T-002
-- [ ] **T-005: Auth Routes Integration Tests** - Test complete auth flow with real database and JWT | deps: T-002, T-004
-- [ ] **T-006: User Management Routes Integration Tests** - Test admin user management endpoints with authorization | deps: T-003, T-004
+- [x] **T-005: Auth Routes Integration Tests** - Test complete auth flow with real database and JWT | deps: T-002, T-004
+- [x] **T-006: User Management Routes Integration Tests** - Test admin user management endpoints with authorization | deps: T-003, T-004
 - [x] **T-007: Rate Limiting Integration Tests** - Test login rate limiting with Redis backend | deps: T-002
 - [x] **T-008: User Model Unit Tests** - Test User model validation, constraints, and relationships | deps: T-001
 - [x] **T-009: AuthService Unit Tests** - Test password hashing, JWT creation/verification, account locking | deps: T-002

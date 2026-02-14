@@ -1,7 +1,7 @@
 # specs/004-monthly-review/tasks.md
 
 ## Progress
-Total: 18 tasks | Complete: 11 | Remaining: 7
+Total: 18 tasks | Complete: 13 | Remaining: 5
 
 ## Tasks
 - [x] **T-001: MonthlyReview Model Contract** - Define MonthlyReview SQLAlchemy model with relationships and constraints | deps: none
@@ -18,8 +18,8 @@ Total: 18 tasks | Complete: 11 | Remaining: 7
 - [x] **T-012: Schema Unit Tests** - Test Pydantic validation rules and serialization | deps: T-004
 - [x] **T-013: ReviewService Implementation** - Implement ReviewService with atomic transactions and validation | deps: T-010
 - [x] **T-014: FastAPI Routes Implementation** - Implement review endpoints with authorization dependencies | deps: T-013
-- [ ] **T-015: ReviewWizard Component** - React component for 4-step review creation wizard | deps: T-014
-- [ ] **T-016: ReviewHistory Component** - React component for displaying review history on canvas page | deps: T-014
+- [x] **T-015: ReviewWizard Component** - React component for 4-step review creation wizard | deps: T-014
+- [x] **T-016: ReviewHistory Component** - React component for displaying review history on canvas page | deps: T-014
 - [ ] **T-017: Auto-save and File Upload** - Implement draft saving and attachment integration | deps: T-015
 - [ ] **T-018: End-to-End Integration** - Complete review workflow from wizard to history display | deps: T-015, T-016, T-017
 

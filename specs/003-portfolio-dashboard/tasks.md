@@ -6,10 +6,10 @@ Total: 18 tasks | Complete: 5 | Remaining: 13
 ## Tasks
 - [x] **T-001: Portfolio Service Contract Tests** - Define and test PortfolioService interface with get_summary and update_portfolio_notes methods | deps: none
 - [x] **T-002: PDF Service Contract Tests** - Define and test PDFService interface with export_canvas method | deps: none
-- [ ] **T-003: Portfolio API Contract Tests** - Test portfolio endpoints with role-based access and filtering | deps: T-001
+- [x] **T-003: Portfolio API Contract Tests** - Test portfolio endpoints with role-based access and filtering | deps: T-001
 - [x] **T-004: Health Indicator Database Schema** - Add health_indicator_cache column and update trigger to canvases table | deps: none
-- [ ] **T-005: Portfolio Service Implementation** - Implement PortfolioService with optimized queries and health computation | deps: T-001, T-004
-- [ ] **T-006: PDF Service Implementation** - Implement PDFService with WeasyPrint and Canvas template | deps: T-002
+- [x] **T-005: Portfolio Service Implementation** - Implement PortfolioService with optimized queries and health computation | deps: T-001, T-004
+- [x] **T-006: PDF Service Implementation** - Implement PDFService with WeasyPrint and Canvas template | deps: T-002
 - [ ] **T-007: Portfolio API Routes** - Implement GET /api/portfolio/summary and PATCH /api/portfolio/notes endpoints | deps: T-003, T-005
 - [ ] **T-008: Canvas PDF Export Route** - Implement GET /api/vbus/{vbu_id}/canvas/pdf endpoint | deps: T-006
 - [x] **T-009: Dashboard Page Component Tests** - Test DashboardPage with responsive layout and loading states | deps: none

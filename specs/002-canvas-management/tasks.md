@@ -1,11 +1,11 @@
 # specs/002-canvas-management/tasks.md
 
 ## Progress
-Total: 25 tasks | Complete: 6 | Remaining: 19
+Total: 25 tasks | Complete: 7 | Remaining: 18
 
 ## Tasks
 - [x] **T-001: Model Contract Tests** - Define SQLAlchemy models with relationships and constraints | deps: none
-- [ ] **T-002: Service Contract Tests** - Define CanvasService and AttachmentService interfaces | deps: none
+- [x] **T-002: Service Contract Tests** - Define CanvasService and AttachmentService interfaces | deps: none
 - [x] **T-003: Model Implementation** - Implement VBU, Canvas, Thesis, ProofPoint, Attachment models | deps: T-001
 - [x] **T-004: Database Migration** - Create Alembic migration for canvas management tables | deps: T-003
 - [ ] **T-005: CanvasService Integration Tests** - Test canvas CRUD operations with real database | deps: T-002, T-004

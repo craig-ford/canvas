@@ -2,11 +2,11 @@
 EXIT_SIGNAL: false
 CURRENT_MODE: execute
 CURRENT_FEATURE: all
-ACTION_COMPLETED: Batch 3 execute - 15 tasks completed across 4 parallel chains. Chain 1 (001-auth T-001,T-002,T-009,T-013): User model + AuthService + unit tests + implementation. Chain 2 (002-canvas-management T-001,T-003,T-004): All 5 canvas models + schemas + migration. Chain 3 (004-monthly-review T-001,T-002,T-003): MonthlyReview + Commitment models + ReviewService interface. Chain 4 (003-portfolio-dashboard T-001,T-002,T-004,T-009,T-012): Portfolio/PDF service contracts + health schema + dashboard/notes tests. 42/90 tasks done.
+ACTION_COMPLETED: Batch 4 execute - 14 tasks completed across 4 parallel chains. Chain 1 (001-auth T-003,T-010,T-014): UserService contract + unit tests + implementation. Chain 2 (001-auth T-008,T-011,T-012): User model unit tests + implementation + migration. Chain 3 (001-auth T-004,T-007,T-015): Auth dependencies contract + rate limiting + implementation. Chain 4 (004-monthly-review T-007,T-008,T-010,T-013,T-014): ReviewService integration + auth + unit tests + impl + routes. 56/90 tasks done.
 FEATURES_TOTAL: 5
 FEATURES_WITH_SPECS: 5
 FEATURES_WITH_PLANS: 5
 FEATURES_WITH_TASKS: 5
 FEATURES_VERIFIED: 5
-RECOMMENDATION: Continue execute mode - next batch should focus on: 001-auth remaining (T-003 UserService contract, T-008 User model unit tests, T-010 UserService unit tests, T-004 Auth deps contract, T-007 Rate limiting tests → then T-011 User model impl, T-012 Migration, T-014 UserService impl, T-015 Auth deps impl). Also 002-canvas-management T-002 (service contracts) is ready. Critical path: 001-auth T-016 (routes) blocks T-017 (useAuth hook) which blocks 003/004 frontend tasks.
+RECOMMENDATION: Continue execute mode - next batch should focus on: 001-auth T-005 (auth routes integration tests, deps T-002[x]+T-004[x] READY), T-006 (user mgmt routes integration tests, deps T-003[x]+T-004[x] READY) → T-016 (auth routes impl). Also 002-canvas-management T-002 (service contracts, deps none READY) → T-005/T-006 (integration tests). 003-portfolio-dashboard T-003 (API contract tests READY), T-005 (portfolio service impl READY), T-006 (PDF service impl READY), T-014/T-016/T-017 (frontend impls READY). 004-monthly-review T-015/T-016 (frontend components, deps T-014[x] READY).
 ---END_RALPH_STATUS---
