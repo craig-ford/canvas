@@ -3,64 +3,38 @@
 ## Summary
 | Feature | 1C | 1D | Status |
 |---------|----|----|--------|
-| 001A-infrastructure | ✓ | ✓ | PASS |
+| 001A-infrastructure | N/A | N/A | N/A |
 | 001-auth | ✓ | ✓ | PASS |
-| 002-canvas-management | ✓ | ✓ | PASS |
-| 003-portfolio-dashboard | ✓ | ✓ | PASS |
-| 004-monthly-review | ✓ | ✓ | PASS |
+| 002-canvas-management | ✗ | ✓ | FAIL |
+| 003-portfolio-dashboard | N/A | N/A | N/A |
+| 004-monthly-review | ✗ | ✓ | FAIL |
 
 ## Entity Mismatches (1C)
-None
+| Feature | Entity | Field | Spec Says | Schema Says |
+|---------|--------|-------|-----------|-------------|
+| 002-canvas-management | VBU | name | CHECK(LENGTH(TRIM(name)) > 0) | NOT NULL |
+| 002-canvas-management | VBU | gm_id | FK → users.id ON DELETE RESTRICT | FK → users.id |
+| 002-canvas-management | VBU | updated_by | FK → users.id ON DELETE SET NULL | FK → users.id |
+| 002-canvas-management | Canvas | vbu_id | FK → vbus.id ON DELETE CASCADE | FK → vbus.id |
+| 002-canvas-management | Canvas | product_name | CHECK(product_name IS NULL OR LENGTH(TRIM(product_name)) > 0) | NULLABLE |
+| 002-canvas-management | Canvas | updated_by | FK → users.id ON DELETE SET NULL | FK → users.id |
+| 002-canvas-management | Thesis | canvas_id | FK → canvases.id ON DELETE CASCADE | FK → canvases.id |
+| 002-canvas-management | Thesis | order | CHECK(order BETWEEN 1 AND 5) | CHECK(1-5) |
+| 002-canvas-management | Thesis | text | CHECK(LENGTH(TRIM(text)) > 0) | NOT NULL |
+| 002-canvas-management | ProofPoint | thesis_id | FK → theses.id ON DELETE CASCADE | FK → theses.id |
+| 002-canvas-management | ProofPoint | description | CHECK(LENGTH(TRIM(description)) > 0) | NOT NULL |
+| 002-canvas-management | Attachment | proof_point_id | FK → proof_points.id ON DELETE CASCADE | FK → proof_points.id |
+| 002-canvas-management | Attachment | monthly_review_id | FK → monthly_reviews.id ON DELETE CASCADE | FK → monthly_reviews.id |
+| 002-canvas-management | Attachment | filename | CHECK(LENGTH(TRIM(filename)) > 0) | NOT NULL |
+| 002-canvas-management | Attachment | storage_path | CHECK(LENGTH(TRIM(storage_path)) > 0) | UNIQUE, NOT NULL |
+| 002-canvas-management | Attachment | label | CHECK(label IS NULL OR LENGTH(TRIM(label)) > 0) | NULLABLE |
+| 002-canvas-management | Attachment | uploaded_by | FK → users.id ON DELETE RESTRICT | FK → users.id |
+| 004-monthly-review | MonthlyReview | canvas_id | FK → canvases.id ON DELETE CASCADE | FK → canvases.id |
+| 004-monthly-review | MonthlyReview | created_by | FK → users.id ON DELETE RESTRICT | FK → users.id |
+| 004-monthly-review | Commitment | monthly_review_id | FK → monthly_reviews.id ON DELETE CASCADE | FK → monthly_reviews.id |
+| 004-monthly-review | Commitment | order | CHECK(order BETWEEN 1 AND 3) | CHECK(1-3) |
 
 ## Contradictions Found (1D)
 None
 
-## Overall: 5 PASS, 0 FAIL
-
-## Detailed Analysis
-
-### 001A-infrastructure
-- No Data Model section found in spec.md (infrastructure feature)
-- CHECK 1C: PASS (no entities to verify)
-- CHECK 1D: PASS (no contradictions possible)
-
-### 001-auth
-- Entity: User
-- All fields match schema.md exactly:
-  - Field names: ✓ (id, email, password_hash, name, role, is_active, last_login_at, failed_login_attempts, locked_until, created_at, updated_at)
-  - Types: ✓ (UUID, VARCHAR(255), BOOLEAN, TIMESTAMPTZ, INTEGER, ENUM('admin','gm','viewer'))
-  - Constraints: ✓ (PK, UNIQUE, NOT NULL, NULLABLE, defaults match)
-- CHECK 1C: PASS
-- CHECK 1D: PASS (no contradictions found)
-
-### 002-canvas-management
-- Entities: VBU, Canvas, Thesis, ProofPoint, Attachment
-- All entities match schema.md exactly:
-  - VBU: All fields and constraints match
-  - Canvas: All fields and constraints match (including ENUM values for lifecycle_lane and currently_testing_type)
-  - Thesis: All fields and constraints match (including CHECK(order BETWEEN 1 AND 5))
-  - ProofPoint: All fields and constraints match (including ENUM values for status)
-  - Attachment: All fields and constraints match (including content_type CHECK constraint with all MIME types)
-- CHECK 1C: PASS
-- CHECK 1D: PASS (no contradictions found)
-
-### 003-portfolio-dashboard
-- No entity tables in Data Model section (only response models and frontend components)
-- CHECK 1C: PASS (no entities to verify)
-- CHECK 1D: PASS (no contradictions possible)
-
-### 004-monthly-review
-- Entities: MonthlyReview, Commitment
-- All entities match schema.md exactly:
-  - MonthlyReview: All fields and constraints match (including ENUM('thesis','proof_point') for currently_testing_type)
-  - Commitment: All fields and constraints match (including CHECK(length(text) BETWEEN 1 AND 1000) and CHECK(order BETWEEN 1 AND 3))
-- CHECK 1C: PASS
-- CHECK 1D: PASS (no contradictions found)
-
-## Notes
-- All spec.md Data Model sections now use canonical SQL DDL types matching schema.md exactly
-- No SQLAlchemy Column() syntax found (previous issue resolved)
-- All ENUM types use inline values format: ENUM('value1','value2','value3')
-- All constraint syntax matches schema.md format
-- No field name, type, or constraint mismatches detected
-- No internal contradictions found in any entity definitions
+## Overall: 2 PASS, 2 FAIL

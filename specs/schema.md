@@ -37,11 +37,11 @@ Canvas uses a straightforward relational model centred on the VBU → Canvas 1:1
 | Field | Type | Constraints | Description |
 |-------|------|-------------|-------------|
 | id | UUID | PK, default uuid4 | Primary key |
-| name | VARCHAR(255) | NOT NULL | VBU display name |
-| gm_id | UUID | FK → users.id, NOT NULL | Owning GM |
+| name | VARCHAR(255) | NOT NULL, CHECK(LENGTH(TRIM(name)) > 0) | VBU display name |
+| gm_id | UUID | FK → users.id ON DELETE RESTRICT, NOT NULL | Owning GM |
 | created_at | TIMESTAMPTZ | NOT NULL, server default now() | Creation timestamp |
 | updated_at | TIMESTAMPTZ | NOT NULL, server default now(), on update now() | Last update |
-| updated_by | UUID | FK → users.id, NULLABLE | Last editor |
+| updated_by | UUID | FK → users.id ON DELETE SET NULL, NULLABLE | Last editor |
 
 **Relationships:**
 - belongs_to: User via gm_id
@@ -59,8 +59,8 @@ Canvas uses a straightforward relational model centred on the VBU → Canvas 1:1
 | Field | Type | Constraints | Description |
 |-------|------|-------------|-------------|
 | id | UUID | PK, default uuid4 | Primary key |
-| vbu_id | UUID | FK → vbus.id, UNIQUE, NOT NULL | 1:1 with VBU |
-| product_name | VARCHAR(255) | NULLABLE | Optional product name |
+| vbu_id | UUID | FK → vbus.id ON DELETE CASCADE, UNIQUE, NOT NULL | 1:1 with VBU |
+| product_name | VARCHAR(255) | NULLABLE, CHECK(product_name IS NULL OR LENGTH(TRIM(product_name)) > 0) | Optional product name |
 | lifecycle_lane | ENUM('build','sell','milk','reframe') | NOT NULL, default 'build' | Current lane |
 | success_description | TEXT | NULLABLE | "In this lane, success over 12-24 months means..." |
 | future_state_intent | TEXT | NULLABLE | 3-5 year vision statement |
@@ -73,7 +73,7 @@ Canvas uses a straightforward relational model centred on the VBU → Canvas 1:1
 | portfolio_notes | TEXT | NULLABLE | Admin-only free text |
 | created_at | TIMESTAMPTZ | NOT NULL, server default now() | Creation timestamp |
 | updated_at | TIMESTAMPTZ | NOT NULL, server default now(), on update now() | Last update |
-| updated_by | UUID | FK → users.id, NULLABLE | Last editor |
+| updated_by | UUID | FK → users.id ON DELETE SET NULL, NULLABLE | Last editor |
 
 **Relationships:**
 - belongs_to: VBU via vbu_id (1:1)
@@ -92,9 +92,9 @@ Canvas uses a straightforward relational model centred on the VBU → Canvas 1:1
 | Field | Type | Constraints | Description |
 |-------|------|-------------|-------------|
 | id | UUID | PK, default uuid4 | Primary key |
-| canvas_id | UUID | FK → canvases.id, NOT NULL | Parent canvas |
-| order | INTEGER | NOT NULL, CHECK(1-5) | Display order |
-| text | TEXT | NOT NULL | Thesis statement |
+| canvas_id | UUID | FK → canvases.id ON DELETE CASCADE, NOT NULL | Parent canvas |
+| order | INTEGER | NOT NULL, CHECK(order BETWEEN 1 AND 5) | Display order |
+| text | TEXT | NOT NULL, CHECK(LENGTH(TRIM(text)) > 0) | Thesis statement |
 | created_at | TIMESTAMPTZ | NOT NULL, server default now() | Creation timestamp |
 | updated_at | TIMESTAMPTZ | NOT NULL, server default now(), on update now() | Last update |
 
@@ -115,8 +115,8 @@ Canvas uses a straightforward relational model centred on the VBU → Canvas 1:1
 | Field | Type | Constraints | Description |
 |-------|------|-------------|-------------|
 | id | UUID | PK, default uuid4 | Primary key |
-| thesis_id | UUID | FK → theses.id, NOT NULL | Parent thesis |
-| description | TEXT | NOT NULL | Observable signal description |
+| thesis_id | UUID | FK → theses.id ON DELETE CASCADE, NOT NULL | Parent thesis |
+| description | TEXT | NOT NULL, CHECK(LENGTH(TRIM(description)) > 0) | Observable signal description |
 | status | ENUM('not_started','in_progress','observed','stalled') | NOT NULL, default 'not_started' | Current status |
 | evidence_note | TEXT | NULLABLE | Evidence supporting status |
 | target_review_month | DATE | NULLABLE | Target month for observation |
@@ -140,14 +140,14 @@ Canvas uses a straightforward relational model centred on the VBU → Canvas 1:1
 | Field | Type | Constraints | Description |
 |-------|------|-------------|-------------|
 | id | UUID | PK, default uuid4 | Primary key |
-| canvas_id | UUID | FK → canvases.id, NOT NULL | Parent canvas |
+| canvas_id | UUID | FK → canvases.id ON DELETE CASCADE, NOT NULL | Parent canvas |
 | review_date | DATE | NOT NULL | Review date |
 | what_moved | TEXT | NULLABLE | "What moved since last month (evidence)?" |
 | what_learned | TEXT | NULLABLE | "What did we learn that changes our beliefs?" |
 | what_threatens | TEXT | NULLABLE | "What now threatens the next proof point?" |
 | currently_testing_type | ENUM('thesis','proof_point') | NULLABLE | What was selected as focus |
 | currently_testing_id | UUID | NULLABLE | Polymorphic FK |
-| created_by | UUID | FK → users.id, NOT NULL | Review author |
+| created_by | UUID | FK → users.id ON DELETE RESTRICT, NOT NULL | Review author |
 | created_at | TIMESTAMPTZ | NOT NULL, server default now() | Creation timestamp |
 
 **Relationships:**
@@ -168,9 +168,9 @@ Canvas uses a straightforward relational model centred on the VBU → Canvas 1:1
 | Field | Type | Constraints | Description |
 |-------|------|-------------|-------------|
 | id | UUID | PK, default uuid4 | Primary key |
-| monthly_review_id | UUID | FK → monthly_reviews.id, NOT NULL | Parent review |
+| monthly_review_id | UUID | FK → monthly_reviews.id ON DELETE CASCADE, NOT NULL | Parent review |
 | text | TEXT | NOT NULL, CHECK(length(text) BETWEEN 1 AND 1000) | Commitment text |
-| order | INTEGER | NOT NULL, CHECK(1-3) | Display order |
+| order | INTEGER | NOT NULL, CHECK(order BETWEEN 1 AND 3) | Display order |
 
 **Relationships:**
 - belongs_to: MonthlyReview via monthly_review_id
@@ -187,14 +187,14 @@ Canvas uses a straightforward relational model centred on the VBU → Canvas 1:1
 | Field | Type | Constraints | Description |
 |-------|------|-------------|-------------|
 | id | UUID | PK, default uuid4 | Primary key |
-| proof_point_id | UUID | FK → proof_points.id, NULLABLE | Attached to proof point |
-| monthly_review_id | UUID | FK → monthly_reviews.id, NULLABLE | Attached to review |
-| filename | VARCHAR(255) | NOT NULL | Original filename |
-| storage_path | VARCHAR(1024) | UNIQUE, NOT NULL | Path on disk |
+| proof_point_id | UUID | FK → proof_points.id ON DELETE CASCADE, NULLABLE | Attached to proof point |
+| monthly_review_id | UUID | FK → monthly_reviews.id ON DELETE CASCADE, NULLABLE | Attached to review |
+| filename | VARCHAR(255) | NOT NULL, CHECK(LENGTH(TRIM(filename)) > 0) | Original filename |
+| storage_path | VARCHAR(1024) | UNIQUE, NOT NULL, CHECK(LENGTH(TRIM(storage_path)) > 0) | Path on disk |
 | content_type | VARCHAR(128) | NOT NULL, CHECK(content_type IN ('image/jpeg','image/png','image/gif','application/pdf','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','application/vnd.openxmlformats-officedocument.wordprocessingml.document','application/vnd.openxmlformats-officedocument.presentationml.presentation')) | MIME type |
 | size_bytes | INTEGER | NOT NULL, CHECK(size_bytes BETWEEN 1 AND 10485760) | File size (max 10MB) |
-| label | VARCHAR(255) | NULLABLE | User-provided label |
-| uploaded_by | UUID | FK → users.id, NOT NULL | Uploader |
+| label | VARCHAR(255) | NULLABLE, CHECK(label IS NULL OR LENGTH(TRIM(label)) > 0) | User-provided label |
+| uploaded_by | UUID | FK → users.id ON DELETE RESTRICT, NOT NULL | Uploader |
 | created_at | TIMESTAMPTZ | NOT NULL, server default now() | Upload timestamp |
 
 **Relationships:**
