@@ -12,6 +12,7 @@
 - Consecutive Clean Verify Passes: 0
 - Consecutive Clean Verify-All Passes: 0
 
+
 ## History
 - Run 1 (2026-02-13): ALL FAIL. Fixes applied: schema.md (4 User fields, Canvas default, Attachment constraints, Commitment constraint), 4 CREATE→MODIFY conflicts, predecessor file path fix, DashboardPage wiring to App.tsx. Counter reset to 0.
 - Run 2 (2026-02-13): 5/7 agents PASS, 2 FAIL. Fixes applied: 4 schema mismatches (User.role enum format, Attachment.content_type MIME types, MonthlyReview.currently_testing_type enum naming, Commitment.text constraint syntax), 1 missing cross-feature predecessor (001-auth/T-013→001A-infrastructure/T-006). TDD ordering flags (8) assessed as false positives. Counter reset to 0.
@@ -21,3 +22,4 @@
 - Run 6 (2026-02-13): 5/7 agents PASS, 2 FAIL (verify-schema: 9 representation mismatches across 3 features, verify-scope: 3 stale CREATE/CREATE in file-map.md). Fixes applied: aligned spec.md entity types with schema.md canonical SQL types (ENUM→inline values, DateTime(timezone=True)→TIMESTAMPTZ, default→server_default), fixed 3 file-map.md entries (CREATE→MODIFY for dependencies.py, attachment_service.py, reviews/service.py). Counter reset to 0.
 - Run 7 (2026-02-13): 6/7 agents PASS, 1 FAIL (verify-schema: 38 SQLAlchemy→SQL type mismatches in 001-auth, 002-canvas-management, 004-monthly-review). Fixes applied: rewrote all 3 spec.md Data Model sections from SQLAlchemy Column() syntax to canonical SQL DDL table format matching schema.md exactly (VARCHAR, UUID, TEXT, INTEGER, BOOLEAN, ENUM inline values, TIMESTAMPTZ). Counter reset to 0.
 - Run 8 (2026-02-13): 5/7 agents PASS, 2 FAIL (verify-tdd: 2 TDD ordering false positives in 002/003 — foundational data layer tasks must precede tests; verify-scope: 3A FR coverage — 39/40 FRs lacked explicit FR-### in task Context sections). Fixes applied: added FR-### references to all 84 task Context sections. TDD ordering assessed as false positives (models/schemas are prerequisites for tests, not violations). Counter reset to 0.
+- Run 9 (2026-02-13): 6/7 agents PASS, 1 FAIL (verify-contracts: 3K AttachmentService.upload signature mismatch in cross-cutting.md vs 002-canvas-management/T-013). Fix applied: aligned cross-cutting.md AttachmentService signatures with detailed T-013 implementation spec (added db, entity_id, label params; changed UUID→str types to match task spec). Counter reset to 0.

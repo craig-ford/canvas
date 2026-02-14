@@ -19,9 +19,9 @@ Consumed by: all features
 ### File Storage Service (owned by 002-canvas-management)
 ```python
 class AttachmentService:
-    async def upload(file: UploadFile, vbu_id: UUID, entity_type: str, uploaded_by: UUID) -> Attachment
-    async def download(attachment_id: UUID) -> FileResponse
-    async def delete(attachment_id: UUID) -> None
+    async def upload(file: UploadFile, vbu_id: str, entity_type: str, entity_id: str, uploaded_by: str, db: AsyncSession, label: Optional[str] = None) -> Attachment
+    async def download(attachment_id: str, db: AsyncSession) -> FileResponse
+    async def delete(attachment_id: str, db: AsyncSession) -> None
 ```
 Consumed by: 002-canvas-management, 004-monthly-review
 
