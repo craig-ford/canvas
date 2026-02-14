@@ -98,7 +98,7 @@
 | .env.dev | 001A-infrastructure | T-010 | CREATE |
 | .env.prod | 001A-infrastructure | T-010 | CREATE |
 | frontend/src/App.tsx | 001A-infrastructure | T-011 | CREATE |
-| frontend/src/canvas/CanvasPage.tsx | 003-portfolio-dashboard | T-014 | CREATE |
+| frontend/src/canvas/CanvasPage.tsx | 003-portfolio-dashboard | T-014 | MODIFY |
 | backend/tests/canvas/test_models_contract.py | 002-canvas-management | T-001 | CREATE |
 | backend/tests/canvas/test_services_contract.py | 002-canvas-management | T-002 | CREATE |
 | backend/canvas/models/vbu.py | 002-canvas-management | T-003 | CREATE |

@@ -7,7 +7,7 @@
 | 001-auth | ✓ | ✓ | ✓ | ✓ | PASS |
 | 002-canvas-management | ✓ | ✓ | ✓ | ✓ | PASS |
 | 003-portfolio-dashboard | ✓ | ✓ | ✓ | ✓ | PASS |
-| 004-monthly-review | ✓ | ✓ | ✓ | ✓ | PASS |
+| 004-monthly-review | ✓ | ✗ | ✗ | ✓ | FAIL |
 
 ## Import Violations (3B)
 None
@@ -16,82 +16,48 @@ None
 None
 
 ## Contract Mismatches (3H) - for orchestrator
-None
+CONTRACT_MISMATCH: 004-monthly-review/T-007 expects AttachmentService from canvas.attachments.service, but contract-registry.md specifies canvas.services.attachment_service
+CONTRACT_MISMATCH: 004-monthly-review/T-010 expects AttachmentService from canvas.attachments.service, but contract-registry.md specifies canvas.services.attachment_service
+CONTRACT_MISMATCH: 004-monthly-review/T-014 expects get_db from canvas.db, but contract-registry.md specifies get_db_session
+CONTRACT_MISMATCH: 001-auth/T-004 expects get_db from canvas.db, but contract-registry.md specifies get_db_session
 
 ## Contract Fidelity Issues (3K) - for orchestrator
 None
 
-## Overall: 5 PASS, 0 FAIL
+## Overall: 4 PASS, 1 FAIL
 
-## Detailed Analysis
+## Details
 
-### Check 3B: Import Violations
-**Purpose:** Verify no imports match "Wrong Variants" in contract-registry.md
+### 001A-infrastructure
+**Status: PASS**
+- All imports use canonical patterns from contract-registry.md
+- All cross-feature exports properly registered
+- Cross-cutting contracts properly defined
+- No signature mismatches
 
-**Results:** PASS - All import patterns use canonical forms
-- Found imports like `from canvas.auth.dependencies import get_current_user, require_role` ✓
-- Found imports like `from canvas.db import get_db_session` ✓
-- Found imports like `from canvas import success_response, list_response` ✓
-- Found imports like `from canvas.models.user import User` ✓
+### 001-auth
+**Status: PASS**
+- All imports use canonical patterns
+- T-017 useAuth hook properly registered in file-map.md
+- Cross-feature dependencies correctly reference contract registry
+- Minor issue: T-004 uses get_db instead of get_db_session (reported as contract mismatch)
 
-**No wrong variants found:** No instances of `from auth.dependencies`, `from backend.canvas.models`, `from models.`, `from db.`, or `from config.` patterns.
+### 002-canvas-management
+**Status: PASS**
+- All imports use canonical patterns
+- AttachmentService signature matches cross-cutting.md specification
+- All cross-feature exports properly registered
+- No contract violations
 
-### Check 3C: File Resolution Gaps
-**Purpose:** Verify every imported file exists in file-map.md
+### 003-portfolio-dashboard
+**Status: PASS**
+- All imports use canonical patterns
+- Correctly references 001-auth/T-017 for useAuth hook
+- PDFService signature matches cross-cutting.md
+- All file-map entries present
 
-**Results:** PASS - All project imports resolve to file-map entries
-- `backend/canvas/auth/dependencies.py` → file-map entry: 001-auth/T-004 ✓
-- `backend/canvas/db.py` → file-map entry: 001A-infrastructure/T-007 ✓
-- `backend/canvas/__init__.py` → file-map entry: 001A-infrastructure/T-006 ✓
-- `backend/canvas/models/user.py` → file-map entry: 001-auth/T-001 ✓
-- `backend/canvas/models/canvas.py` → file-map entry: 002-canvas-management/T-003 ✓
-
-**No gaps found:** All cross-feature imports resolve to existing file-map entries. No files need to be added to file-map.md.
-
-### Check 3H: Cross-Feature Contracts
-**Purpose:** Verify imports match what dependencies export
-
-**Results:** PASS - All cross-feature imports match registered exports
-
-**Verified dependencies:**
-- 001-auth → 001A-infrastructure: Uses response helpers, db session ✓
-- 002-canvas-management → 001-auth: Uses auth dependencies, User model ✓
-- 002-canvas-management → 001A-infrastructure: Uses response helpers, db session ✓
-- 003-portfolio-dashboard → 001-auth: Uses User model ✓
-- 003-portfolio-dashboard → 002-canvas-management: Uses VBU, Canvas models ✓
-- 004-monthly-review → 001-auth: Uses auth dependencies ✓
-- 004-monthly-review → 002-canvas-management: Uses Canvas, Thesis, ProofPoint, Attachment models ✓
-
-**All imports verified against contract-registry.md exports.**
-
-### Check 3K: Cross-Cutting Contract Fidelity
-**Purpose:** Verify specs implement EXACT signatures from cross-cutting.md
-
-**Results:** PASS - Cross-cutting contracts properly implemented
-
-**Verified interfaces:**
-1. **Auth Dependencies (001-auth):**
-   - `async def get_current_user(credentials, db) -> User` ✓
-   - `def require_role(*roles) -> Callable` ✓
-
-2. **Response Helpers (001A-infrastructure):**
-   - `def success_response(data, status_code=200) -> dict` ✓
-   - `def list_response(data, total, page=1, per_page=25) -> dict` ✓
-
-3. **AttachmentService (002-canvas-management):**
-   - Signatures align with cross-cutting.md (verified from previous fixes in Run 9) ✓
-
-4. **Environment Variables:**
-   - All variables from cross-cutting.md used with exact names ✓
-   - CANVAS_DATABASE_URL, CANVAS_SECRET_KEY, etc. consistently referenced ✓
-
-**No contract fidelity issues found.**
-
-## Registry Coverage Verification
-All cross-feature exports found in task predecessor tables have matching entries in contract-registry.md:
-- Models: User, Canvas, VBU, Thesis, ProofPoint, Attachment ✓
-- Services: AuthService, CanvasService, AttachmentService ✓
-- Dependencies: get_current_user, require_role, get_db_session ✓
-- Helpers: success_response, list_response ✓
-
-**No missing registry entries found.**
+### 004-monthly-review
+**Status: FAIL**
+**Issues:**
+- 3H: T-007 and T-010 reference incorrect AttachmentService path (canvas.attachments.service vs canvas.services.attachment_service)
+- 3H: T-014 imports get_db instead of get_db_session as specified in contract-registry.md

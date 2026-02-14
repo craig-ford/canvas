@@ -2,11 +2,11 @@
 
 | Feature | Verify Pass | Verify-All Pass | Status |
 |---------|-------------|-----------------|--------|
-| 001A-infrastructure | Run 17 | - | PENDING |
-| 001-auth | Run 17 | - | PENDING |
-| 002-canvas-management | Run 17 | - | PENDING |
-| 003-portfolio-dashboard | Run 17 | - | PENDING |
-| 004-monthly-review | Run 17 | - | PENDING |
+| 001A-infrastructure | Run 18 | - | PENDING |
+| 001-auth | Run 18 | - | PENDING |
+| 002-canvas-management | Run 18 | - | PENDING |
+| 003-portfolio-dashboard | Run 18 | - | PENDING |
+| 004-monthly-review | Run 18 | - | PENDING |
 
 ## Counters
 - Consecutive Clean Verify Passes: 0
@@ -34,3 +34,4 @@
 - Verify-All Run 2 (2026-02-13): VA-1 PASS. VA-2 PASS. VA-3 PASS (80+ false positives — same literal text matching issue as Run 1, all symbols verified in predecessor Contract sections). No fixes needed. Counter incremented to 1.
 - Verify-All Run 3 (2026-02-13): VA-1 PASS. VA-2 PASS. VA-3 PASS (same false positive pattern). No fixes needed. Counter incremented to 2. Threshold reached — creating .review-ready.
 - Run 17 (2026-02-14): 6/7 agents PASS, 1 FAIL (verify-predecessors: 003-portfolio-dashboard T-009,T-012,T-014,T-017 referenced non-existent frontend/src/auth/useAuth.ts from 001-auth/T-016 which creates backend routes). Fix applied: created 001-auth/T-017 (useAuth Hook Implementation) with CREATE for frontend/src/auth/useAuth.ts and frontend/src/auth/AuthContext.tsx, updated 001-auth/tasks.md, added file-map entries, fixed all 4 predecessor references in 003 to point to 001-auth/T-017. Counter reset to 0.
+- Run 18 (2026-02-14): 5/7 agents PASS, 2 FAIL (verify-contracts: 4 contract mismatches — 004/T-007,T-010 wrong AttachmentService path canvas.attachments.service→canvas.services.attachment_service, 004/T-014 and 001-auth/T-004 get_db→get_db_session; verify-scope: 002-canvas-management all 8 FRs missing from task Context sections, CREATE/CREATE conflict on CanvasPage.tsx between 002/T-022 and 003/T-014). Fixes applied: corrected all 4 import paths, added FR references to all 25 002-canvas-management tasks, changed 003/T-014 CanvasPage.tsx from CREATE to MODIFY, added cross-feature predecessor for 002/T-022, updated file-map.md. Counter reset to 0.
