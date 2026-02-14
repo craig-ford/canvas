@@ -2,11 +2,11 @@
 EXIT_SIGNAL: false
 CURRENT_MODE: verify
 CURRENT_FEATURE: all
-ACTION_COMPLETED: Verify run 3 complete. 6/7 agents PASS, 1 FAIL (verify-scope). Fixed 4 CREATE/CREATE conflicts (T-015 dependencies.py, T-013 attachment_service.py, T-013 service.py, T-014 schemas.py → MODIFY) and 1 FR coverage gap (FR-INFRA-004 → T-010). Counter remains at 0, need 2 clean passes.
+ACTION_COMPLETED: Verify run 4 complete. 6/7 agents PASS, 1 FAIL (verify-requirements: 001A-infrastructure traceability). Fixes applied: added 001A-infrastructure to application.md, fixed response helper import in 004/T-014, fixed 3 schema submodule imports in 002/T-016,T-017,T-018, fixed file-map CREATE/CREATE on reviews/schemas.py. Counter reset to 0.
 FEATURES_TOTAL: 5
 FEATURES_WITH_SPECS: 5
 FEATURES_WITH_PLANS: 5
 FEATURES_WITH_TASKS: 5
-FEATURES_VERIFIED: 0
-RECOMMENDATION: Run verify again (run 4). Need 2 consecutive clean passes to advance to verify-all.
+FEATURES_VERIFIED: 0 (counter at 0, need 2 clean passes)
+RECOMMENDATION: Run verify pass 5. Fixes were minor (import paths, traceability gap). Expect clean pass next run.
 ---END_RALPH_STATUS---

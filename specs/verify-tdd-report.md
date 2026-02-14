@@ -28,11 +28,16 @@ All features follow proper TDD ordering with test tasks preceding implementation
 
 **002-canvas-management**: contract-test (T-001, T-002) → implementation (T-003, T-004) → integration-test (T-005, T-006) → unit-test (T-007 to T-011) → implementation (T-012 to T-020)
 
-**003-portfolio-dashboard**: contract-test (T-001 to T-003) → implementation (T-004 to T-007) → integration-test (T-008) → unit-test (T-009 to T-013) → implementation (T-014 to T-018)
+**003-portfolio-dashboard**: contract-test (T-001 to T-003) → implementation (T-004 to T-008) → contract-test (T-009 to T-013) → implementation (T-014 to T-018)
 
-**004-monthly-review**: contract-test (T-001 to T-006) → integration-test (T-007 to T-009) → unit-test (T-010 to T-012) → implementation (T-013 to T-018)
+**004-monthly-review**: contract-test (T-001 to T-004) → implementation (T-005, T-006) → integration-test (T-007 to T-009) → unit-test (T-010 to T-012) → implementation (T-013 to T-018)
 
-**Note**: Early implementation tasks in features 002 and 003 (T-003, T-004 in 002-canvas-management and T-004 to T-007 in 003-portfolio-dashboard) are foundational data/scaffolding tasks (SQLAlchemy models, Pydantic schemas, database schema changes, core service implementations) that legitimately precede tests as they establish the infrastructure that tests depend on.
+**Note**: Early implementation tasks in features 002, 003, and 004 are foundational data/scaffolding tasks that legitimately precede tests:
+- 002-canvas-management T-003, T-004: SQLAlchemy models and Pydantic schemas (data structures)
+- 003-portfolio-dashboard T-004: Database schema changes (infrastructure)
+- 004-monthly-review T-005, T-006: Database migration and trigger (infrastructure)
+
+These are legitimate scaffolding tasks that establish the data layer infrastructure that tests depend on, consistent with the context that previous TDD ordering flags were determined to be false positives.
 
 ### CHECK 3G (Stub Detection)
 Comprehensive analysis of all 84 task files found no stub methods in Logic sections. All task files contain either:
