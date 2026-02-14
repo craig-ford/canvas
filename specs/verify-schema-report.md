@@ -4,53 +4,65 @@
 | Feature | 1C | 1D | Status |
 |---------|----|----|--------|
 | 001A-infrastructure | ✓ | ✓ | PASS |
-| 001-auth | ✗ | ✓ | FAIL |
-| 002-canvas-management | ✗ | ✓ | FAIL |
+| 001-auth | ✓ | ✓ | PASS |
+| 002-canvas-management | ✓ | ✓ | PASS |
 | 003-portfolio-dashboard | ✓ | ✓ | PASS |
-| 004-monthly-review | ✗ | ✓ | FAIL |
+| 004-monthly-review | ✓ | ✓ | PASS |
 
 ## Entity Mismatches (1C)
-| Feature | Entity | Field | Spec Says | Schema Says |
-|---------|--------|-------|-----------|-------------|
-| 001-auth | User | email | String(255) | VARCHAR(255) |
-| 001-auth | User | password_hash | String(255) | VARCHAR(255) |
-| 001-auth | User | name | String(255) | VARCHAR(255) |
-| 001-auth | User | is_active | Boolean, server_default=text('true') | BOOLEAN, default True |
-| 001-auth | User | failed_login_attempts | Integer, server_default=text('0') | INTEGER, default 0 |
-| 002-canvas-management | VBU | name | String(255) | VARCHAR(255) |
-| 002-canvas-management | VBU | gm_id | UUID(as_uuid=True) | UUID |
-| 002-canvas-management | VBU | updated_by | UUID(as_uuid=True) | UUID |
-| 002-canvas-management | Canvas | vbu_id | UUID(as_uuid=True) | UUID |
-| 002-canvas-management | Canvas | product_name | String(255) | VARCHAR(255) |
-| 002-canvas-management | Canvas | primary_focus | String(255) | VARCHAR(255) |
-| 002-canvas-management | Canvas | currently_testing_id | UUID(as_uuid=True) | UUID |
-| 002-canvas-management | Canvas | updated_by | UUID(as_uuid=True) | UUID |
-| 002-canvas-management | Thesis | canvas_id | UUID(as_uuid=True) | UUID |
-| 002-canvas-management | Thesis | order | Integer | INTEGER |
-| 002-canvas-management | Thesis | text | Text | TEXT |
-| 002-canvas-management | ProofPoint | thesis_id | UUID(as_uuid=True) | UUID |
-| 002-canvas-management | ProofPoint | description | Text | TEXT |
-| 002-canvas-management | ProofPoint | status | Enum(ProofPointStatus) | ENUM('not_started','in_progress','observed','stalled') |
-| 002-canvas-management | ProofPoint | evidence_note | Text | TEXT |
-| 002-canvas-management | Attachment | proof_point_id | UUID(as_uuid=True) | UUID |
-| 002-canvas-management | Attachment | monthly_review_id | UUID(as_uuid=True) | UUID |
-| 002-canvas-management | Attachment | filename | String(255) | VARCHAR(255) |
-| 002-canvas-management | Attachment | storage_path | String(1024) | VARCHAR(1024) |
-| 002-canvas-management | Attachment | content_type | String(128) | VARCHAR(128) |
-| 002-canvas-management | Attachment | size_bytes | Integer | INTEGER |
-| 002-canvas-management | Attachment | label | String(255) | VARCHAR(255) |
-| 002-canvas-management | Attachment | uploaded_by | UUID(as_uuid=True) | UUID |
-| 004-monthly-review | MonthlyReview | canvas_id | UUID(as_uuid=True) | UUID |
-| 004-monthly-review | MonthlyReview | what_moved | Text | TEXT |
-| 004-monthly-review | MonthlyReview | what_learned | Text | TEXT |
-| 004-monthly-review | MonthlyReview | what_threatens | Text | TEXT |
-| 004-monthly-review | MonthlyReview | currently_testing_id | UUID(as_uuid=True) | UUID |
-| 004-monthly-review | MonthlyReview | created_by | UUID(as_uuid=True) | UUID |
-| 004-monthly-review | Commitment | monthly_review_id | UUID(as_uuid=True) | UUID |
-| 004-monthly-review | Commitment | text | Text | TEXT |
-| 004-monthly-review | Commitment | order | Integer | INTEGER |
+None
 
 ## Contradictions Found (1D)
 None
 
-## Overall: 2 PASS, 3 FAIL
+## Overall: 5 PASS, 0 FAIL
+
+## Detailed Analysis
+
+### 001A-infrastructure
+- No Data Model section found (infrastructure feature)
+- Check 1C: PASS (no entities to verify)
+- Check 1D: PASS (no contradictions possible)
+
+### 001-auth
+- User entity matches schema.md exactly:
+  - All field names, types, and constraints match
+  - ENUM('admin','gm','viewer') format matches schema
+  - All TIMESTAMPTZ, VARCHAR, UUID, BOOLEAN, INTEGER types correct
+- Check 1C: PASS (perfect match)
+- Check 1D: PASS (no contradictions found)
+
+### 002-canvas-management
+- VBU entity matches schema.md exactly
+- Canvas entity matches schema.md exactly
+- Thesis entity matches schema.md exactly  
+- ProofPoint entity matches schema.md exactly
+- Attachment entity matches schema.md exactly
+- All field names, types, constraints, and ENUM values match
+- Check 1C: PASS (all entities match perfectly)
+- Check 1D: PASS (no contradictions found)
+
+### 003-portfolio-dashboard
+- No entity tables in Data Model section (only response models and frontend components)
+- Check 1C: PASS (no entities to verify)
+- Check 1D: PASS (no contradictions possible)
+
+### 004-monthly-review
+- MonthlyReview entity matches schema.md exactly
+- Commitment entity matches schema.md exactly
+- All field names, types, and constraints match
+- ENUM('thesis','proof_point') format matches schema
+- Check 1C: PASS (perfect match)
+- Check 1D: PASS (no contradictions found)
+
+## Verification Notes
+
+The rewrite in run 7 successfully converted all Data Model sections from SQLAlchemy Column() syntax to canonical SQL DDL table format. All entity definitions now use the exact same field names, types, and constraint formats as schema.md:
+
+- VARCHAR(255) instead of String(255)
+- TIMESTAMPTZ instead of DateTime(timezone=True)  
+- ENUM('value1','value2') instead of Enum class references
+- UUID, TEXT, INTEGER, BOOLEAN, DATE types match exactly
+- All constraint syntax (NOT NULL, NULLABLE, PK, FK, CHECK, UNIQUE) matches
+
+No entity inconsistencies or internal contradictions were found across any feature.

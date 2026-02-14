@@ -5,69 +5,45 @@
 |---------|-------|----------|----------|--------|
 | 001A-infrastructure | 12 | ✓ | ✓ | PASS |
 | 001-auth | 16 | ✓ | ✓ | PASS |
-| 002-canvas-management | 20 | ✓ | ✓ | PASS |
-| 003-portfolio-dashboard | 18 | ✓ | ✓ | PASS |
+| 002-canvas-management | 20 | ❌ | ✓ | FAIL |
+| 003-portfolio-dashboard | 18 | ❌ | ✓ | FAIL |
 | 004-monthly-review | 18 | ✓ | ✓ | PASS |
 
 ## TDD Ordering Issues (3E)
-None
+| Feature | Issue | Tasks Affected |
+|---------|-------|----------------|
+| 002-canvas-management | Implementation tasks before tests | T-003, T-004 (implementation) precede T-005, T-006 (integration-test) |
+| 003-portfolio-dashboard | Implementation tasks before tests | T-004, T-005, T-006, T-007 (implementation) precede T-008 (integration-test) |
 
 ## Stubs Found (3G)
 None
 
-## Overall: 5 PASS, 0 FAIL
+## Overall: 3 PASS, 2 FAIL
 
-## Analysis Details
+## Detailed Analysis
 
-### Check 3E: TDD Ordering Verification
-All features follow proper TDD ordering with test tasks (contract-test, integration-test, unit-test) preceding their corresponding implementation tasks:
+### CHECK 3E: TDD Ordering Violations
 
-**001A-infrastructure:**
-- T-001 (contract-test) → T-006 (implementation)
-- T-002 (contract-test) → T-006 (implementation)  
-- T-003 (contract-test) → T-007 (implementation)
-- T-004 (contract-test) → T-008, T-009 (implementation)
-- T-005 (integration-test) → T-010 (implementation)
+**Task Type Hierarchy:** 1. contract-test, 2. integration-test, 3. unit-test, 4. implementation
 
-**001-auth:**
-- T-001 (contract-test) → T-011 (implementation)
-- T-002 (contract-test) → T-013 (implementation)
-- T-003 (contract-test) → T-014 (implementation)
-- T-004 (contract-test) → T-015 (implementation)
-- T-005, T-006, T-007 (integration-test) → T-016 (implementation)
-- T-008, T-009, T-010 (unit-test) → T-011, T-013, T-014 (implementation)
+**PASS Features:**
+- **001A-infrastructure**: Perfect ordering - T-001 to T-004 (contract-test), T-005 (integration-test), T-006 to T-012 (implementation)
+- **001-auth**: Perfect ordering - T-001 to T-004 (contract-test), T-005 to T-007 (integration-test), T-008 to T-010 (unit-test), T-011 to T-016 (implementation)
+- **004-monthly-review**: Perfect ordering - T-001 to T-006 (contract-test), T-007 to T-009 (integration-test), T-010 to T-012 (unit-test), T-013 to T-018 (implementation)
 
-**002-canvas-management:**
-- T-001, T-002 (contract-test) → T-012, T-013 (implementation)
-- T-005, T-006 (integration-test) → T-014-T-018 (implementation)
-- T-007-T-011 (unit-test) → T-012, T-013 (implementation)
+**FAIL Features:**
+- **002-canvas-management**: T-003 and T-004 are implementation tasks that precede integration-test tasks T-005 and T-006
+- **003-portfolio-dashboard**: T-004 through T-007 are implementation tasks that precede integration-test task T-008 and unit-test tasks T-009 through T-013
 
-**003-portfolio-dashboard:**
-- T-001, T-002, T-003 (contract-test) → T-005, T-006, T-007, T-008 (implementation)
-- T-009-T-013 (unit-test) → T-014-T-018 (implementation)
+### CHECK 3G: Stub Detection
 
-**004-monthly-review:**
-- T-001-T-006 (contract-test) → T-013, T-014 (implementation)
-- T-007-T-009 (integration-test) → T-013, T-014 (implementation)
-- T-010-T-012 (unit-test) → T-013, T-014 (implementation)
+**Analysis:** Examined all 84 task files across 5 features for stub methods in Contract sections.
 
-### Check 3G: Stub Detection
-Examined all task files for stub methods in Logic sections. Found:
+**Findings:**
+- All Contract sections properly use `...` (ellipsis) for interface definitions, which are NOT stubs
+- No `pass` statements found in Logic sections where actual implementation is expected
+- No `NotImplementedError` without explicit BLOCKED comments found
+- Test methods in Contract sections properly define interfaces with docstrings and `...` placeholders
+- Implementation tasks contain actual logic and implementation details in Logic sections
 
-**Contract Sections (NOT flagged as stubs):**
-- All Contract sections contain method signatures with `...` (ellipsis) - these are interface definitions, not implementations
-- Abstract method definitions with `@abstractmethod` decorator - these are proper abstract interfaces
-- Exception class definitions with `pass` - these are valid empty exception classes
-
-**Logic Sections (checked for stubs):**
-- No methods found with only `pass` statements in Logic sections
-- No methods found with only `NotImplementedError` without BLOCKED comments in Logic sections
-- All Logic sections contain actual implementation steps or detailed implementation plans
-
-**Test Methods:**
-- All test methods in contract-test tasks contain proper verification steps with assertions
-- No test methods found with empty bodies or only `pass` statements
-- All test methods include specific assertion requirements in Verification sections
-
-## Conclusion
-All features demonstrate proper TDD discipline with comprehensive test coverage preceding implementation tasks. No stub implementations were found in Logic sections, indicating all tasks are properly specified with real implementation requirements.
+**Conclusion:** No stub violations found. All Contract sections appropriately use ellipsis for interface definitions, and Logic sections contain proper implementation details.
