@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: canvas
+      POSTGRES_PASSWORD: canvas_dev
+      POSTGRES_DB: canvas
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U canvas"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    ports:
+      - "8001:8000"
+    environment:
+      - CANVAS_DATABASE_URL=postgresql+asyncpg://canvas:canvas_dev@db:5432/canvas
+      - CANVAS_CORS_ORIGINS=["http://localhost:5173","http://localhost:3000"]
+      - CANVAS_SECRET_KEY=dev-secret-key-change-in-production
+      - CANVAS_LOG_LEVEL=INFO
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"  # dev profile
+    depends_on:
+      backend:
+        condition: service_healthy
+    profiles:
+      - dev
+
+  frontend-prod:
+    build: 
+      context: ./frontend
+      target: production
+    ports:
+      - "80:80"      # prod profile
+    depends_on:
+      backend:
+        condition: service_healthy
+    profiles:
+      - prod
+
+volumes:
+  postgres_data:
