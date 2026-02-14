@@ -2,11 +2,11 @@
 EXIT_SIGNAL: false
 CURRENT_MODE: verify
 CURRENT_FEATURE: all
-ACTION_COMPLETED: Verify run 8 complete. 5/7 agents PASS (requirements, schema, contracts, predecessors, conventions). 2 FAIL: verify-tdd (TDD ordering false positives in 002/003 - foundational data tasks before tests), verify-scope (3A FR coverage - added FR-### refs to all 84 task Context sections). Fixes applied, counter reset to 0.
+ACTION_COMPLETED: Verify run 9 - 6/7 agents PASS, 1 FAIL (verify-contracts 3K: AttachmentService.upload signature). Fixed cross-cutting.md to match T-013 detailed spec. Counter remains 0.
 FEATURES_TOTAL: 5
 FEATURES_WITH_SPECS: 5
 FEATURES_WITH_PLANS: 5
 FEATURES_WITH_TASKS: 5
 FEATURES_VERIFIED: 0
-RECOMMENDATION: Run verify again (run 9). The schema fix from run 7 held (PASS). FR refs now added. TDD ordering is a recurring false positive - may need to document exception for foundational data layer tasks. Need 2 consecutive clean passes to advance to verify-all.
+RECOMMENDATION: Run verify again (run 10) - need 2 consecutive clean passes to advance to verify-all
 ---END_RALPH_STATUS---
