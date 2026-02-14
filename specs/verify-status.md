@@ -4,13 +4,13 @@
 |---------|-------------|-----------------|--------|
 | 001A-infrastructure | Run 16 | Run 2 | PASS |
 | 001-auth | Run 16 | Run 2 | PASS |
-| 002-canvas-management | Run 16 | Run 2 | PASS |
+| 002-canvas-management | - | - | PENDING |
 | 003-portfolio-dashboard | Run 16 | Run 2 | PASS |
 | 004-monthly-review | Run 16 | Run 2 | PASS |
 
 ## Counters
-- Consecutive Clean Verify Passes: 2
-- Consecutive Clean Verify-All Passes: 2
+- Consecutive Clean Verify Passes: 0
+- Consecutive Clean Verify-All Passes: 0
 
 
 ## History
