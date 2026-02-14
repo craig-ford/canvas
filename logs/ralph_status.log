@@ -1,17 +1,12 @@
 ---RALPH_STATUS---
 EXIT_SIGNAL: false
-CURRENT_MODE: execute
+CURRENT_MODE: smoke-test
 CURRENT_FEATURE: all
-ACTION_COMPLETED: Batch 6 - 8 tasks across 4 chains (001-auth/T-016+T-017, 002-canvas/T-005+T-012, 002-canvas/T-006+T-013, 004-review/T-017+T-018)
+ACTION_COMPLETED: Test-suite phase attempt 1. Fixed 2 code issues (SQLEnum values_callable for 4 enums, reserved word quoting in 2 CHECK constraints). Tests: 127 passed, 50 failed, 89 errors out of 266 total. Root cause: test fixtures don't match conftest.py (89 errors) and test assertions don't match actual API responses (50 failures). Frontend tests not runnable (no vitest configured).
 FEATURES_TOTAL: 5
 FEATURES_WITH_SPECS: 5
 FEATURES_WITH_PLANS: 5
 FEATURES_WITH_TASKS: 5
 FEATURES_VERIFIED: 5
-TASKS_DONE: 72
-TASKS_TOTAL: 90
-PROGRESS: 80%
-FEATURES_COMPLETE: 001-auth (17/17), 004-monthly-review (18/18)
-FEATURES_REMAINING: 002-canvas-management (12/25), 003-portfolio-dashboard (13/18)
-RECOMMENDATION: Continue execute mode. Next batch should target 002-canvas-management T-007,T-008,T-009 (API integration tests, all deps met) and 003-portfolio-dashboard T-007,T-008,T-014,T-016,T-017 (all deps met, all independent leaf tasks). Prioritize 002 chain since it has the longest remaining dependency chain to T-025.
+RECOMMENDATION: Continue test-suite phase. Priority: (1) Add missing fixtures to conftest.py to resolve 89 errors, (2) Fix 50 test assertion mismatches, (3) Add vitest to frontend and run frontend tests. The test deps (pytest, pytest-asyncio, httpx) need to be added to Dockerfile or requirements-dev.txt permanently.
 ---END_RALPH_STATUS---

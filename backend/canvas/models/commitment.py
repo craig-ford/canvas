@@ -16,7 +16,7 @@ class Commitment(Base, TimestampMixin):
     # Constraints
     __table_args__ = (
         CheckConstraint("length(text) > 0 AND length(text) <= 1000", name="ck_commitments_text_length"),
-        CheckConstraint("order >= 1 AND order <= 3", name="ck_commitments_order_range"),
+        CheckConstraint('"order" >= 1 AND "order" <= 3', name="ck_commitments_order_range"),
         UniqueConstraint('monthly_review_id', 'order', name='uq_commitments_review_order'),
         Index('ix_commitments_review_id', 'monthly_review_id'),
     )

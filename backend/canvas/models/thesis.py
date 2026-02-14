@@ -15,7 +15,7 @@ class Thesis(Base, TimestampMixin):
     proof_points = relationship("ProofPoint", back_populates="thesis", cascade="all, delete-orphan")
     
     __table_args__ = (
-        CheckConstraint("order BETWEEN 1 AND 5", name="ck_thesis_order_range"),
+        CheckConstraint('"order" BETWEEN 1 AND 5', name="ck_thesis_order_range"),
         CheckConstraint("LENGTH(TRIM(text)) > 0", name="ck_thesis_text_not_empty"),
         UniqueConstraint("canvas_id", "order", name="uq_theses_canvas_order"),
     )

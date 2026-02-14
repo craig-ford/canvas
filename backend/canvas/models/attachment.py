@@ -17,6 +17,7 @@ class Attachment(Base, TimestampMixin):
     
     # Relationships
     proof_point = relationship("ProofPoint", back_populates="attachments")
+    monthly_review = relationship("MonthlyReview", back_populates="attachments")
     
     __table_args__ = (
         CheckConstraint("LENGTH(TRIM(filename)) > 0", name="ck_attachment_filename_not_empty"),

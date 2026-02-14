@@ -14,7 +14,7 @@ class User(Base, TimestampMixin):
     email = Column(String(255), unique=True, nullable=False, index=True)
     password_hash = Column(String(255), nullable=False)
     name = Column(String(255), nullable=False)
-    role = Column(SQLEnum(UserRole), nullable=False, default=UserRole.VIEWER, server_default='viewer')
+    role = Column(SQLEnum(UserRole, values_callable=lambda e: [x.value for x in e]), nullable=False, default=UserRole.VIEWER, server_default='viewer')
     is_active = Column(Boolean, nullable=False, default=True, server_default='true')
     last_login_at = Column(DateTime(timezone=True), nullable=True)
     failed_login_attempts = Column(Integer, nullable=False, default=0, server_default='0')

@@ -19,14 +19,14 @@ class Canvas(Base, TimestampMixin):
     
     vbu_id = Column(UUID(as_uuid=True), ForeignKey("vbus.id", ondelete="CASCADE"), nullable=False, unique=True, index=True)
     product_name = Column(String(255), nullable=True)
-    lifecycle_lane = Column(SQLEnum(LifecycleLane), nullable=False, default=LifecycleLane.BUILD)
+    lifecycle_lane = Column(SQLEnum(LifecycleLane, values_callable=lambda e: [x.value for x in e]), nullable=False, default=LifecycleLane.BUILD)
     success_description = Column(Text, nullable=True)
     future_state_intent = Column(Text, nullable=True)
     primary_focus = Column(String(255), nullable=True)
     resist_doing = Column(Text, nullable=True)
     good_discipline = Column(Text, nullable=True)
     primary_constraint = Column(Text, nullable=True)
-    currently_testing_type = Column(SQLEnum(CurrentlyTestingType), nullable=True)
+    currently_testing_type = Column(SQLEnum(CurrentlyTestingType, values_callable=lambda e: [x.value for x in e]), nullable=True)
     currently_testing_id = Column(UUID(as_uuid=True), nullable=True)
     portfolio_notes = Column(Text, nullable=True)
     health_indicator_cache = Column(String(20), nullable=True)
@@ -36,6 +36,7 @@ class Canvas(Base, TimestampMixin):
     # Relationships
     vbu = relationship("VBU", back_populates="canvas")
     theses = relationship("Thesis", back_populates="canvas", cascade="all, delete-orphan", order_by="Thesis.order")
+    monthly_reviews = relationship("MonthlyReview", back_populates="canvas", cascade="all, delete-orphan")
     
     __table_args__ = (
         CheckConstraint("product_name IS NULL OR LENGTH(TRIM(product_name)) > 0", name="ck_canvas_product_name_not_empty"),

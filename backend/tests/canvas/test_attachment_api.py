@@ -152,24 +152,7 @@ class TestAttachmentAPI:
         assert result["error"]["code"] == "FORBIDDEN"
 
 
-@pytest.fixture
-async def client():
-    """Create test HTTP client."""
-    from httpx import AsyncClient
-    from canvas.main import create_app
-    
-    app = create_app()
-    async with AsyncClient(app=app, base_url="http://test") as ac:
-        yield ac
-
-
-@pytest.fixture
-async def db():
-    """Create test database session."""
-    from canvas.db import get_db_session
-    async for session in get_db_session():
-        yield session
-        break
+# Uses client and db fixtures from conftest.py
 
 
 @pytest.fixture

@@ -18,6 +18,8 @@ from canvas.models.canvas import Canvas, LifecycleLane, CurrentlyTestingType
 from canvas.models.thesis import Thesis
 from canvas.models.proof_point import ProofPoint, ProofPointStatus
 from canvas.models.attachment import Attachment
+from canvas.models.monthly_review import MonthlyReview
+from canvas.models.commitment import Commitment
 
 __all__ = [
     "Base",
@@ -27,4 +29,6 @@ __all__ = [
     "Thesis",
     "ProofPoint", "ProofPointStatus",
     "Attachment",
+    "MonthlyReview",
+    "Commitment",
 ]

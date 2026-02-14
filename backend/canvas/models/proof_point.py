@@ -15,7 +15,7 @@ class ProofPoint(Base, TimestampMixin):
     
     thesis_id = Column(UUID(as_uuid=True), ForeignKey("theses.id", ondelete="CASCADE"), nullable=False, index=True)
     description = Column(Text, nullable=False)
-    status = Column(SQLEnum(ProofPointStatus), nullable=False, default=ProofPointStatus.NOT_STARTED, index=True)
+    status = Column(SQLEnum(ProofPointStatus, values_callable=lambda e: [x.value for x in e]), nullable=False, default=ProofPointStatus.NOT_STARTED, index=True)
     evidence_note = Column(Text, nullable=True)
     target_review_month = Column(Date, nullable=True)
     

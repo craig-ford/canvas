@@ -28,6 +28,7 @@ RUN pip install --no-cache-dir \
     pydantic-settings \
     python-jose[cryptography] \
     passlib[bcrypt] \
+    "bcrypt<5" \
     alembic \
     aiosqlite \
     python-multipart \

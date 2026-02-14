@@ -140,44 +140,10 @@ class TestUserManagementRoutes:
 
 
 @pytest.fixture
-async def client():
-    """Create test HTTP client."""
-    # BLOCKED: awaiting T-016 auth routes implementation
-    from httpx import AsyncClient
-    from canvas.main import create_app
-    
-    app = create_app()
-    async with AsyncClient(app=app, base_url="http://test") as ac:
-        yield ac
-
-
-@pytest.fixture
-async def admin_token(db):
-    """Create admin user and return JWT token."""
-    auth_service = AuthService()
-    admin_user = await auth_service.register_user("admin@test.local", "password123", "Admin User", "admin", db)
-    return await auth_service.create_access_token(admin_user)
-
-
-@pytest.fixture
-async def gm_token(db):
-    """Create GM user and return JWT token."""
-    auth_service = AuthService()
-    gm_user = await auth_service.register_user("gm@test.local", "password123", "GM User", "gm", db)
-    return await auth_service.create_access_token(gm_user)
-
-
-@pytest.fixture
 async def sample_user(db):
     """Create sample user for testing."""
     auth_service = AuthService()
     return await auth_service.register_user("sample@test.local", "password123", "Sample User", "viewer", db)
 
 
-@pytest.fixture
-async def db():
-    """Create test database session."""
-    from canvas.db import get_db_session
-    async for session in get_db_session():
-        yield session
-        break
+# Uses client, db, admin_token, gm_token fixtures from conftest.py
