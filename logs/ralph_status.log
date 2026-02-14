@@ -2,11 +2,11 @@
 EXIT_SIGNAL: false
 CURRENT_MODE: execute
 CURRENT_FEATURE: all
-ACTION_COMPLETED: Batch 2 execute - 19 tasks completed across 4 parallel chains (001A T-006→T-012, 002 T-022, 003 T-010/T-011/T-013/T-015/T-016/T-018, 004 T-004/T-005/T-006/T-009/T-011/T-012). Infrastructure core fully implemented. 28/90 tasks done.
+ACTION_COMPLETED: Batch 3 execute - 15 tasks completed across 4 parallel chains. Chain 1 (001-auth T-001,T-002,T-009,T-013): User model + AuthService + unit tests + implementation. Chain 2 (002-canvas-management T-001,T-003,T-004): All 5 canvas models + schemas + migration. Chain 3 (004-monthly-review T-001,T-002,T-003): MonthlyReview + Commitment models + ReviewService interface. Chain 4 (003-portfolio-dashboard T-001,T-002,T-004,T-009,T-012): Portfolio/PDF service contracts + health schema + dashboard/notes tests. 42/90 tasks done.
 FEATURES_TOTAL: 5
 FEATURES_WITH_SPECS: 5
 FEATURES_WITH_PLANS: 5
 FEATURES_WITH_TASKS: 5
 FEATURES_VERIFIED: 5
-RECOMMENDATION: Continue execute mode - next batch should focus on 001-auth (now unblocked by 001A completion) and 002-canvas-management T-001→T-003→T-004 chain (needs 001A/T-006 DONE + 001-auth/T-001). Critical path: 001-auth T-001→T-002→T-003→T-004→T-005→...→T-016→T-017 unlocks 003 and 004 remaining tasks.
+RECOMMENDATION: Continue execute mode - next batch should focus on: 001-auth remaining (T-003 UserService contract, T-008 User model unit tests, T-010 UserService unit tests, T-004 Auth deps contract, T-007 Rate limiting tests → then T-011 User model impl, T-012 Migration, T-014 UserService impl, T-015 Auth deps impl). Also 002-canvas-management T-002 (service contracts) is ready. Critical path: 001-auth T-016 (routes) blocks T-017 (useAuth hook) which blocks 003/004 frontend tasks.
 ---END_RALPH_STATUS---

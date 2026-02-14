@@ -1,7 +1,7 @@
 # specs/004-monthly-review/tasks.md
 
 ## Progress
-Total: 18 tasks | Complete: 6 | Remaining: 12
+Total: 18 tasks | Complete: 11 | Remaining: 7
 
 ## Tasks
 - [x] **T-001: MonthlyReview Model Contract** - Define MonthlyReview SQLAlchemy model with relationships and constraints | deps: none
@@ -10,14 +10,14 @@ Total: 18 tasks | Complete: 6 | Remaining: 12
 - [x] **T-004: Pydantic Schemas Contract** - Define request/response schemas with validation rules | deps: T-001, T-002
 - [x] **T-005: Database Migration Contract** - Create Alembic migration for monthly_reviews and commitments tables | deps: T-001, T-002
 - [x] **T-006: Canvas Update Trigger Contract** - PostgreSQL trigger to update canvas currently_testing atomically | deps: T-001, T-005
-- [ ] **T-007: ReviewService Integration Tests** - Test ReviewService methods with real PostgreSQL and AttachmentService | deps: T-003, T-005, T-006
-- [ ] **T-008: Authorization Integration Tests** - Test admin/GM/viewer access patterns for review endpoints | deps: T-003, T-007
+- [x] **T-007: ReviewService Integration Tests** - Test ReviewService methods with real PostgreSQL and AttachmentService | deps: T-003, T-005, T-006
+- [x] **T-008: Authorization Integration Tests** - Test admin/GM/viewer access patterns for review endpoints | deps: T-003, T-007
 - [x] **T-009: Validation Integration Tests** - Test business rules, constraints, and error handling | deps: T-004, T-007
-- [ ] **T-010: ReviewService Unit Tests** - Test individual service methods with focused scenarios | deps: T-007
+- [x] **T-010: ReviewService Unit Tests** - Test individual service methods with focused scenarios | deps: T-007
 - [x] **T-011: Model Unit Tests** - Test MonthlyReview and Commitment model validation and relationships | deps: T-001, T-002
 - [x] **T-012: Schema Unit Tests** - Test Pydantic validation rules and serialization | deps: T-004
-- [ ] **T-013: ReviewService Implementation** - Implement ReviewService with atomic transactions and validation | deps: T-010
-- [ ] **T-014: FastAPI Routes Implementation** - Implement review endpoints with authorization dependencies | deps: T-013
+- [x] **T-013: ReviewService Implementation** - Implement ReviewService with atomic transactions and validation | deps: T-010
+- [x] **T-014: FastAPI Routes Implementation** - Implement review endpoints with authorization dependencies | deps: T-013
 - [ ] **T-015: ReviewWizard Component** - React component for 4-step review creation wizard | deps: T-014
 - [ ] **T-016: ReviewHistory Component** - React component for displaying review history on canvas page | deps: T-014
 - [ ] **T-017: Auto-save and File Upload** - Implement draft saving and attachment integration | deps: T-015
