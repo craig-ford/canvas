@@ -25,76 +25,56 @@ None
 
 ## Detailed Analysis
 
-### Check 3B: Import Pattern Violations
-**Status: PASS**
+### Check 3B: Import Violations
+All imports in task Contract sections follow the canonical patterns from contract-registry.md:
+- Models use `from canvas.models.{entity} import {Entity}`
+- Auth dependencies use `from canvas.auth.dependencies import get_current_user, require_role`
+- DB session uses `from canvas.db import get_db_session`
+- Response helpers use `from canvas import success_response, list_response`
+- Config uses `from canvas.config import Settings`
 
-Verified all imports in Contract sections against contract-registry.md patterns:
-- ✓ All model imports use `from canvas.models.{entity} import {Entity}` pattern
-- ✓ All auth dependency imports use `from canvas.auth.dependencies import get_current_user, require_role` pattern
-- ✓ All database imports use `from canvas.db import get_db_session` pattern
-- ✓ All response helper imports use `from canvas import success_response, list_response` pattern
-- ✓ All config imports use `from canvas.config import Settings` pattern
-
-No wrong variants found (no `from backend.canvas.models...`, `from auth.dependencies...`, etc.)
+No wrong variants found (no `from backend.canvas...`, `from auth.dependencies...`, etc.)
 
 ### Check 3C: File Resolution Gaps
-**Status: PASS**
+All project imports resolve to files listed in file-map.md:
+- All canvas.models.* imports resolve to files created by 002-canvas-management/T-003
+- All canvas.auth.* imports resolve to files created by 001-auth tasks
+- All canvas.* infrastructure imports resolve to files created by 001A-infrastructure tasks
+- No missing files that would need to be added to file-map.md
 
-All imported project files resolve to entries in file-map.md:
-- ✓ `backend/canvas/models/__init__.py` (001A-infrastructure/T-006)
-- ✓ `backend/canvas/config.py` (001A-infrastructure/T-006)
-- ✓ `backend/canvas/auth/dependencies.py` (001-auth/T-004)
-- ✓ `backend/canvas/db.py` (001A-infrastructure/T-007)
-- ✓ `backend/canvas/models/user.py` (001-auth/T-001)
-- ✓ `backend/canvas/models/vbu.py` (002-canvas-management/T-003)
-- ✓ `backend/canvas/models/canvas.py` (002-canvas-management/T-003)
-- ✓ `backend/canvas/models/thesis.py` (002-canvas-management/T-003)
-- ✓ `backend/canvas/models/proof_point.py` (002-canvas-management/T-003)
-- ✓ `backend/canvas/models/attachment.py` (002-canvas-management/T-003)
-
-Standard library and third-party imports (datetime, uuid, typing, fastapi, sqlalchemy, pydantic) correctly ignored.
-
-### Check 3H: Cross-Feature Contract Consistency
-**Status: PASS**
-
-All cross-feature imports match contract registry definitions:
-- ✓ `get_current_user`, `require_role` from 001-auth → consumed by 002, 003, 004
-- ✓ `success_response`, `list_response` from 001A-infrastructure → consumed by all features
-- ✓ `get_db_session` from 001A-infrastructure → consumed by all features
-- ✓ Model imports (User, VBU, Canvas, etc.) → consumed by dependent features
-- ✓ `TimestampMixin` from 001A-infrastructure → consumed by all model-defining features
-
-All Predecessor table entries have matching contract-registry.md entries.
+### Check 3H: Cross-Feature Contracts
+All cross-feature imports match the exports defined in contract-registry.md:
+- 001-auth exports User, UserRole, AuthService, UserService, get_current_user, require_role
+- 002-canvas-management exports VBU, Canvas, Thesis, ProofPoint, Attachment, CanvasService, AttachmentService
+- 001A-infrastructure exports TimestampMixin, Settings, get_db_session, success_response, list_response, create_app
+- All consuming features import exactly what is exported with correct signatures
 
 ### Check 3K: Cross-Cutting Contract Fidelity
-**Status: PASS**
+All cross-cutting contracts from cross-cutting.md are implemented with exact signatures:
 
-All cross-cutting.md interfaces implemented with exact signatures:
-
-**Auth Dependencies (001-auth):**
-- ✓ `async def get_current_user(credentials, db) -> User`
-- ✓ `def require_role(*roles) -> Callable`
+**Auth Dependency (001-auth):**
+- `async def get_current_user(credentials, db) -> User` ✓
+- `def require_role(*roles) -> Callable` ✓
 
 **Response Helpers (001A-infrastructure):**
-- ✓ `def success_response(data, status_code=200) -> dict`
-- ✓ `def list_response(data, total, page=1, per_page=25) -> dict`
+- `def success_response(data, status_code=200) -> dict` ✓
+- `def list_response(data, total, page=1, per_page=25) -> dict` ✓
 
 **AttachmentService (002-canvas-management):**
-- ✓ `async def upload(file: UploadFile, vbu_id: str, entity_type: str, entity_id: str, uploaded_by: str, db: AsyncSession, label: Optional[str] = None) -> Attachment`
-- ✓ `async def download(attachment_id: str, db: AsyncSession) -> FileResponse`
-- ✓ `async def delete(attachment_id: str, db: AsyncSession) -> None`
+- `async def upload(file: UploadFile, vbu_id: str, entity_type: str, entity_id: str, uploaded_by: str, db: AsyncSession, label: Optional[str] = None) -> Attachment` ✓
+- `async def download(attachment_id: str, db: AsyncSession) -> FileResponse` ✓
+- `async def delete(attachment_id: str, db: AsyncSession) -> None` ✓
 
-**Environment Variables:**
-- ✓ All CANVAS_* variables defined in owning specs match cross-cutting.md
+**PDFService (003-portfolio-dashboard):**
+- `async def export_canvas(canvas_id: UUID) -> bytes` ✓
 
-No signature mismatches, renamed methods, or bypassed shared clients found.
+All environment variables use exact names from cross-cutting.md without renaming.
 
-## Cross-Feature Registry Verification
-**Status: PASS**
-
-All cross-feature imports in task Predecessor tables have matching entries in specs/contract-registry.md:
-- ✓ Model Locations table covers all model imports
-- ✓ Service Locations table covers all service imports  
-- ✓ Dependency Locations table covers all dependency imports
+### Cross-Feature Predecessor Verification
+All cross-feature imports in task Predecessor tables have matching entries in contract-registry.md:
+- 001-auth tasks correctly reference 001A-infrastructure/T-006 for TimestampMixin
+- 002-canvas-management tasks correctly reference 001-auth/T-015 for auth dependencies
+- 003-portfolio-dashboard tasks correctly reference 002-canvas-management/T-003 for models
+- 004-monthly-review tasks correctly reference multiple features for models and services
 
 No missing registry entries found.

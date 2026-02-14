@@ -83,7 +83,7 @@
 | backend/canvas/portfolio/router.py | 003-portfolio-dashboard | T-007 | MODIFY |
 | tests/test_portfolio_routes.py | 003-portfolio-dashboard | T-007 | CREATE |
 | backend/canvas/vbus/test_pdf_routes.py | 003-portfolio-dashboard | T-008 | CREATE |
-| backend/canvas/vbus/router.py | 003-portfolio-dashboard | T-008 | MODIFY |
+| backend/canvas/routes/vbu.py | 003-portfolio-dashboard | T-008 | MODIFY |
 | frontend/src/dashboard/__tests__/DashboardPage.test.tsx | 003-portfolio-dashboard | T-009 | CREATE |
 | frontend/src/dashboard/__tests__/VBUTable.test.tsx | 003-portfolio-dashboard | T-010 | CREATE |
 | frontend/src/dashboard/__tests__/HealthIndicator.test.tsx | 003-portfolio-dashboard | T-011 | CREATE |
@@ -124,3 +124,5 @@
 | frontend/src/App.tsx | 003-portfolio-dashboard | T-014 | MODIFY |
 | .env.dev | 001A-infrastructure | T-010 | CREATE |
 | .env.prod | 001A-infrastructure | T-010 | CREATE |
+| frontend/src/App.tsx | 001A-infrastructure | T-011 | CREATE |
+| frontend/src/canvas/CanvasPage.tsx | 003-portfolio-dashboard | T-014 | CREATE |

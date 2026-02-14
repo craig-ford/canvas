@@ -15,126 +15,127 @@ None
 ## Scope Conflicts (3I)
 None
 
-## File-Map Consistency
-✓ All task Scope files have matching entries in specs/file-map.md
+## Additional Checks
 
-## Path Consistency Issues
-None
+### Scope Path Consistency
+All features maintain consistent path prefixes within their task scopes.
 
-## Orphaned Preparations
-None
+### Orphaned Preparations
+No orphaned preparation tasks found.
 
-## Wiring Completeness
-✓ All frontend components properly wired to App.tsx
+### Wiring Completeness
+All frontend components properly wired to app entry points:
+- 003-portfolio-dashboard: T-014 modifies frontend/src/App.tsx
+- 004-monthly-review: T-018 modifies frontend/src/App.tsx and frontend/src/canvas/CanvasPage.tsx
+
+## File-Map Verification
+All files in task Scope sections have matching entries in specs/file-map.md.
 
 ## Overall: 5 PASS, 0 FAIL
 
 ## Detailed Analysis
 
-### Check 3A: FR Coverage Verification
-All 40 functional requirements have implementing tasks:
+### 001A-infrastructure (15 FRs)
+**FRs Found:**
+- FR-INFRA-001: Docker Compose (T-010)
+- FR-INFRA-002: Backend Dockerfile (T-010)
+- FR-INFRA-003: Frontend Dockerfile (T-010)
+- FR-INFRA-004: Environment files (T-010)
+- FR-INFRA-005: PostgreSQL service (T-010)
+- FR-INFRA-006: Backend config.py (T-006)
+- FR-INFRA-007: Backend db.py (T-007)
+- FR-INFRA-008: Backend main.py (T-008)
+- FR-INFRA-009: Alembic configuration (T-007)
+- FR-INFRA-010: Health endpoint (T-009)
+- FR-INFRA-011: Response helpers (T-006)
+- FR-INFRA-012: Frontend scaffolding (T-011)
+- FR-INFRA-013: Frontend API client (T-011)
+- FR-INFRA-014: Frontend AppShell (T-011)
+- FR-INFRA-015: Seed script (T-012)
 
-**001A-infrastructure (15 FRs):**
-- FR-INFRA-001 to FR-INFRA-005: Covered by T-001, T-002, T-003, T-010
-- FR-INFRA-006: Covered by T-006, T-004
-- FR-INFRA-007: Covered by T-007, T-004
-- FR-INFRA-008: Covered by T-008, T-004
-- FR-INFRA-009: Covered by T-007, T-004
-- FR-INFRA-010: Covered by T-009, T-005
-- FR-INFRA-011: Covered by T-006, T-005
-- FR-INFRA-012 to FR-INFRA-014: Covered by T-011
-- FR-INFRA-015: Covered by T-012
+**Coverage:** All 15 FRs have implementing tasks.
 
-**001-auth (6 FRs):**
-- FR-001: Covered by T-001, T-008, T-011, T-012, T-005, T-016
-- FR-002: Covered by T-002, T-013, T-009, T-005, T-016
-- FR-003: Covered by T-002, T-013, T-009, T-006, T-016
-- FR-004: Covered by T-003, T-006, T-014, T-016
-- FR-005: Covered by T-004, T-007, T-010, T-015
-- FR-006: Covered by T-003, T-007, T-014, T-016
+### 001-auth (6 FRs)
+**FRs Found:**
+- FR-001: User Registration (T-002, T-016)
+- FR-002: User Login (T-002, T-016)
+- FR-003: Token Refresh (T-002, T-016)
+- FR-004: Current User Profile (T-016)
+- FR-005: Role-Based Authorization (T-004, T-015)
+- FR-006: User Management (T-016)
 
-**002-canvas-management (8 FRs):**
-- FR-001: Covered by T-002, T-003, T-004, T-009, T-014, T-020
-- FR-002: Covered by T-001, T-003, T-004, T-005, T-010, T-012, T-015, T-019, T-020
-- FR-003: Covered by T-001, T-003, T-004, T-005, T-011, T-016, T-019, T-020
-- FR-004: Covered by T-001, T-003, T-004, T-005, T-010, T-011, T-017, T-019, T-020
-- FR-005: Covered by T-002, T-003, T-007, T-013, T-018, T-020
-- FR-006: Covered by T-001, T-004, T-008, T-012, T-015
-- FR-007: Covered by T-008, T-012, T-015
-- FR-008: Covered by T-006
+**Coverage:** All 6 FRs have implementing tasks.
 
-**003-portfolio-dashboard (5 FRs):**
-- FR-001: Covered by T-001, T-004, T-007, T-008, T-009, T-013
-- FR-002: Covered by T-001, T-004, T-007, T-010, T-013
-- FR-003: Covered by T-002, T-005, T-011
-- FR-004: Covered by T-003, T-006, T-008, T-012
-- FR-005: Covered by T-014, T-015, T-016, T-017, T-018
+### 002-canvas-management (8 FRs)
+**FRs Found:**
+- FR-001: VBU Management (T-014, T-015)
+- FR-002: Canvas CRUD (T-015)
+- FR-003: Thesis Management (T-016)
+- FR-004: Proof Point Management (T-017)
+- FR-005: File Attachment System (T-002, T-013, T-018)
+- FR-006: Currently Testing Pointer (T-015)
+- FR-007: Inline Editing with Autosave (T-015)
+- FR-008: Authorization (T-006, T-007, T-008, T-009, T-010)
 
-**004-monthly-review (6 FRs):**
-- FR-001: Covered by T-001, T-006, T-007, T-010, T-013, T-015
-- FR-002: Covered by T-001, T-007, T-011, T-013, T-015
-- FR-003: Covered by T-002, T-006, T-008, T-012, T-013, T-015
-- FR-004: Covered by T-003, T-008, T-014, T-016
-- FR-005: Covered by T-004, T-009, T-017
-- FR-006: Covered by T-005, T-009, T-018
+**Coverage:** All 8 FRs have implementing tasks.
 
-### Check 3I: Scope Conflicts Analysis
-No CREATE/CREATE conflicts found. All file operations follow proper sequencing:
+### 003-portfolio-dashboard (5 FRs)
+**FRs Found:**
+- FR-001: Portfolio Summary Endpoint (T-001, T-003)
+- FR-002: Portfolio Filtering (T-003)
+- FR-003: Portfolio Notes Management (T-001, T-017)
+- FR-004: Canvas PDF Export (T-006)
+- FR-005: Dashboard UI Components (T-014, T-015, T-016, T-017)
 
-**File Operation Patterns Verified:**
-- CREATE operations are unique per file across all features
-- MODIFY operations only occur after CREATE operations
-- Multiple MODIFY operations on same file are allowed and present
+**Coverage:** All 5 FRs have implementing tasks.
 
-**Key Files with Multiple Operations:**
-- `backend/canvas/main.py`: CREATE (T-008) → MODIFY (T-009) ✓
-- `backend/canvas/models/user.py`: CREATE (T-001) → MODIFY (T-011) ✓
-- `backend/canvas/auth/service.py`: CREATE (T-002) → MODIFY (T-013) ✓
-- `backend/canvas/auth/dependencies.py`: CREATE (T-004) → MODIFY (T-015) ✓
-- `frontend/src/App.tsx`: MODIFY (T-014 003-portfolio) → MODIFY (T-018 004-monthly) ✓
+### 004-monthly-review (6 FRs)
+**FRs Found:**
+- FR-001: Monthly Review Wizard (T-015, T-017)
+- FR-002: Commitments Management (T-015)
+- FR-003: Currently Testing Selection (T-015)
+- FR-004: Review History Display (T-016, T-018)
+- FR-005: Review File Attachments (T-017)
+- FR-006: Access Control (T-014)
 
-### File-Map Consistency Check
-All 122 Scope operations from task files have corresponding entries in specs/file-map.md. No orphaned or missing entries detected.
+**Coverage:** All 6 FRs have implementing tasks.
 
-### Path Consistency Analysis
-All features maintain consistent path prefixes:
-- Backend files: `backend/canvas/...` or `backend/tests/...`
-- Frontend files: `frontend/src/...`
-- Root files: `docker-compose.yml`, `.env.*`, `alembic.ini`
+## Verification Details
 
-No inconsistent path patterns found.
+### Check 3A: Implementation Gaps
+Verified that every FR-### identifier in each feature's spec.md has at least one task that:
+- References the FR in its Context section, OR
+- Implements the FR functionality in its Logic section, OR
+- Provides the FR interface in its Contract section
 
-### Orphaned Preparations Check
-No dangling preparation comments found. All "add placeholder/comment/TODO for feature X" references have corresponding MODIFY tasks in the target features.
+**Result:** All 40 FRs across 5 features have implementing tasks.
 
-### Wiring Completeness Check
-Frontend component wiring verified:
-- 003-portfolio-dashboard: T-014 MODIFYs `frontend/src/App.tsx` to wire DashboardPage ✓
-- 004-monthly-review: T-018 MODIFYs `frontend/src/App.tsx` and `frontend/src/canvas/CanvasPage.tsx` to wire ReviewWizard ✓
+### Check 3I: Scope Conflicts
+Analyzed all task Scope sections for file operation conflicts:
+- No CREATE/CREATE conflicts found
+- No MODIFY before CREATE conflicts found
+- Multiple MODIFY operations on same files are valid
 
-All created components have proper integration tasks.
+**Result:** No scope conflicts detected.
 
-## Additional Verification Notes
+### File-Map Consistency
+Verified that all files mentioned in task Scope sections have corresponding entries in specs/file-map.md with correct actions (CREATE/MODIFY).
 
-### Cross-Feature Dependencies
-All cross-feature dependencies properly declared in Predecessors tables with correct feature names and file paths.
+**Result:** All task scope files are properly mapped.
 
-### Task Numbering
-Non-sequential task numbers present (expected and valid):
-- 001A-infrastructure: T-001 through T-012 (12 tasks)
-- 001-auth: T-001 through T-016 (16 tasks)  
-- 002-canvas-management: T-001 through T-020 (20 tasks)
-- 003-portfolio-dashboard: T-001 through T-018 (18 tasks)
-- 004-monthly-review: T-001 through T-018 (18 tasks)
+### Path Consistency
+Checked for consistent path prefixes within each feature:
+- 001A-infrastructure: Mixed backend/ and frontend/ paths (expected)
+- 001-auth: Consistent backend/ paths
+- 002-canvas-management: Consistent backend/ paths
+- 003-portfolio-dashboard: Mixed backend/ and frontend/ paths (expected)
+- 004-monthly-review: Mixed backend/ and frontend/ paths (expected)
 
-Total: 84 tasks across 5 features
+**Result:** All path prefixes are consistent within feature contexts.
 
-### Verification Methodology
-- Extracted all FR-### patterns from spec.md files
-- Parsed all task Context sections for Requirements field
-- Built complete file operation map from Scope sections
-- Cross-referenced file-map.md entries
-- Analyzed path consistency patterns
-- Checked component wiring completeness
+### Wiring Completeness
+Verified that frontend components are properly wired to app entry points:
+- 003-portfolio-dashboard creates DashboardPage.tsx and T-014 modifies App.tsx
+- 004-monthly-review creates ReviewWizard.tsx and T-018 modifies App.tsx
 
-All checks completed successfully with no issues found.
+**Result:** All frontend components properly wired.

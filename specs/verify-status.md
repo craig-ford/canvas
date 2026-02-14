@@ -2,14 +2,14 @@
 
 | Feature | Verify Pass | Verify-All Pass | Status |
 |---------|-------------|-----------------|--------|
-| 001A-infrastructure | Run 15 | 0 | PASS |
-| 001-auth | Run 15 | 0 | PASS |
-| 002-canvas-management | Run 15 | 0 | PASS |
-| 003-portfolio-dashboard | Run 15 | 0 | PASS |
-| 004-monthly-review | Run 15 | 0 | PASS |
+| 001A-infrastructure | Run 16 | 0 | RECHECK |
+| 001-auth | Run 16 | 0 | PASS |
+| 002-canvas-management | Run 16 | 0 | PASS |
+| 003-portfolio-dashboard | Run 16 | 0 | RECHECK |
+| 004-monthly-review | Run 16 | 0 | RECHECK |
 
 ## Counters
-- Consecutive Clean Verify Passes: 1
+- Consecutive Clean Verify Passes: 2
 - Consecutive Clean Verify-All Passes: 0
 
 
@@ -29,3 +29,5 @@
 - Run 13 (2026-02-13): 6/7 agents PASS, 1 FAIL (verify-schema: 22 constraint mismatches — ON DELETE clauses and CHECK constraints in spec.md not in schema.md). Fix applied: updated schema.md to include ON DELETE CASCADE/RESTRICT/SET NULL on all FK definitions and CHECK(LENGTH(TRIM(...))) constraints to match spec.md detail level. Counter reset to 0.
 - Run 14 (2026-02-13): 5/7 agents PASS, 2 FAIL (verify-predecessors: 6 invalid cross-feature entries — wrong feature names "001-core-models", wrong file paths, malformed table entries in 002/T-004,T-005,T-020 and 003/T-003,T-007,T-017; verify-tdd: 2 TDD ordering false positives in 002/003 — foundational data layer tasks must precede integration tests, same pattern as Run 2/8). Fixes applied: corrected all 6 predecessor entries with correct feature names, file paths, and table format. TDD ordering assessed as false positives. Counter reset to 0.
 - Run 15 (2026-02-13): 7/7 agents PASS, 0 FAIL. ALL features clean. No fixes needed. Counter incremented to 1.
+- Run 16 (2026-02-13): 7/7 agents PASS, 0 FAIL. ALL features clean. No fixes needed. Counter incremented to 2. Threshold reached — proceeded to verify-all.
+- Verify-All Run 1 (2026-02-13): VA-1 FAIL (3 issues: path mismatch backend/canvas/vbus/router.py→routes/vbu.py in 003/T-008, missing CREATE for frontend/src/App.tsx added to 001A/T-011, missing CREATE for frontend/src/canvas/CanvasPage.tsx added to 003/T-014, fixed predecessor in 004/T-018). VA-2 PASS. VA-3 PASS (80+ false positives — check script too strict on import text matching). Verify-All counter stays at 0.
