@@ -3,10 +3,10 @@
 ## Summary
 | Feature | 1C | 1D | Status |
 |---------|----|----|--------|
-| 001A-infrastructure | N/A | N/A | N/A |
+| 001A-infrastructure | ✓ | ✓ | PASS |
 | 001-auth | ✓ | ✓ | PASS |
 | 002-canvas-management | ✓ | ✓ | PASS |
-| 003-portfolio-dashboard | N/A | N/A | N/A |
+| 003-portfolio-dashboard | ✓ | ✓ | PASS |
 | 004-monthly-review | ✓ | ✓ | PASS |
 
 ## Entity Mismatches (1C)
@@ -15,50 +15,48 @@ None
 ## Contradictions Found (1D)
 None
 
-## Overall: 3 PASS, 0 FAIL
+## Overall: 5 PASS, 0 FAIL
 
-## Analysis Details
+## Detailed Analysis
 
 ### 001A-infrastructure
-- No Data Model section found in spec.md
-- Status: N/A (infrastructure feature, no entities expected)
+- **Data Model Section:** Not found (no entities defined)
+- **Check 1C:** PASS (no entities to verify)
+- **Check 1D:** PASS (no contradictions possible)
 
 ### 001-auth
-- **User entity**: All fields match schema.md exactly
-  - Field names: ✓ (id, email, password_hash, name, role, is_active, last_login_at, failed_login_attempts, locked_until, created_at, updated_at)
-  - Types: ✓ (UUID, VARCHAR(255), BOOLEAN, TIMESTAMPTZ, INTEGER, ENUM('admin','gm','viewer'))
-  - Constraints: ✓ (PK, UNIQUE, NOT NULL, default values, server defaults)
-- **Check 1C**: PASS - Perfect match with schema.md
-- **Check 1D**: PASS - No contradictions found
+- **Entities Found:** User
+- **Check 1C:** PASS - All User entity fields match schema.md exactly:
+  - Field names, types, constraints, and nullability all consistent
+  - ENUM values match: ('admin','gm','viewer')
+  - All timestamp fields use TIMESTAMPTZ as required
+- **Check 1D:** PASS - No contradictions found within User entity definition
 
 ### 002-canvas-management
-- **VBU entity**: All fields match schema.md exactly
-- **Canvas entity**: All fields match schema.md exactly
-- **Thesis entity**: All fields match schema.md exactly
-- **ProofPoint entity**: All fields match schema.md exactly
-- **Attachment entity**: All fields match schema.md exactly
-- **Check 1C**: PASS - All entities match schema.md field-by-field
-- **Check 1D**: PASS - No contradictions found
+- **Entities Found:** VBU, Canvas, Thesis, ProofPoint, Attachment
+- **Check 1C:** PASS - All entity fields match schema.md exactly:
+  - VBU: All fields consistent with schema
+  - Canvas: All fields including ENUM values match
+  - Thesis: All fields and constraints match
+  - ProofPoint: All fields including status ENUM match
+  - Attachment: All fields including content_type constraint match
+- **Check 1D:** PASS - No contradictions found in any entity definitions
 
 ### 003-portfolio-dashboard
-- No entity tables found in Data Model section
-- Contains only response models and frontend components
-- Status: N/A (dashboard feature, no new entities)
+- **Data Model Section:** Contains response models and frontend components, no database entities
+- **Check 1C:** PASS (no database entities to verify against schema.md)
+- **Check 1D:** PASS (no entity contradictions possible)
 
 ### 004-monthly-review
-- **MonthlyReview entity**: All fields match schema.md exactly
-  - Field names: ✓ (id, canvas_id, review_date, what_moved, what_learned, what_threatens, currently_testing_type, currently_testing_id, created_by, created_at)
-  - Types: ✓ (UUID, DATE, TEXT, ENUM('thesis','proof_point'), TIMESTAMPTZ)
-  - Constraints: ✓ (PK, FK references, NOT NULL, NULLABLE, server defaults)
-- **Commitment entity**: All fields match schema.md exactly
-  - Field names: ✓ (id, monthly_review_id, text, order)
-  - Types: ✓ (UUID, TEXT, INTEGER)
-  - Constraints: ✓ (PK, FK, NOT NULL, CHECK constraints)
-- **Check 1C**: PASS - Perfect match with schema.md
-- **Check 1D**: PASS - No contradictions found
+- **Entities Found:** MonthlyReview, Commitment
+- **Check 1C:** PASS - All entity fields match schema.md exactly:
+  - MonthlyReview: All fields, types, and constraints consistent
+  - Commitment: All fields including CHECK constraints match
+- **Check 1D:** PASS - No contradictions found within entity definitions
 
-## Verification Notes
-- All spec.md Data Model sections use canonical SQL DDL types matching schema.md
-- No new entities introduced beyond those defined in schema.md
-- All field names, types, and constraints are consistent
-- No internal contradictions found in any feature specifications
+## Notes
+- All spec.md files use proper SQL DDL format with markdown tables as expected from run 7 rewrite
+- No SQLAlchemy Column() syntax found (which would have been flagged as an issue)
+- All ENUM definitions use inline values matching schema.md format
+- All timestamp fields consistently use TIMESTAMPTZ type
+- All constraint definitions match between spec.md and schema.md
