@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeftIcon, CalendarIcon } from '@heroicons/react/24/outline';
 import InlineEdit from '../components/InlineEdit';
 import StatusBadge from '../components/StatusBadge';
 import FileUpload from '../components/FileUpload';
-
-interface CanvasPageProps {
-  vbuId: string;
-}
+import ReviewHistory from '../reviews/ReviewHistory';
 
 interface Attachment {
   id: string;
@@ -50,7 +48,9 @@ interface Canvas {
   theses: Thesis[];
 }
 
-const CanvasPage: React.FC<CanvasPageProps> = ({ vbuId }) => {
+const CanvasPage: React.FC = () => {
+  const { id: vbuId } = useParams<{ id: string }>()
+  const navigate = useNavigate()
   const [canvas, setCanvas] = useState<Canvas | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -104,7 +104,9 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ vbuId }) => {
       }
     };
 
-    loadCanvas();
+    if (vbuId) {
+      loadCanvas();
+    }
   }, [vbuId]);
 
   const handleSave = async (field: string, value: string) => {
@@ -228,9 +230,12 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ vbuId }) => {
           </button>
           <h1 className="text-2xl font-semibold">VBU Canvas</h1>
         </div>
-        <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+        <button 
+          onClick={() => navigate(`/vbus/${vbuId}/review/new`)}
+          className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+        >
           <CalendarIcon className="h-4 w-4" />
-          <span>Monthly Review</span>
+          <span>Start Review</span>
         </button>
       </div>
 
@@ -413,6 +418,9 @@ const CanvasPage: React.FC<CanvasPageProps> = ({ vbuId }) => {
           }
         </div>
       </div>
+
+      {/* Review History Section */}
+      <ReviewHistory canvasId={canvas.id} />
     </div>
   );
 };

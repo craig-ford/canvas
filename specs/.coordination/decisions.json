@@ -1,84 +1,74 @@
 {
   "phase": "execute",
-  "timestamp": "2024-12-19T10:30:00Z",
+  "timestamp": "2026-02-14T18:43:52Z",
   "batch_items": [
-    "chain-1: 001-auth/T-005→T-006",
-    "chain-2: 002-canvas-management/T-002",
-    "chain-3: 003-portfolio-dashboard/T-003→T-005→T-006",
-    "chain-4: 004-monthly-review/T-015→T-016"
+    "chain-1: 001-auth/T-016→T-017",
+    "chain-2: 002-canvas-management/T-005→T-012", 
+    "chain-3: 002-canvas-management/T-006→T-013",
+    "chain-4: 004-monthly-review/T-017→T-018"
   ],
   "file_ownership": {
-    "backend/tests/auth/test_auth_routes_integration.py": {
+    "backend/canvas/auth/routes.py": {
       "owner": "chain-1",
       "action": "CREATE",
       "importers": []
     },
-    "backend/tests/auth/test_user_routes.py": {
-      "owner": "chain-1",
+    "frontend/src/auth/useAuth.ts": {
+      "owner": "chain-1", 
       "action": "CREATE",
-      "importers": []
+      "importers": ["chain-4"]
     },
-    "backend/tests/canvas/test_services_contract.py": {
+    "frontend/src/auth/AuthContext.tsx": {
+      "owner": "chain-1",
+      "action": "CREATE", 
+      "importers": ["chain-4"]
+    },
+    "backend/tests/canvas/test_canvas_service_integration.py": {
       "owner": "chain-2",
       "action": "CREATE",
       "importers": []
     },
-    "backend/canvas/portfolio/router.py": {
-      "owner": "chain-3",
+    "backend/canvas/services/canvas_service.py": {
+      "owner": "chain-2",
       "action": "CREATE",
+      "importers": ["chain-3", "chain-4"]
+    },
+    "backend/tests/canvas/test_attachment_service_integration.py": {
+      "owner": "chain-3",
+      "action": "CREATE", 
       "importers": []
     },
-    "tests/test_portfolio_api.py": {
+    "backend/canvas/services/attachment_service.py": {
       "owner": "chain-3",
       "action": "CREATE",
-      "importers": []
-    },
-    "backend/canvas/portfolio/service.py": {
-      "owner": "chain-3",
-      "action": "MODIFY",
-      "importers": []
-    },
-    "tests/test_portfolio_service_impl.py": {
-      "owner": "chain-3",
-      "action": "CREATE",
-      "importers": []
-    },
-    "backend/canvas/pdf/service.py": {
-      "owner": "chain-3",
-      "action": "CREATE",
-      "importers": []
-    },
-    "backend/canvas/pdf/templates/canvas.html": {
-      "owner": "chain-3",
-      "action": "CREATE",
-      "importers": []
-    },
-    "backend/canvas/pdf/__init__.py": {
-      "owner": "chain-3",
-      "action": "CREATE",
-      "importers": []
+      "importers": ["chain-4"]
     },
     "frontend/src/reviews/ReviewWizard.tsx": {
       "owner": "chain-4",
-      "action": "CREATE",
+      "action": "MODIFY",
       "importers": []
     },
-    "frontend/src/reviews/components/StepIndicator.tsx": {
+    "frontend/src/reviews/hooks/useAutoSave.ts": {
       "owner": "chain-4",
       "action": "CREATE",
       "importers": []
     },
-    "frontend/src/reviews/components/WhatMovedStep.tsx": {
-      "owner": "chain-4",
+    "frontend/src/reviews/components/FileUploadStep.tsx": {
+      "owner": "chain-4", 
       "action": "CREATE",
       "importers": []
     },
-    "frontend/src/reviews/components/CommitmentsStep.tsx": {
+    "frontend/src/App.tsx": {
       "owner": "chain-4",
-      "action": "CREATE",
+      "action": "MODIFY",
       "importers": []
     },
-    "frontend/src/reviews/ReviewHistory.tsx": {
+    "frontend/src/canvas/CanvasPage.tsx": {
+      "owner": "chain-4",
+      "action": "MODIFY", 
+      "importers": []
+    },
+    "frontend/src/reviews/index.ts": {
       "owner": "chain-4",
       "action": "CREATE",
       "importers": []
@@ -89,68 +79,53 @@
       "location": "backend/canvas/services/canvas_service.py",
       "signature": "async def create_vbu(self, name: str, gm_id: UUID, created_by: UUID, db: AsyncSession) -> VBU",
       "defined_by": "chain-2",
-      "consumed_by": []
+      "consumed_by": ["chain-3"]
     },
     "CanvasService.get_canvas_by_vbu": {
-      "location": "backend/canvas/services/canvas_service.py",
+      "location": "backend/canvas/services/canvas_service.py", 
       "signature": "async def get_canvas_by_vbu(self, vbu_id: UUID, db: AsyncSession) -> Canvas",
       "defined_by": "chain-2",
-      "consumed_by": []
+      "consumed_by": ["chain-4"]
     },
     "AttachmentService.upload": {
       "location": "backend/canvas/services/attachment_service.py",
       "signature": "async def upload(self, file: UploadFile, vbu_id: UUID, entity_type: str, entity_id: UUID, uploaded_by: UUID, db: AsyncSession, label: Optional[str] = None) -> Attachment",
-      "defined_by": "chain-2",
+      "defined_by": "chain-3", 
       "consumed_by": ["chain-4"]
     },
-    "PortfolioService.get_summary": {
-      "location": "backend/canvas/portfolio/service.py",
-      "signature": "async def get_summary(self, user: User, filters: PortfolioFilters) -> List[VBUSummary]",
+    "AttachmentService.delete": {
+      "location": "backend/canvas/services/attachment_service.py",
+      "signature": "async def delete(self, attachment_id: UUID, db: AsyncSession) -> None",
       "defined_by": "chain-3",
-      "consumed_by": []
+      "consumed_by": ["chain-4"]
     },
-    "PortfolioService.update_portfolio_notes": {
-      "location": "backend/canvas/portfolio/service.py",
-      "signature": "async def update_portfolio_notes(self, notes: str, user: User) -> None",
-      "defined_by": "chain-3",
-      "consumed_by": []
-    },
-    "PDFService.export_canvas": {
-      "location": "backend/canvas/pdf/service.py",
-      "signature": "async def export_canvas(self, canvas_id: UUID) -> bytes",
-      "defined_by": "chain-3",
-      "consumed_by": []
-    },
-    "ReviewWizard": {
-      "location": "frontend/src/reviews/ReviewWizard.tsx",
-      "signature": "export const ReviewWizard: React.FC = ()",
-      "defined_by": "chain-4",
-      "consumed_by": []
-    },
-    "ReviewHistory": {
-      "location": "frontend/src/reviews/ReviewHistory.tsx",
-      "signature": "export default function ReviewHistory({ canvasId }: ReviewHistoryProps): JSX.Element",
-      "defined_by": "chain-4",
-      "consumed_by": []
+    "useAuth": {
+      "location": "frontend/src/auth/useAuth.ts",
+      "signature": "export function useAuth(): AuthContextType",
+      "defined_by": "chain-1",
+      "consumed_by": ["chain-4"]
     }
   },
   "naming": {
     "table_names": "plural",
     "module_pattern": "from canvas.{module} import {class}",
-    "import_base": "from canvas.{module} import {class}",
+    "import_base": "canvas",
     "env_prefix": "CANVAS_",
     "docker_services": "db/backend/frontend"
   },
   "conventions": {
-    "response_helpers": "from canvas import success_response, list_response",
-    "auth_dependencies": "from canvas.auth.dependencies import get_current_user, require_role",
+    "auth_dependency": "from canvas.auth.dependencies import get_current_user",
+    "response_helpers": "from canvas import success_response, list_response", 
     "db_session": "from canvas.db import get_db_session",
-    "config": "from canvas.config import Settings",
-    "models": "from canvas.models.{entity} import {Entity}",
-    "api_client": "import { apiClient } from '../api/client'",
-    "file_upload": "import { FileUpload } from '../components/FileUpload'",
-    "app_shell": "import { AppShell } from '../components/AppShell'"
+    "model_imports": "from canvas.models.{entity} import {Entity}",
+    "service_directory": "backend/canvas/services/",
+    "test_directory": "backend/tests/canvas/",
+    "frontend_hooks": "frontend/src/{feature}/hooks/",
+    "frontend_components": "frontend/src/{feature}/components/"
   },
   "deferred": [],
-  "warnings": []
+  "warnings": [
+    "Chain-4 (T-017) depends on FileUpload component from 002-canvas-management/T-021 which is not in this batch - using existing component",
+    "Chain-4 (T-017) depends on useAttachments hook from 002-canvas-management/T-024 which is not in this batch - using existing hook"
+  ]
 }

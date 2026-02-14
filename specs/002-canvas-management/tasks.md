@@ -1,22 +1,22 @@
 # specs/002-canvas-management/tasks.md
 
 ## Progress
-Total: 25 tasks | Complete: 7 | Remaining: 18
+Total: 25 tasks | Complete: 9 | Remaining: 16
 
 ## Tasks
 - [x] **T-001: Model Contract Tests** - Define SQLAlchemy models with relationships and constraints | deps: none
 - [x] **T-002: Service Contract Tests** - Define CanvasService and AttachmentService interfaces | deps: none
 - [x] **T-003: Model Implementation** - Implement VBU, Canvas, Thesis, ProofPoint, Attachment models | deps: T-001
 - [x] **T-004: Database Migration** - Create Alembic migration for canvas management tables | deps: T-003
-- [ ] **T-005: CanvasService Integration Tests** - Test canvas CRUD operations with real database | deps: T-002, T-004
-- [ ] **T-006: AttachmentService Integration Tests** - Test file upload/download with real filesystem | deps: T-002, T-004
+- [x] **T-005: CanvasService Integration Tests** - Test canvas CRUD operations with real database | deps: T-002, T-004
+- [x] **T-006: AttachmentService Integration Tests** - Test file upload/download with real filesystem | deps: T-002, T-004
 - [ ] **T-007: VBU API Integration Tests** - Test VBU endpoints with authorization | deps: T-005
 - [ ] **T-008: Canvas API Integration Tests** - Test canvas endpoints with nested data | deps: T-005
 - [ ] **T-009: Thesis API Integration Tests** - Test thesis CRUD and reordering | deps: T-005
 - [ ] **T-010: ProofPoint API Integration Tests** - Test proof point CRUD with attachments | deps: T-006
 - [ ] **T-011: Attachment API Integration Tests** - Test file upload/download endpoints | deps: T-006
-- [ ] **T-012: CanvasService Implementation** - Implement canvas business logic with authorization | deps: T-005
-- [ ] **T-013: AttachmentService Implementation** - Implement file handling with validation | deps: T-006
+- [x] **T-012: CanvasService Implementation** - Implement canvas business logic with authorization | deps: T-005
+- [x] **T-013: AttachmentService Implementation** - Implement file handling with validation | deps: T-006
 - [ ] **T-014: VBU API Routes** - Implement VBU CRUD endpoints | deps: T-007, T-012
 - [ ] **T-015: Canvas API Routes** - Implement canvas management endpoints | deps: T-008, T-012
 - [ ] **T-016: Thesis API Routes** - Implement thesis CRUD and reordering endpoints | deps: T-009, T-012

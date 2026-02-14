@@ -4,6 +4,8 @@ import { apiClient } from '../api/client'
 import { StepIndicator } from './components/StepIndicator'
 import { WhatMovedStep } from './components/WhatMovedStep'
 import { CommitmentsStep } from './components/CommitmentsStep'
+import { FileUploadStep } from './components/FileUploadStep'
+import { useAutoSave } from './hooks/useAutoSave'
 
 interface ReviewData {
   what_moved: string
@@ -42,6 +44,18 @@ export const ReviewWizard: React.FC = () => {
   const [canvasOptions, setCanvasOptions] = useState<CanvasOptions | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+
+  const { saveDraft } = useAutoSave({
+    data: reviewData,
+    canvasId: vbuId!,
+    onSave: (success) => setSaveStatus(success ? 'saved' : 'error')
+  })
+
+  const handleManualSave = async () => {
+    setSaveStatus('saving')
+    await saveDraft()
+  }
 
   useEffect(() => {
     const fetchCanvasOptions = async () => {
@@ -101,7 +115,15 @@ export const ReviewWizard: React.FC = () => {
   const renderStep = () => {
     switch (currentStep) {
       case 1:
-        return <WhatMovedStep data={reviewData} onChange={setReviewData} />
+        return (
+          <div className="space-y-6">
+            <WhatMovedStep data={reviewData} onChange={setReviewData} />
+            <FileUploadStep 
+              attachmentIds={reviewData.attachment_ids}
+              onAttachmentsChange={(ids) => setReviewData({...reviewData, attachment_ids: ids})}
+            />
+          </div>
+        )
       case 2:
         return (
           <div className="space-y-6">
@@ -139,14 +161,26 @@ export const ReviewWizard: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <div className="mb-6">
-        <button
-          onClick={() => navigate(`/vbus/${vbuId}`)}
-          className="text-blue-600 hover:text-blue-500 text-sm"
-        >
-          ← Back to Canvas
-        </button>
-        <h1 className="text-3xl font-bold mt-2">Monthly Review</h1>
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <button
+            onClick={() => navigate(`/vbus/${vbuId}`)}
+            className="text-blue-600 hover:text-blue-500 text-sm"
+          >
+            ← Back to Canvas
+          </button>
+          <h1 className="text-3xl font-bold mt-2">Monthly Review</h1>
+        </div>
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
+            {saveStatus === 'saving' && <span className="text-blue-600">Saving...</span>}
+            {saveStatus === 'saved' && <span className="text-green-600">Saved</span>}
+            {saveStatus === 'error' && <span className="text-red-600">Save failed</span>}
+          </div>
+          <button onClick={handleManualSave} className="px-4 py-2 border rounded">
+            Save Draft
+          </button>
+        </div>
       </div>
 
       <StepIndicator currentStep={currentStep} totalSteps={4} />
