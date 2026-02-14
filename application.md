@@ -176,6 +176,14 @@ Canvas is a lightweight web application that lets General Managers (GMs) maintai
 
 ## Features
 
+### 001A-infrastructure
+**Purpose:** Shared project infrastructure — database configuration, Docker setup, base models, response helpers, frontend scaffolding, and seed data.
+**Success Criteria:** Backend boots with FastAPI, connects to PostgreSQL, serves health endpoint. Frontend scaffolding renders. Docker Compose orchestrates all services. Alembic migrations run. Seed data populates dev environment.
+**Inputs:** Environment variables (CANVAS_DATABASE_URL, CANVAS_SECRET_KEY, etc.).
+**Outputs:** Running backend/frontend/db containers, health check endpoint, base model mixins, response helpers.
+**Dependencies:** None (foundational).
+**UI Surface:** None (infrastructure only).
+
 ### 001-auth
 **Purpose:** User authentication and role-based access control.
 **Success Criteria:** Users can register, log in, receive JWT tokens, and access is restricted by role.

@@ -109,7 +109,7 @@
 | backend/tests/schemas/test_commitment_validation.py | 004-monthly-review | T-012 | CREATE |
 | backend/canvas/reviews/service.py | 004-monthly-review | T-013 | CREATE |
 | backend/canvas/reviews/router.py | 004-monthly-review | T-014 | CREATE |
-| backend/canvas/reviews/schemas.py | 004-monthly-review | T-014 | CREATE |
+| backend/canvas/reviews/schemas.py | 004-monthly-review | T-014 | MODIFY |
 | frontend/src/reviews/ReviewWizard.tsx | 004-monthly-review | T-015 | CREATE |
 | frontend/src/reviews/components/StepIndicator.tsx | 004-monthly-review | T-015 | CREATE |
 | frontend/src/reviews/components/WhatMovedStep.tsx | 004-monthly-review | T-015 | CREATE |
