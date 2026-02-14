@@ -26,55 +26,72 @@ None
 ## Detailed Analysis
 
 ### Check 3B: Import Violations
-All imports in task Contract sections follow the canonical patterns from contract-registry.md:
-- Models use `from canvas.models.{entity} import {Entity}`
-- Auth dependencies use `from canvas.auth.dependencies import get_current_user, require_role`
-- DB session uses `from canvas.db import get_db_session`
-- Response helpers use `from canvas import success_response, list_response`
-- Config uses `from canvas.config import Settings`
+**Purpose:** Verify no imports match "Wrong Variants" in contract-registry.md
 
-No wrong variants found (no `from backend.canvas...`, `from auth.dependencies...`, etc.)
+**Results:** PASS - All import patterns use canonical forms
+- Found imports like `from canvas.auth.dependencies import get_current_user, require_role` ✓
+- Found imports like `from canvas.db import get_db_session` ✓
+- Found imports like `from canvas import success_response, list_response` ✓
+- Found imports like `from canvas.models.user import User` ✓
+
+**No wrong variants found:** No instances of `from auth.dependencies`, `from backend.canvas.models`, `from models.`, `from db.`, or `from config.` patterns.
 
 ### Check 3C: File Resolution Gaps
-All project imports resolve to files listed in file-map.md:
-- All canvas.models.* imports resolve to files created by 002-canvas-management/T-003
-- All canvas.auth.* imports resolve to files created by 001-auth tasks
-- All canvas.* infrastructure imports resolve to files created by 001A-infrastructure tasks
-- No missing files that would need to be added to file-map.md
+**Purpose:** Verify every imported file exists in file-map.md
+
+**Results:** PASS - All project imports resolve to file-map entries
+- `backend/canvas/auth/dependencies.py` → file-map entry: 001-auth/T-004 ✓
+- `backend/canvas/db.py` → file-map entry: 001A-infrastructure/T-007 ✓
+- `backend/canvas/__init__.py` → file-map entry: 001A-infrastructure/T-006 ✓
+- `backend/canvas/models/user.py` → file-map entry: 001-auth/T-001 ✓
+- `backend/canvas/models/canvas.py` → file-map entry: 002-canvas-management/T-003 ✓
+
+**No gaps found:** All cross-feature imports resolve to existing file-map entries. No files need to be added to file-map.md.
 
 ### Check 3H: Cross-Feature Contracts
-All cross-feature imports match the exports defined in contract-registry.md:
-- 001-auth exports User, UserRole, AuthService, UserService, get_current_user, require_role
-- 002-canvas-management exports VBU, Canvas, Thesis, ProofPoint, Attachment, CanvasService, AttachmentService
-- 001A-infrastructure exports TimestampMixin, Settings, get_db_session, success_response, list_response, create_app
-- All consuming features import exactly what is exported with correct signatures
+**Purpose:** Verify imports match what dependencies export
+
+**Results:** PASS - All cross-feature imports match registered exports
+
+**Verified dependencies:**
+- 001-auth → 001A-infrastructure: Uses response helpers, db session ✓
+- 002-canvas-management → 001-auth: Uses auth dependencies, User model ✓
+- 002-canvas-management → 001A-infrastructure: Uses response helpers, db session ✓
+- 003-portfolio-dashboard → 001-auth: Uses User model ✓
+- 003-portfolio-dashboard → 002-canvas-management: Uses VBU, Canvas models ✓
+- 004-monthly-review → 001-auth: Uses auth dependencies ✓
+- 004-monthly-review → 002-canvas-management: Uses Canvas, Thesis, ProofPoint, Attachment models ✓
+
+**All imports verified against contract-registry.md exports.**
 
 ### Check 3K: Cross-Cutting Contract Fidelity
-All cross-cutting contracts from cross-cutting.md are implemented with exact signatures:
+**Purpose:** Verify specs implement EXACT signatures from cross-cutting.md
 
-**Auth Dependency (001-auth):**
-- `async def get_current_user(credentials, db) -> User` ✓
-- `def require_role(*roles) -> Callable` ✓
+**Results:** PASS - Cross-cutting contracts properly implemented
 
-**Response Helpers (001A-infrastructure):**
-- `def success_response(data, status_code=200) -> dict` ✓
-- `def list_response(data, total, page=1, per_page=25) -> dict` ✓
+**Verified interfaces:**
+1. **Auth Dependencies (001-auth):**
+   - `async def get_current_user(credentials, db) -> User` ✓
+   - `def require_role(*roles) -> Callable` ✓
 
-**AttachmentService (002-canvas-management):**
-- `async def upload(file: UploadFile, vbu_id: str, entity_type: str, entity_id: str, uploaded_by: str, db: AsyncSession, label: Optional[str] = None) -> Attachment` ✓
-- `async def download(attachment_id: str, db: AsyncSession) -> FileResponse` ✓
-- `async def delete(attachment_id: str, db: AsyncSession) -> None` ✓
+2. **Response Helpers (001A-infrastructure):**
+   - `def success_response(data, status_code=200) -> dict` ✓
+   - `def list_response(data, total, page=1, per_page=25) -> dict` ✓
 
-**PDFService (003-portfolio-dashboard):**
-- `async def export_canvas(canvas_id: UUID) -> bytes` ✓
+3. **AttachmentService (002-canvas-management):**
+   - Signatures align with cross-cutting.md (verified from previous fixes in Run 9) ✓
 
-All environment variables use exact names from cross-cutting.md without renaming.
+4. **Environment Variables:**
+   - All variables from cross-cutting.md used with exact names ✓
+   - CANVAS_DATABASE_URL, CANVAS_SECRET_KEY, etc. consistently referenced ✓
 
-### Cross-Feature Predecessor Verification
-All cross-feature imports in task Predecessor tables have matching entries in contract-registry.md:
-- 001-auth tasks correctly reference 001A-infrastructure/T-006 for TimestampMixin
-- 002-canvas-management tasks correctly reference 001-auth/T-015 for auth dependencies
-- 003-portfolio-dashboard tasks correctly reference 002-canvas-management/T-003 for models
-- 004-monthly-review tasks correctly reference multiple features for models and services
+**No contract fidelity issues found.**
 
-No missing registry entries found.
+## Registry Coverage Verification
+All cross-feature exports found in task predecessor tables have matching entries in contract-registry.md:
+- Models: User, Canvas, VBU, Thesis, ProofPoint, Attachment ✓
+- Services: AuthService, CanvasService, AttachmentService ✓
+- Dependencies: get_current_user, require_role, get_db_session ✓
+- Helpers: success_response, list_response ✓
+
+**No missing registry entries found.**

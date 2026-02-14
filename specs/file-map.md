@@ -106,7 +106,7 @@
 | backend/canvas/models/thesis.py | 002-canvas-management | T-003 | CREATE |
 | backend/canvas/models/proof_point.py | 002-canvas-management | T-003 | CREATE |
 | backend/canvas/models/attachment.py | 002-canvas-management | T-003 | CREATE |
-| backend/canvas/models/__init__.py | 002-canvas-management | T-003 | MODIFY |
+| backend/canvas/models/__init__.py | 002-canvas-management | T-003 | CREATE |
 | backend/canvas/schemas.py | 002-canvas-management | T-004 | CREATE |
 | backend/alembic/versions/002_canvas_tables.py | 002-canvas-management | T-004 | CREATE |
 | backend/tests/canvas/test_canvas_service_integration.py | 002-canvas-management | T-005 | CREATE |
@@ -130,3 +130,5 @@
 | frontend/src/api/canvas.ts | 002-canvas-management | T-023 | CREATE |
 | frontend/src/canvas/hooks/useCanvas.ts | 002-canvas-management | T-024 | CREATE |
 | frontend/src/App.tsx | 002-canvas-management | T-025 | MODIFY |
+| frontend/src/auth/useAuth.ts | 001-auth | T-017 | CREATE |
+| frontend/src/auth/AuthContext.tsx | 001-auth | T-017 | CREATE |

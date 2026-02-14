@@ -20,6 +20,7 @@ Total: 16 tasks | Complete: 0 | Remaining: 16
 - [ ] **T-014: UserService Implementation** - Implement user management CRUD operations | deps: T-010
 - [ ] **T-015: Auth Dependencies Implementation** - Implement get_current_user and require_role functions | deps: T-004, T-013
 - [ ] **T-016: Auth Routes Implementation** - Implement FastAPI routes for authentication and user management | deps: T-005, T-006, T-007, T-013, T-014, T-015
+- [ ] **T-017: useAuth Hook Implementation** - Implement React useAuth hook and AuthProvider for frontend auth state | deps: T-016, 001A-infrastructure/T-011
 
 ## Success Criteria
 - ⬜ All tests pass

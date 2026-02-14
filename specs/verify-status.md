@@ -2,11 +2,11 @@
 
 | Feature | Verify Pass | Verify-All Pass | Status |
 |---------|-------------|-----------------|--------|
-| 001A-infrastructure | Run 16 | Run 2 | PASS |
-| 001-auth | Run 16 | Run 2 | PASS |
-| 002-canvas-management | - | - | RECHECK |
-| 003-portfolio-dashboard | Run 16 | Run 2 | PASS |
-| 004-monthly-review | Run 16 | Run 2 | PASS |
+| 001A-infrastructure | Run 17 | - | PENDING |
+| 001-auth | Run 17 | - | PENDING |
+| 002-canvas-management | Run 17 | - | PENDING |
+| 003-portfolio-dashboard | Run 17 | - | PENDING |
+| 004-monthly-review | Run 17 | - | PENDING |
 
 ## Counters
 - Consecutive Clean Verify Passes: 0
@@ -33,3 +33,4 @@
 - Verify-All Run 1 (2026-02-13): VA-1 FAIL (3 issues: path mismatch backend/canvas/vbus/router.py→routes/vbu.py in 003/T-008, missing CREATE for frontend/src/App.tsx added to 001A/T-011, missing CREATE for frontend/src/canvas/CanvasPage.tsx added to 003/T-014, fixed predecessor in 004/T-018). VA-2 PASS. VA-3 PASS (80+ false positives — check script too strict on import text matching). Verify-All counter stays at 0.
 - Verify-All Run 2 (2026-02-13): VA-1 PASS. VA-2 PASS. VA-3 PASS (80+ false positives — same literal text matching issue as Run 1, all symbols verified in predecessor Contract sections). No fixes needed. Counter incremented to 1.
 - Verify-All Run 3 (2026-02-13): VA-1 PASS. VA-2 PASS. VA-3 PASS (same false positive pattern). No fixes needed. Counter incremented to 2. Threshold reached — creating .review-ready.
+- Run 17 (2026-02-14): 6/7 agents PASS, 1 FAIL (verify-predecessors: 003-portfolio-dashboard T-009,T-012,T-014,T-017 referenced non-existent frontend/src/auth/useAuth.ts from 001-auth/T-016 which creates backend routes). Fix applied: created 001-auth/T-017 (useAuth Hook Implementation) with CREATE for frontend/src/auth/useAuth.ts and frontend/src/auth/AuthContext.tsx, updated 001-auth/tasks.md, added file-map entries, fixed all 4 predecessor references in 003 to point to 001-auth/T-017. Counter reset to 0.
