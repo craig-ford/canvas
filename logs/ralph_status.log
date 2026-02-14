@@ -2,11 +2,11 @@
 EXIT_SIGNAL: false
 CURRENT_MODE: verify
 CURRENT_FEATURE: all
-ACTION_COMPLETED: Verify run 13 - 6/7 PASS, 1 FAIL (verify-schema: 22 ON DELETE/CHECK constraint mismatches). Fixed schema.md to match spec.md constraint detail. Counter reset to 0.
-FEATURES_TOTAL: 5
-FEATURES_WITH_SPECS: 5
-FEATURES_WITH_PLANS: 5
-FEATURES_WITH_TASKS: 5
-FEATURES_VERIFIED: 5 (all PASS after fixes)
-RECOMMENDATION: Run verify again (run 14). Need 2 consecutive clean passes to advance to verify-all. Counter is at 0.
+ACTION_COMPLETED: Verify Run 14 complete. 5/7 agents PASS, 2 FAIL (predecessors: 6 invalid entries fixed, tdd: false positives). Counter reset to 0.
+FEATURES_TOTAL: 4
+FEATURES_WITH_SPECS: 4
+FEATURES_WITH_PLANS: 4
+FEATURES_WITH_TASKS: 4
+FEATURES_VERIFIED: 4 (all PASS after fixes)
+RECOMMENDATION: Run verify again (Run 15) to check if fixes hold. Need 2 consecutive clean passes to advance to verify-all.
 ---END_RALPH_STATUS---
