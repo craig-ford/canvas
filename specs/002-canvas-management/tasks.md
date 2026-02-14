@@ -1,7 +1,7 @@
 # specs/002-canvas-management/tasks.md
 
 ## Progress
-Total: 25 tasks | Complete: 0 | Remaining: 25
+Total: 25 tasks | Complete: 3 | Remaining: 22
 
 ## Tasks
 - [ ] **T-001: Model Contract Tests** - Define SQLAlchemy models with relationships and constraints | deps: none
@@ -22,9 +22,9 @@ Total: 25 tasks | Complete: 0 | Remaining: 25
 - [ ] **T-016: Thesis API Routes** - Implement thesis CRUD and reordering endpoints | deps: T-009, T-012
 - [ ] **T-017: ProofPoint API Routes** - Implement proof point CRUD endpoints | deps: T-010, T-012
 - [ ] **T-018: Attachment API Routes** - Implement file upload/download endpoints | deps: T-011, T-013
-- [ ] **T-019: InlineEdit Component** - Create inline editing component with autosave | deps: none
-- [ ] **T-020: StatusBadge Component** - Create status badge component with dropdown | deps: none
-- [ ] **T-021: FileUpload Component** - Create file upload component with drag-and-drop | deps: none
+- [x] **T-019: InlineEdit Component** - Create inline editing component with autosave | deps: none
+- [x] **T-020: StatusBadge Component** - Create status badge component with dropdown | deps: none
+- [x] **T-021: FileUpload Component** - Create file upload component with drag-and-drop | deps: none
 - [ ] **T-022: VBU Canvas Page** - Create main canvas page with all sections | deps: T-019, T-020, T-021
 - [ ] **T-023: Canvas API Client** - Create frontend API client for canvas operations | deps: T-015, T-016, T-017, T-018
 - [ ] **T-024: Canvas Page Integration** - Wire canvas page with API client and state management | deps: T-022, T-023

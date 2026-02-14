@@ -1,12 +1,13 @@
 ---RALPH_STATUS---
 EXIT_SIGNAL: false
-CURRENT_MODE: verify
+CURRENT_MODE: execute
 CURRENT_FEATURE: all
-ACTION_COMPLETED: Verify Run 18 - spawned 7 agents (2 batches), 5/7 PASS, 2 FAIL. Fixed: 4 contract mismatches (AttachmentService path, get_db→get_db_session), added FR refs to all 25 002-canvas-management tasks, fixed CanvasPage.tsx CREATE/CREATE conflict (003/T-014→MODIFY), added cross-feature predecessor. Counter reset to 0.
+ACTION_COMPLETED: Execute Batch 1 - 9 tasks completed (001A-infrastructure T-001-T-005,T-011; 002-canvas-management T-019-T-021). Herald resolved file ownership for 4 chains. Backend contract tests created (49 assertions total). Frontend scaffolding (App.tsx, AppShell, API client). 3 UI components (InlineEdit, StatusBadge, FileUpload). Batch gate validation PASS - no stubs, no conflicts.
 FEATURES_TOTAL: 5
 FEATURES_WITH_SPECS: 5
 FEATURES_WITH_PLANS: 5
 FEATURES_WITH_TASKS: 5
-FEATURES_VERIFIED: 0 (all reset to PENDING after fixes)
-RECOMMENDATION: Run verify again (Run 19). Need 2 consecutive clean passes to advance to verify-all.
+FEATURES_VERIFIED: 5
+TASKS_COMPLETE: 9/90
+RECOMMENDATION: Continue execute mode. Next batch: 001A-infrastructure T-006 (core impl, needs T-001+T-002), T-007 (DB impl, needs T-003+T-006), T-008 (app impl, needs T-004+T-006), T-009 (health route, needs T-008). These are the implementation tasks that make the contract tests pass.
 ---END_RALPH_STATUS---

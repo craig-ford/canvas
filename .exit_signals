@@ -1,5 +1,9 @@
 {
   "test_only_loops": [],
-  "done_signals": [],
-  "completion_indicators": []
+  "done_signals": [
+    4
+  ],
+  "completion_indicators": [
+    4
+  ]
 }

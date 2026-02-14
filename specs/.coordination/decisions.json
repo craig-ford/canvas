@@ -1,266 +1,176 @@
 {
-  "phase": "tasks-detail",
-  "timestamp": "2026-02-13T14:00:00Z",
+  "phase": "execute",
+  "timestamp": "2026-02-14T17:41:44Z",
   "batch_items": [
-    "Chain 1: T-001→T-003→T-004",
-    "Chain 2: T-002",
-    "Chain 3: T-019",
-    "Chain 4: T-020", 
-    "Chain 5: T-021",
-    "Layer 1: T-005,T-006",
-    "Layer 2: T-007,T-008,T-009,T-010,T-011,T-012,T-013",
-    "Layer 3: T-014,T-015,T-016,T-017,T-018",
-    "Layer 4: T-022,T-023",
-    "Layer 5: T-024,T-025"
+    "chain-1: 001A-infrastructure/T-001,T-002",
+    "chain-2: 001A-infrastructure/T-003,T-004,T-005", 
+    "chain-3: 001A-infrastructure/T-011",
+    "chain-4: 002-canvas-management/T-019,T-020,T-021"
   ],
   "file_ownership": {
-    "backend/canvas/models/vbu.py": {
-      "owner": "T-003",
-      "action": "CREATE",
-      "importers": ["T-005", "T-007", "T-014"]
-    },
-    "backend/canvas/models/canvas.py": {
-      "owner": "T-003",
-      "action": "CREATE", 
-      "importers": ["T-005", "T-008", "T-015"]
-    },
-    "backend/canvas/models/thesis.py": {
-      "owner": "T-003",
-      "action": "CREATE",
-      "importers": ["T-005", "T-009", "T-016"]
-    },
-    "backend/canvas/models/proof_point.py": {
-      "owner": "T-003",
-      "action": "CREATE",
-      "importers": ["T-006", "T-010", "T-017"]
-    },
-    "backend/canvas/models/attachment.py": {
-      "owner": "T-003",
-      "action": "CREATE",
-      "importers": ["T-006", "T-011", "T-018"]
-    },
-    "backend/canvas/models/__init__.py": {
-      "owner": "T-003",
-      "action": "MODIFY",
-      "importers": ["all tasks"]
-    },
-    "backend/canvas/services/canvas_service.py": {
-      "owner": "T-012",
-      "action": "CREATE",
-      "importers": ["T-014", "T-015", "T-016", "T-017", "T-023"]
-    },
-    "backend/canvas/services/attachment_service.py": {
-      "owner": "T-013",
-      "action": "CREATE",
-      "importers": ["T-018", "T-023"]
-    },
-    "backend/canvas/schemas.py": {
-      "owner": "T-004",
-      "action": "CREATE",
-      "importers": ["T-014", "T-015", "T-016", "T-017", "T-018", "T-023"]
-    },
-    "backend/alembic/versions/002_canvas_tables.py": {
-      "owner": "T-004",
+    "backend/tests/test_models_contract.py": {
+      "owner": "chain-1",
       "action": "CREATE",
       "importers": []
     },
-    "backend/canvas/routes/vbu.py": {
-      "owner": "T-014",
+    "backend/tests/test_responses_contract.py": {
+      "owner": "chain-1", 
       "action": "CREATE",
-      "importers": ["T-025"]
+      "importers": []
     },
-    "backend/canvas/routes/canvas.py": {
-      "owner": "T-015",
-      "action": "CREATE",
-      "importers": ["T-025"]
+    "backend/tests/test_config_contract.py": {
+      "owner": "chain-1",
+      "action": "CREATE", 
+      "importers": []
     },
-    "backend/canvas/routes/thesis.py": {
-      "owner": "T-016",
+    "backend/tests/test_db_contract.py": {
+      "owner": "chain-2",
       "action": "CREATE",
-      "importers": ["T-025"]
+      "importers": []
     },
-    "backend/canvas/routes/proof_point.py": {
-      "owner": "T-017",
+    "backend/tests/test_health_contract.py": {
+      "owner": "chain-2",
       "action": "CREATE",
-      "importers": ["T-025"]
+      "importers": []
     },
-    "backend/canvas/routes/attachment.py": {
-      "owner": "T-018",
+    "backend/tests/test_docker_integration.py": {
+      "owner": "chain-2",
       "action": "CREATE",
-      "importers": ["T-025"]
-    },
-    "frontend/src/components/InlineEdit.tsx": {
-      "owner": "T-019",
-      "action": "CREATE",
-      "importers": ["T-022"]
-    },
-    "frontend/src/components/StatusBadge.tsx": {
-      "owner": "T-020",
-      "action": "CREATE",
-      "importers": ["T-022"]
-    },
-    "frontend/src/components/FileUpload.tsx": {
-      "owner": "T-021",
-      "action": "CREATE",
-      "importers": ["T-022"]
-    },
-    "frontend/src/canvas/CanvasPage.tsx": {
-      "owner": "T-022",
-      "action": "CREATE",
-      "importers": ["T-024"]
-    },
-    "frontend/src/api/canvas.ts": {
-      "owner": "T-023",
-      "action": "CREATE",
-      "importers": ["T-024"]
-    },
-    "frontend/src/canvas/hooks/useCanvas.ts": {
-      "owner": "T-024",
-      "action": "CREATE",
-      "importers": ["T-025"]
+      "importers": []
     },
     "frontend/src/App.tsx": {
-      "owner": "T-025",
-      "action": "MODIFY",
+      "owner": "chain-3",
+      "action": "CREATE",
+      "importers": []
+    },
+    "frontend/src/api/client.ts": {
+      "owner": "chain-3",
+      "action": "CREATE",
+      "importers": ["chain-4"]
+    },
+    "frontend/src/components/AppShell.tsx": {
+      "owner": "chain-3",
+      "action": "CREATE",
+      "importers": ["chain-4"]
+    },
+    "frontend/src/components/InlineEdit.tsx": {
+      "owner": "chain-4",
+      "action": "CREATE",
+      "importers": []
+    },
+    "frontend/src/components/StatusBadge.tsx": {
+      "owner": "chain-4",
+      "action": "CREATE",
+      "importers": []
+    },
+    "frontend/src/components/FileUpload.tsx": {
+      "owner": "chain-4",
+      "action": "CREATE",
       "importers": []
     }
   },
   "interfaces": {
-    "CanvasService.get_canvas_by_vbu": {
-      "location": "backend/canvas/services/canvas_service.py",
-      "signature": "async def get_canvas_by_vbu(self, vbu_id: UUID, db: AsyncSession) -> Canvas",
-      "defined_by": "T-012",
-      "consumed_by": ["T-015", "T-023"]
+    "TimestampMixin": {
+      "location": "backend/canvas/models/__init__.py",
+      "signature": "class TimestampMixin: id: UUID, created_at: datetime, updated_at: datetime",
+      "defined_by": "001A-infrastructure/T-006",
+      "consumed_by": ["chain-1"]
     },
-    "CanvasService.update_canvas": {
-      "location": "backend/canvas/services/canvas_service.py", 
-      "signature": "async def update_canvas(self, vbu_id: UUID, canvas_data: CanvasUpdate, updated_by: UUID, db: AsyncSession) -> Canvas",
-      "defined_by": "T-012",
-      "consumed_by": ["T-015", "T-023"]
+    "success_response": {
+      "location": "backend/canvas/__init__.py", 
+      "signature": "def success_response(data: Any, status_code: int = 200) -> dict",
+      "defined_by": "001A-infrastructure/T-006",
+      "consumed_by": ["chain-1"]
     },
-    "CanvasService.create_vbu": {
-      "location": "backend/canvas/services/canvas_service.py",
-      "signature": "async def create_vbu(self, vbu_data: VBUCreate, created_by: UUID, db: AsyncSession) -> VBU",
-      "defined_by": "T-012",
-      "consumed_by": ["T-014", "T-023"]
+    "list_response": {
+      "location": "backend/canvas/__init__.py",
+      "signature": "def list_response(data: list, total: int, page: int = 1, per_page: int = 25) -> dict", 
+      "defined_by": "001A-infrastructure/T-006",
+      "consumed_by": ["chain-1"]
     },
-    "CanvasService.update_vbu": {
-      "location": "backend/canvas/services/canvas_service.py",
-      "signature": "async def update_vbu(self, vbu_id: UUID, vbu_data: VBUUpdate, updated_by: UUID, db: AsyncSession) -> VBU",
-      "defined_by": "T-012",
-      "consumed_by": ["T-014", "T-023"]
+    "Settings": {
+      "location": "backend/canvas/config.py",
+      "signature": "class Settings(BaseSettings): database_url: str, cors_origins: list[str], log_level: str, secret_key: str",
+      "defined_by": "001A-infrastructure/T-006",
+      "consumed_by": ["chain-1"]
     },
-    "CanvasService.delete_vbu": {
-      "location": "backend/canvas/services/canvas_service.py",
-      "signature": "async def delete_vbu(self, vbu_id: UUID, db: AsyncSession) -> None",
-      "defined_by": "T-012",
-      "consumed_by": ["T-014", "T-023"]
+    "get_db_session": {
+      "location": "backend/canvas/db.py",
+      "signature": "async def get_db_session() -> AsyncGenerator[AsyncSession, None]",
+      "defined_by": "001A-infrastructure/T-007",
+      "consumed_by": ["chain-2"]
     },
-    "CanvasService.list_vbus": {
-      "location": "backend/canvas/services/canvas_service.py",
-      "signature": "async def list_vbus(self, current_user: User, page: int, per_page: int, db: AsyncSession) -> Tuple[List[VBU], int]",
-      "defined_by": "T-012",
-      "consumed_by": ["T-014", "T-023"]
+    "create_async_engine": {
+      "location": "backend/canvas/db.py",
+      "signature": "def create_async_engine(database_url: str) -> AsyncEngine",
+      "defined_by": "001A-infrastructure/T-007", 
+      "consumed_by": ["chain-2"]
     },
-    "CanvasService.create_thesis": {
-      "location": "backend/canvas/services/canvas_service.py",
-      "signature": "async def create_thesis(self, canvas_id: UUID, thesis_data: ThesisCreate, db: AsyncSession) -> Thesis",
-      "defined_by": "T-012",
-      "consumed_by": ["T-016", "T-023"]
+    "health_endpoint": {
+      "location": "backend/canvas/main.py",
+      "signature": "@router.get('/health') async def health() -> dict",
+      "defined_by": "001A-infrastructure/T-008",
+      "consumed_by": ["chain-2"]
     },
-    "CanvasService.update_thesis": {
-      "location": "backend/canvas/services/canvas_service.py",
-      "signature": "async def update_thesis(self, thesis_id: UUID, thesis_data: ThesisUpdate, db: AsyncSession) -> Thesis",
-      "defined_by": "T-012",
-      "consumed_by": ["T-016", "T-023"]
+    "create_app": {
+      "location": "backend/canvas/main.py",
+      "signature": "def create_app() -> FastAPI",
+      "defined_by": "001A-infrastructure/T-008",
+      "consumed_by": ["chain-2"]
     },
-    "CanvasService.delete_thesis": {
-      "location": "backend/canvas/services/canvas_service.py",
-      "signature": "async def delete_thesis(self, thesis_id: UUID, db: AsyncSession) -> None",
-      "defined_by": "T-012",
-      "consumed_by": ["T-016", "T-023"]
+    "apiClient": {
+      "location": "frontend/src/api/client.ts",
+      "signature": "export const apiClient: AxiosInstance",
+      "defined_by": "chain-3",
+      "consumed_by": ["chain-4"]
     },
-    "CanvasService.reorder_theses": {
-      "location": "backend/canvas/services/canvas_service.py",
-      "signature": "async def reorder_theses(self, canvas_id: UUID, thesis_orders: List[Dict[str, Union[UUID, int]]], db: AsyncSession) -> List[Thesis]",
-      "defined_by": "T-012",
-      "consumed_by": ["T-016", "T-023"]
+    "AppShell": {
+      "location": "frontend/src/components/AppShell.tsx",
+      "signature": "export function AppShell({ children }: { children: React.ReactNode }): JSX.Element",
+      "defined_by": "chain-3",
+      "consumed_by": ["chain-4"]
     },
-    "CanvasService.create_proof_point": {
-      "location": "backend/canvas/services/canvas_service.py",
-      "signature": "async def create_proof_point(self, thesis_id: UUID, proof_point_data: ProofPointCreate, db: AsyncSession) -> ProofPoint",
-      "defined_by": "T-012",
-      "consumed_by": ["T-017", "T-023"]
+    "InlineEdit": {
+      "location": "frontend/src/components/InlineEdit.tsx",
+      "signature": "const InlineEdit: React.FC<{ value: string; onSave: (value: string) => Promise<void>; multiline?: boolean; placeholder?: string; readonly?: boolean }>",
+      "defined_by": "chain-4",
+      "consumed_by": []
     },
-    "CanvasService.update_proof_point": {
-      "location": "backend/canvas/services/canvas_service.py",
-      "signature": "async def update_proof_point(self, proof_point_id: UUID, proof_point_data: ProofPointUpdate, db: AsyncSession) -> ProofPoint",
-      "defined_by": "T-012",
-      "consumed_by": ["T-017", "T-023"]
+    "StatusBadge": {
+      "location": "frontend/src/components/StatusBadge.tsx", 
+      "signature": "const StatusBadge: React.FC<{ status: 'not_started' | 'in_progress' | 'observed' | 'stalled'; onChange?: (status: string) => void; readonly?: boolean }>",
+      "defined_by": "chain-4",
+      "consumed_by": []
     },
-    "CanvasService.delete_proof_point": {
-      "location": "backend/canvas/services/canvas_service.py",
-      "signature": "async def delete_proof_point(self, proof_point_id: UUID, db: AsyncSession) -> None",
-      "defined_by": "T-012",
-      "consumed_by": ["T-017", "T-023"]
-    },
-    "AttachmentService.upload": {
-      "location": "backend/canvas/services/attachment_service.py",
-      "signature": "async def upload(self, file: UploadFile, vbu_id: UUID, entity_type: str, entity_id: UUID, uploaded_by: UUID, db: AsyncSession, label: Optional[str] = None) -> Attachment",
-      "defined_by": "T-013",
-      "consumed_by": ["T-018", "T-023"]
-    },
-    "AttachmentService.download": {
-      "location": "backend/canvas/services/attachment_service.py",
-      "signature": "async def download(self, attachment_id: UUID, db: AsyncSession) -> FileResponse",
-      "defined_by": "T-013",
-      "consumed_by": ["T-018", "T-023"]
-    },
-    "AttachmentService.delete": {
-      "location": "backend/canvas/services/attachment_service.py",
-      "signature": "async def delete(self, attachment_id: UUID, db: AsyncSession) -> None",
-      "defined_by": "T-013",
-      "consumed_by": ["T-018", "T-023"]
+    "FileUpload": {
+      "location": "frontend/src/components/FileUpload.tsx",
+      "signature": "const FileUpload: React.FC<{ onUpload: (file: File, label?: string) => Promise<void>; attachments: Attachment[]; onDelete: (id: string) => Promise<void>; maxSize: number; allowedTypes: string[] }>",
+      "defined_by": "chain-4", 
+      "consumed_by": []
     }
   },
   "naming": {
     "table_names": "plural",
     "module_pattern": "from canvas.{module} import {class}",
-    "import_base": "from canvas.{module} import {class}",
+    "import_base": "canvas",
     "frontend_paths": "src/{feature}/{Component}.tsx",
-    "enum_naming": "UPPER_SNAKE_CASE values, PascalCase types"
+    "enum_naming": "snake_case values, PascalCase types"
   },
   "conventions": {
-    "model_imports": "from canvas.models.{entity} import {Entity}",
-    "service_imports": "from canvas.services.{service}_service import {Service}Service",
-    "auth_imports": "from canvas.auth.dependencies import get_current_user, require_role",
-    "response_imports": "from canvas import success_response, list_response",
-    "db_imports": "from canvas.db import get_db_session",
-    "schema_imports": "from canvas.schemas import {Schema}Create, {Schema}Update, {Schema}Response",
-    "frontend_component_paths": {
-      "InlineEdit": "frontend/src/components/InlineEdit.tsx",
-      "StatusBadge": "frontend/src/components/StatusBadge.tsx", 
-      "FileUpload": "frontend/src/components/FileUpload.tsx",
-      "CanvasPage": "frontend/src/canvas/CanvasPage.tsx"
-    },
-    "frontend_api_paths": {
-      "canvas_client": "frontend/src/api/canvas.ts",
-      "canvas_hooks": "frontend/src/canvas/hooks/useCanvas.ts"
-    },
-    "enum_definitions": {
-      "LifecycleLane": "build, sell, milk, reframe",
-      "ProofPointStatus": "not_started, in_progress, observed, stalled",
-      "CurrentlyTestingType": "thesis, proof_point"
-    },
-    "file_storage_pattern": "/uploads/{vbu_id}/{entity_type}/{uuid}.{ext}",
-    "cli_command_pattern": "canvas-cli {action}-{entity}",
-    "test_file_pattern": "backend/tests/{module}/test_{feature}_{type}.py"
+    "test_imports": "import pytest, from unittest.mock import Mock, AsyncMock",
+    "contract_test_pattern": "test_{interface}_{aspect}() asserts {expectation}",
+    "frontend_imports": "import React from 'react', import axios from 'axios'",
+    "component_export_pattern": "export default {ComponentName} or export function {ComponentName}",
+    "api_client_baseURL": "http://localhost:8000/api",
+    "tailwind_usage": "Use Tailwind utility classes for styling",
+    "typescript_strict": "All components must have proper TypeScript interfaces",
+    "status_colors": {
+      "not_started": "gray",
+      "in_progress": "teal", 
+      "observed": "green",
+      "stalled": "yellow"
+    }
   },
   "deferred": [],
-  "warnings": [
-    "T-005 and T-006 integration tests depend on T-002 service contracts and T-004 migration - ensure T-002 and T-004 complete before T-005/T-006 start",
-    "Frontend components T-019, T-020, T-021 are independent but T-022 requires all three - coordinate completion timing",
-    "T-023 API client depends on all backend routes T-015-T-018 being complete with stable interfaces",
-    "T-025 App.tsx modification requires T-024 canvas page integration to be complete with proper routing structure"
-  ]
+  "warnings": []
 }
