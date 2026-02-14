@@ -1,5 +1,5 @@
 # Execution DAG
-Generated: 2026-02-14T09:50:33-08:00
+Generated: 2026-02-14T10:19:45-08:00
 
 ## All Tasks
 | Task | Predecessors | Status |
@@ -73,16 +73,16 @@ Generated: 2026-02-14T09:50:33-08:00
 | 003-portfolio-dashboard/T-013 | none | DONE |
 | 003-portfolio-dashboard/T-014 | 001-auth/T-017,002-canvas-management/T-022 | PENDING |
 | 003-portfolio-dashboard/T-015 | none | DONE |
-| 003-portfolio-dashboard/T-016 | none | DONE |
+| 003-portfolio-dashboard/T-016 | none | PENDING |
 | 003-portfolio-dashboard/T-017 | 001-auth/T-017,001A-infrastructure/T-011 | PENDING |
 | 003-portfolio-dashboard/T-018 | none | DONE |
-| 004-monthly-review/T-001 | 001A-infrastructure/T-006 | PENDING |
-| 004-monthly-review/T-002 | 001A-infrastructure/T-006 | PENDING |
+| 004-monthly-review/T-001 | 001A-infrastructure/T-006 | DONE |
+| 004-monthly-review/T-002 | 001A-infrastructure/T-006 | DONE |
 | 004-monthly-review/T-003 | 002-canvas-management/T-003,002-canvas-management/T-003,002-canvas-management/T-003,002-canvas-management/T-003 | PENDING |
 | 004-monthly-review/T-004 | none | DONE |
 | 004-monthly-review/T-005 | none | DONE |
 | 004-monthly-review/T-006 | none | DONE |
-| 004-monthly-review/T-007 | 002-canvas-management/T-013 | PENDING |
+| 004-monthly-review/T-007 | 002-canvas-management/T-013 | DONE |
 | 004-monthly-review/T-008 | 001-auth/T-015 | PENDING |
 | 004-monthly-review/T-009 | none | DONE |
 | 004-monthly-review/T-010 | 001-auth/T-015,002-canvas-management/T-013 | PENDING |
@@ -94,8 +94,3 @@ Generated: 2026-02-14T09:50:33-08:00
 | 004-monthly-review/T-016 | 001A-infrastructure/T-011 | PENDING |
 | 004-monthly-review/T-017 | 002-canvas-management/T-011,002-canvas-management/T-011 | PENDING |
 | 004-monthly-review/T-018 | 003-portfolio-dashboard/T-014 | PENDING |
-
-## Summary
-- Total: 90
-- Done: 28
-- Pending: 62

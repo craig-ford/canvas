@@ -4,9 +4,9 @@
 Total: 18 tasks | Complete: 6 | Remaining: 12
 
 ## Tasks
-- [ ] **T-001: MonthlyReview Model Contract** - Define MonthlyReview SQLAlchemy model with relationships and constraints | deps: none
-- [ ] **T-002: Commitment Model Contract** - Define Commitment SQLAlchemy model with validation constraints | deps: T-001
-- [ ] **T-003: ReviewService Interface Contract** - Define ReviewService async methods and signatures | deps: T-001, T-002
+- [x] **T-001: MonthlyReview Model Contract** - Define MonthlyReview SQLAlchemy model with relationships and constraints | deps: none
+- [x] **T-002: Commitment Model Contract** - Define Commitment SQLAlchemy model with validation constraints | deps: T-001
+- [x] **T-003: ReviewService Interface Contract** - Define ReviewService async methods and signatures | deps: T-001, T-002
 - [x] **T-004: Pydantic Schemas Contract** - Define request/response schemas with validation rules | deps: T-001, T-002
 - [x] **T-005: Database Migration Contract** - Create Alembic migration for monthly_reviews and commitments tables | deps: T-001, T-002
 - [x] **T-006: Canvas Update Trigger Contract** - PostgreSQL trigger to update canvas currently_testing atomically | deps: T-001, T-005

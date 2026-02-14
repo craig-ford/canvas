@@ -9,3 +9,5 @@ class Settings(BaseSettings):
     cors_origins: list[str]
     log_level: str = "INFO"
     secret_key: str
+    access_token_expire_minutes: int = 30
+    refresh_token_expire_days: int = 7
