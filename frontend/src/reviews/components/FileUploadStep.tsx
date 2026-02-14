@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { FileUpload } from '../../components/FileUpload'
+import FileUpload from '../../components/FileUpload'
 import { apiClient } from '../../api/client'
 
 interface Attachment {

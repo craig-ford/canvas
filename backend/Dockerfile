@@ -6,6 +6,12 @@ WORKDIR /app
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     curl \
+    libglib2.0-0t64 \
+    libpango-1.0-0 \
+    libpangocairo-1.0-0 \
+    libgdk-pixbuf-2.0-0 \
+    libffi-dev \
+    shared-mime-info \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first for better caching
@@ -18,12 +24,15 @@ RUN pip install --no-cache-dir \
     uvicorn[standard] \
     sqlalchemy[asyncio] \
     asyncpg \
-    pydantic \
+    pydantic[email] \
     pydantic-settings \
     python-jose[cryptography] \
     passlib[bcrypt] \
     alembic \
-    aiosqlite
+    aiosqlite \
+    python-multipart \
+    weasyprint \
+    jinja2
 
 # Copy application code
 COPY . .
