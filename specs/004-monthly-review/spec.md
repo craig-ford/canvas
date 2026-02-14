@@ -141,54 +141,38 @@ The Monthly Review feature provides a guided 4-step wizard that walks GMs throug
 ## Data Models
 
 ### MonthlyReview
-```python
-class MonthlyReview(Base, TimestampMixin):
-    __tablename__ = "monthly_reviews"
-    
-    canvas_id = Column(UUID(as_uuid=True), ForeignKey("canvases.id", ondelete="CASCADE"), nullable=False)
-    review_date = Column(Date, nullable=False)
-    what_moved = Column(Text, nullable=True)
-    what_learned = Column(Text, nullable=True) 
-    what_threatens = Column(Text, nullable=True)
-    currently_testing_type = Column(ENUM('thesis','proof_point', name='testing_type_enum'), nullable=True)  # ENUM('thesis','proof_point'), NULLABLE
-    currently_testing_id = Column(UUID(as_uuid=True), nullable=True)
-    created_by = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="RESTRICT"), nullable=False)
-    
-    # Relationships
-    canvas = relationship("Canvas", back_populates="monthly_reviews")
-    commitments = relationship("Commitment", back_populates="monthly_review", cascade="all, delete-orphan")
-    attachments = relationship("Attachment", back_populates="monthly_review", cascade="all, delete-orphan")
-    created_by_user = relationship("User")
-    
-    # Constraints
-    __table_args__ = (
-        UniqueConstraint('canvas_id', 'review_date', name='uq_monthly_reviews_canvas_date'),
-        CheckConstraint("currently_testing_type IN ('thesis', 'proof_point') OR currently_testing_type IS NULL"),
-        Index('ix_monthly_reviews_canvas_id', 'canvas_id'),
-        Index('ix_monthly_reviews_review_date', 'review_date'),
-        Index('ix_monthly_reviews_created_by', 'created_by'),
-    )
-```
+**Table:** monthly_reviews
+
+| Field | Type | Constraints | Description |
+|-------|------|-------------|-------------|
+| id | UUID | PK, default uuid4 | Primary key |
+| canvas_id | UUID | FK → canvases.id ON DELETE CASCADE, NOT NULL | Parent canvas |
+| review_date | DATE | NOT NULL | Review date |
+| what_moved | TEXT | NULLABLE | What moved since last month |
+| what_learned | TEXT | NULLABLE | What did we learn |
+| what_threatens | TEXT | NULLABLE | What now threatens |
+| currently_testing_type | ENUM('thesis','proof_point') | NULLABLE | What was selected as focus |
+| currently_testing_id | UUID | NULLABLE | Polymorphic FK |
+| created_by | UUID | FK → users.id ON DELETE RESTRICT, NOT NULL | Review author |
+| created_at | TIMESTAMPTZ | NOT NULL, server default now() | Creation timestamp |
+
+**Constraints:** UNIQUE(canvas_id, review_date)
+**Relationships:** belongs_to Canvas via canvas_id; has_many Commitment (max 3, ordered); has_many Attachment
+**Indexes:** ix_monthly_reviews_canvas_id on canvas_id; ix_monthly_reviews_review_date on review_date
 
 ### Commitment
-```python
-class Commitment(Base, TimestampMixin):
-    __tablename__ = "commitments"
-    
-    monthly_review_id = Column(UUID(as_uuid=True), ForeignKey("monthly_reviews.id", ondelete="CASCADE"), nullable=False)
-    text = Column(Text, nullable=False)  # CHECK(length(text) BETWEEN 1 AND 1000) — enforced in __table_args__
-    order = Column(Integer, nullable=False, CheckConstraint("order >= 1 AND order <= 3"))
-    
-    # Relationships
-    monthly_review = relationship("MonthlyReview", back_populates="commitments")
-    
-    # Constraints
-    __table_args__ = (
-        CheckConstraint("length(text) BETWEEN 1 AND 1000", name="ck_commitment_text_length"),
-        UniqueConstraint('monthly_review_id', 'order', name='uq_commitments_review_order'),
-        Index('ix_commitments_review_id', 'monthly_review_id'),
-    )
-```
+**Table:** commitments
+
+| Field | Type | Constraints | Description |
+|-------|------|-------------|-------------|
+| id | UUID | PK, default uuid4 | Primary key |
+| monthly_review_id | UUID | FK → monthly_reviews.id ON DELETE CASCADE, NOT NULL | Parent review |
+| text | TEXT | NOT NULL, CHECK(length(text) BETWEEN 1 AND 1000) | Commitment text |
+| order | INTEGER | NOT NULL, CHECK(order BETWEEN 1 AND 3) | Display order |
+
+**Constraints:** UNIQUE(monthly_review_id, order)
+**Relationships:** belongs_to MonthlyReview via monthly_review_id
+**Indexes:** ix_commitments_review_id on monthly_review_id
 
 ### Canvas Update Trigger
 ```sql

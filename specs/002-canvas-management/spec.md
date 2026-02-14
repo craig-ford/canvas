@@ -204,130 +204,97 @@ Canvas Management provides full CRUD operations for VBUs and their Strategy + Li
 ## Data Models
 
 ### VBU Model
-```python
-class VBU(TimestampMixin, Base):
-    __tablename__ = "vbus"
-    
-    name = Column(String(255), nullable=False, CheckConstraint("LENGTH(TRIM(name)) > 0"))
-    gm_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="RESTRICT"), nullable=False)
-    updated_by = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
-    
-    # Relationships
-    gm = relationship("User", foreign_keys=[gm_id])
-    canvas = relationship("Canvas", back_populates="vbu", uselist=False, cascade="all, delete-orphan")
-    
-    # Indexes
-    __table_args__ = (
-        Index("ix_vbus_gm_id", "gm_id"),
-        Index("ix_vbus_name_gin", "name", postgresql_using="gin", postgresql_ops={"name": "gin_trgm_ops"}),
-        Index("ix_vbus_updated_at", "updated_at", postgresql_using="btree"),
-    )
-```
+**Table:** vbus
+
+| Field | Type | Constraints | Description |
+|-------|------|-------------|-------------|
+| id | UUID | PK, default uuid4 | Primary key |
+| name | VARCHAR(255) | NOT NULL, CHECK(LENGTH(TRIM(name)) > 0) | VBU display name |
+| gm_id | UUID | FK → users.id ON DELETE RESTRICT, NOT NULL | Owning GM |
+| created_at | TIMESTAMPTZ | NOT NULL, server default now() | Creation timestamp |
+| updated_at | TIMESTAMPTZ | NOT NULL, server default now(), on update now() | Last update |
+| updated_by | UUID | FK → users.id ON DELETE SET NULL, NULLABLE | Last editor |
+
+**Relationships:** belongs_to User via gm_id; has_one Canvas
+**Indexes:** ix_vbus_gm_id on gm_id
 
 ### Canvas Model
-```python
-class Canvas(TimestampMixin, Base):
-    __tablename__ = "canvases"
-    
-    vbu_id = Column(UUID(as_uuid=True), ForeignKey("vbus.id", ondelete="CASCADE"), unique=True, nullable=False)
-    product_name = Column(String(255), CheckConstraint("product_name IS NULL OR LENGTH(TRIM(product_name)) > 0"))
-    lifecycle_lane = Column(ENUM('build','sell','milk','reframe', name='lifecycle_lane_enum'), nullable=False, server_default='build')  # ENUM, default 'build'
-    success_description = Column(Text)
-    future_state_intent = Column(Text)
-    primary_focus = Column(String(255))
-    resist_doing = Column(Text)
-    good_discipline = Column(Text)
-    primary_constraint = Column(Text)
-    currently_testing_type = Column(ENUM('thesis','proof_point', name='currently_testing_type_enum'))  # NULLABLE
-    currently_testing_id = Column(UUID(as_uuid=True))
-    portfolio_notes = Column(Text)  # Admin-only field
-    updated_by = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"))
-    
-    # Relationships
-    vbu = relationship("VBU", back_populates="canvas")
-    theses = relationship("Thesis", back_populates="canvas", cascade="all, delete-orphan", order_by="Thesis.order")
-    
-    # Constraints
-    __table_args__ = (
-        CheckConstraint("(currently_testing_type IS NULL) = (currently_testing_id IS NULL)", name="ck_currently_testing_consistency"),
-        Index("uq_canvases_vbu_id", "vbu_id", unique=True),
-        Index("ix_canvases_lifecycle_lane", "lifecycle_lane"),
-        Index("ix_canvases_currently_testing", "currently_testing_type", "currently_testing_id"),
-    )
-```
+**Table:** canvases
+
+| Field | Type | Constraints | Description |
+|-------|------|-------------|-------------|
+| id | UUID | PK, default uuid4 | Primary key |
+| vbu_id | UUID | FK → vbus.id ON DELETE CASCADE, UNIQUE, NOT NULL | 1:1 with VBU |
+| product_name | VARCHAR(255) | NULLABLE, CHECK(product_name IS NULL OR LENGTH(TRIM(product_name)) > 0) | Optional product name |
+| lifecycle_lane | ENUM('build','sell','milk','reframe') | NOT NULL, default 'build' | Current lane |
+| success_description | TEXT | NULLABLE | Success description |
+| future_state_intent | TEXT | NULLABLE | 3-5 year vision |
+| primary_focus | VARCHAR(255) | NULLABLE | Learning / Replication / Cash & Risk |
+| resist_doing | TEXT | NULLABLE | What we must resist doing |
+| good_discipline | TEXT | NULLABLE | What good discipline looks like |
+| primary_constraint | TEXT | NULLABLE | Single biggest blocker |
+| currently_testing_type | ENUM('thesis','proof_point') | NULLABLE | Polymorphic type discriminator |
+| currently_testing_id | UUID | NULLABLE | Polymorphic FK |
+| portfolio_notes | TEXT | NULLABLE | Admin-only free text |
+| created_at | TIMESTAMPTZ | NOT NULL, server default now() | Creation timestamp |
+| updated_at | TIMESTAMPTZ | NOT NULL, server default now(), on update now() | Last update |
+| updated_by | UUID | FK → users.id ON DELETE SET NULL, NULLABLE | Last editor |
+
+**Constraints:** CHECK((currently_testing_type IS NULL) = (currently_testing_id IS NULL))
+**Relationships:** belongs_to VBU via vbu_id (1:1); has_many Thesis (max 5, ordered); has_many MonthlyReview
+**Indexes:** uq_canvases_vbu_id UNIQUE on vbu_id
 
 ### Thesis Model
-```python
-class Thesis(TimestampMixin, Base):
-    __tablename__ = "theses"
-    
-    canvas_id = Column(UUID(as_uuid=True), ForeignKey("canvases.id", ondelete="CASCADE"), nullable=False)
-    order = Column(Integer, CheckConstraint("order BETWEEN 1 AND 5"), nullable=False)
-    text = Column(Text, nullable=False, CheckConstraint("LENGTH(TRIM(text)) > 0"))
-    
-    # Relationships
-    canvas = relationship("Canvas", back_populates="theses")
-    proof_points = relationship("ProofPoint", back_populates="thesis", cascade="all, delete-orphan")
-    
-    # Constraints
-    __table_args__ = (
-        UniqueConstraint("canvas_id", "order", name="uq_theses_canvas_order"),
-        Index("ix_theses_canvas_id", "canvas_id"),
-        Index("ix_theses_text_gin", "text", postgresql_using="gin", postgresql_ops={"text": "gin_trgm_ops"}),
-    )
-```
+**Table:** theses
+
+| Field | Type | Constraints | Description |
+|-------|------|-------------|-------------|
+| id | UUID | PK, default uuid4 | Primary key |
+| canvas_id | UUID | FK → canvases.id ON DELETE CASCADE, NOT NULL | Parent canvas |
+| order | INTEGER | NOT NULL, CHECK(order BETWEEN 1 AND 5) | Display order |
+| text | TEXT | NOT NULL, CHECK(LENGTH(TRIM(text)) > 0) | Thesis statement |
+| created_at | TIMESTAMPTZ | NOT NULL, server default now() | Creation timestamp |
+| updated_at | TIMESTAMPTZ | NOT NULL, server default now(), on update now() | Last update |
+
+**Relationships:** belongs_to Canvas via canvas_id; has_many ProofPoint
+**Indexes:** ix_theses_canvas_id on canvas_id; uq_theses_canvas_order UNIQUE on (canvas_id, order)
 
 ### ProofPoint Model
-```python
-class ProofPoint(TimestampMixin, Base):
-    __tablename__ = "proof_points"
-    
-    thesis_id = Column(UUID(as_uuid=True), ForeignKey("theses.id", ondelete="CASCADE"), nullable=False)
-    description = Column(Text, nullable=False, CheckConstraint("LENGTH(TRIM(description)) > 0"))
-    status = Column(Enum(ProofPointStatus), nullable=False, default=ProofPointStatus.NOT_STARTED)
-    evidence_note = Column(Text)
-    target_review_month = Column(Date, CheckConstraint("target_review_month >= CURRENT_DATE - INTERVAL '1 year'"))
-    
-    # Relationships
-    thesis = relationship("Thesis", back_populates="proof_points")
-    attachments = relationship("Attachment", back_populates="proof_point", cascade="all, delete-orphan")
-    
-    # Indexes
-    __table_args__ = (
-        Index("ix_proof_points_thesis_id", "thesis_id"),
-        Index("ix_proof_points_status", "status"),
-        Index("ix_proof_points_target_month", "target_review_month"),
-        Index("ix_proof_points_description_gin", "description", postgresql_using="gin", postgresql_ops={"description": "gin_trgm_ops"}),
-    )
-```
+**Table:** proof_points
+
+| Field | Type | Constraints | Description |
+|-------|------|-------------|-------------|
+| id | UUID | PK, default uuid4 | Primary key |
+| thesis_id | UUID | FK → theses.id ON DELETE CASCADE, NOT NULL | Parent thesis |
+| description | TEXT | NOT NULL, CHECK(LENGTH(TRIM(description)) > 0) | Observable signal |
+| status | ENUM('not_started','in_progress','observed','stalled') | NOT NULL, default 'not_started' | Current status |
+| evidence_note | TEXT | NULLABLE | Evidence supporting status |
+| target_review_month | DATE | NULLABLE | Target month for observation |
+| created_at | TIMESTAMPTZ | NOT NULL, server default now() | Creation timestamp |
+| updated_at | TIMESTAMPTZ | NOT NULL, server default now(), on update now() | Last update |
+
+**Relationships:** belongs_to Thesis via thesis_id; has_many Attachment
+**Indexes:** ix_proof_points_thesis_id on thesis_id; ix_proof_points_status on status
 
 ### Attachment Model
-```python
-class Attachment(TimestampMixin, Base):
-    __tablename__ = "attachments"
-    
-    proof_point_id = Column(UUID(as_uuid=True), ForeignKey("proof_points.id", ondelete="CASCADE"))
-    monthly_review_id = Column(UUID(as_uuid=True), ForeignKey("monthly_reviews.id", ondelete="CASCADE"))
-    filename = Column(String(255), nullable=False, CheckConstraint("LENGTH(TRIM(filename)) > 0"))
-    storage_path = Column(String(1024), nullable=False, unique=True, CheckConstraint("LENGTH(TRIM(storage_path)) > 0"))
-    content_type = Column(String(128), nullable=False, CheckConstraint("content_type IN ('image/jpeg','image/png','image/gif','application/pdf','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','application/vnd.openxmlformats-officedocument.wordprocessingml.document','application/vnd.openxmlformats-officedocument.presentationml.presentation')"))  # CHECK(content_type IN (...))
-    size_bytes = Column(Integer, nullable=False, CheckConstraint("size_bytes BETWEEN 1 AND 10485760"))
-    label = Column(String(255), CheckConstraint("label IS NULL OR LENGTH(TRIM(label)) > 0"))
-    uploaded_by = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="RESTRICT"), nullable=False)
-    
-    # Relationships
-    proof_point = relationship("ProofPoint", back_populates="attachments")
-    uploader = relationship("User")
-    
-    # Constraints
-    __table_args__ = (
-        CheckConstraint("(proof_point_id IS NOT NULL AND monthly_review_id IS NULL) OR (proof_point_id IS NULL AND monthly_review_id IS NOT NULL)", name="ck_attachment_single_parent"),
-        Index("ix_attachments_proof_point_id", "proof_point_id"),
-        Index("ix_attachments_monthly_review_id", "monthly_review_id"),
-        Index("ix_attachments_uploaded_by", "uploaded_by"),
-        Index("ix_attachments_content_type", "content_type"),
-        Index("uq_attachments_storage_path", "storage_path", unique=True),
-    )
+**Table:** attachments
+
+| Field | Type | Constraints | Description |
+|-------|------|-------------|-------------|
+| id | UUID | PK, default uuid4 | Primary key |
+| proof_point_id | UUID | FK → proof_points.id ON DELETE CASCADE, NULLABLE | Attached to proof point |
+| monthly_review_id | UUID | FK → monthly_reviews.id ON DELETE CASCADE, NULLABLE | Attached to review |
+| filename | VARCHAR(255) | NOT NULL, CHECK(LENGTH(TRIM(filename)) > 0) | Original filename |
+| storage_path | VARCHAR(1024) | UNIQUE, NOT NULL, CHECK(LENGTH(TRIM(storage_path)) > 0) | Path on disk |
+| content_type | VARCHAR(128) | NOT NULL, CHECK(content_type IN ('image/jpeg','image/png','image/gif','application/pdf','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','application/vnd.openxmlformats-officedocument.wordprocessingml.document','application/vnd.openxmlformats-officedocument.presentationml.presentation')) | MIME type |
+| size_bytes | INTEGER | NOT NULL, CHECK(size_bytes BETWEEN 1 AND 10485760) | File size (max 10MB) |
+| label | VARCHAR(255) | NULLABLE, CHECK(label IS NULL OR LENGTH(TRIM(label)) > 0) | User-provided label |
+| uploaded_by | UUID | FK → users.id ON DELETE RESTRICT, NOT NULL | Uploader |
+| created_at | TIMESTAMPTZ | NOT NULL, server default now() | Upload timestamp |
+
+**Constraints:** CHECK(exactly one of proof_point_id, monthly_review_id IS NOT NULL)
+**Relationships:** belongs_to ProofPoint via proof_point_id (nullable); belongs_to MonthlyReview via monthly_review_id (nullable)
+**Indexes:** ix_attachments_proof_point_id on proof_point_id; ix_attachments_monthly_review_id on monthly_review_id
 ```
 
 ## Service Layer

@@ -237,24 +237,23 @@ Provides user authentication via email/password with JWT tokens and role-based a
 ## Data Models
 
 ### User
-```python
-class User(Base, TimestampMixin):
-    __tablename__ = "users"
-    
-    email = Column(String(255), unique=True, nullable=False, index=True)
-    password_hash = Column(String(255), nullable=False)
-    name = Column(String(255), nullable=False)
-    role = Column(ENUM('admin','gm','viewer', name='user_role_enum'), nullable=False, server_default='viewer')  # ENUM('admin','gm','viewer')
-    is_active = Column(Boolean, nullable=False, server_default=text('true'))  # NOT NULL, default True
-    last_login_at = Column(TIMESTAMPTZ, nullable=True)  # TIMESTAMPTZ, NULLABLE
-    failed_login_attempts = Column(Integer, nullable=False, server_default=text('0'))
-    locked_until = Column(TIMESTAMPTZ, nullable=True)  # TIMESTAMPTZ, NULLABLE
+**Table:** users
 
-class UserRole(str, Enum):
-    ADMIN = "admin"
-    GM = "gm"
-    VIEWER = "viewer"
-```
+| Field | Type | Constraints | Description |
+|-------|------|-------------|-------------|
+| id | UUID | PK, default uuid4 | Primary key |
+| email | VARCHAR(255) | UNIQUE, NOT NULL | Login identifier |
+| password_hash | VARCHAR(255) | NOT NULL | bcrypt hash |
+| name | VARCHAR(255) | NOT NULL | Display name |
+| role | ENUM('admin','gm','viewer') | NOT NULL, default 'viewer' | Access level |
+| is_active | BOOLEAN | NOT NULL, default True | Account active flag |
+| last_login_at | TIMESTAMPTZ | NULLABLE | Last successful login |
+| failed_login_attempts | INTEGER | NOT NULL, default 0 | Consecutive failed logins |
+| locked_until | TIMESTAMPTZ | NULLABLE | Account lock expiry |
+| created_at | TIMESTAMPTZ | NOT NULL, server default now() | Creation timestamp |
+| updated_at | TIMESTAMPTZ | NOT NULL, server default now(), on update now() | Last update |
+
+**UserRole enum values:** admin, gm, viewer
 
 ### Database Constraints
 - Email: Unique, case-insensitive, RFC 5322 format validation
