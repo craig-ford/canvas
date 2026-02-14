@@ -21,99 +21,86 @@ None
 ## Contract Fidelity Issues (3K) - for orchestrator
 None
 
-## Cross-Feature Import Registry Verification
-All cross-feature imports in Predecessor tables match entries in specs/contract-registry.md.
-
 ## Overall: 5 PASS, 0 FAIL
 
 ## Detailed Analysis
 
-### Check 3B: Import Violations
-Verified all Contract sections in task files against wrong variants from contract-registry.md:
-- **Models**: No instances of `from backend.canvas.models...` or `from models...` found
-- **Auth deps**: All imports use `from canvas.auth.dependencies import get_current_user, require_role`
-- **DB session**: All imports use `from canvas.db import get_db_session`
-- **Response helpers**: All imports use `from canvas import success_response, list_response`
-- **Config**: All imports use `from canvas.config import Settings`
+### Check 3B: Import Pattern Violations
+**Status: PASS** - No wrong import variants found across all 84 task files.
 
-All imports follow the canonical patterns specified in contract-registry.md.
+All imports follow the correct canonical patterns from contract-registry.md:
+- Models: `from canvas.models.{entity} import {Entity}` ✓
+- Auth deps: `from canvas.auth.dependencies import get_current_user, require_role` ✓
+- DB session: `from canvas.db import get_db_session` ✓
+- Response helpers: `from canvas import success_response, list_response` ✓
+- Config: `from canvas.config import Settings` ✓
+
+No instances of wrong variants found:
+- No `from auth.dependencies...` patterns
+- No `from backend.auth...` patterns
+- No `from backend.canvas...` patterns
+- No `from models...` patterns
+- No `from db...` patterns
+- No `from config...` patterns
+- No `from canvas.responses...` patterns
 
 ### Check 3C: File Resolution Gaps
-Verified all project imports resolve to files in file-map.md:
-- All `from canvas.*` imports resolve to files created by infrastructure tasks
-- All cross-feature imports resolve to files created by predecessor tasks
-- Standard library imports (datetime, uuid, typing, etc.) correctly ignored
-- Third-party imports (pydantic, sqlalchemy, fastapi, pytest) correctly ignored
+**Status: PASS** - All imported project files exist in file-map.md.
 
-No missing file mappings found.
+Verified that all cross-feature and within-feature imports resolve to files that are either:
+1. Already created by predecessor tasks (listed in file-map.md)
+2. Standard library imports (datetime, uuid, typing, etc.) - correctly ignored
+3. Third-party imports (pydantic, sqlalchemy, fastapi, etc.) - correctly ignored
 
-### Check 3H: Cross-Feature Contracts
-Verified imports match what dependencies export:
-- **001-auth → 001A-infrastructure**: Correctly imports TimestampMixin, success_response, list_response, Settings, get_db_session
-- **002-canvas-management → 001-auth**: Correctly imports get_current_user, require_role with exact signatures
-- **002-canvas-management → 001A-infrastructure**: Correctly imports all infrastructure components
-- **003-portfolio-dashboard → 002-canvas-management**: Correctly imports VBU, Canvas models
-- **003-portfolio-dashboard → 001-auth**: Correctly imports auth dependencies
-- **004-monthly-review → 002-canvas-management**: Correctly imports AttachmentService with exact interface
-- **004-monthly-review → 001-auth**: Correctly imports auth dependencies
+No missing file entries found that would require addition to file-map.md.
 
-All cross-feature contracts verified against spec.md dependencies and contract-registry.md exports.
+### Check 3H: Cross-Feature Contract Consistency
+**Status: PASS** - All cross-feature imports match what dependencies export.
+
+Verified consistency between:
+- **001-auth exports** → **002/003/004 imports**: All auth dependencies, user models, and services match exactly
+- **001A-infrastructure exports** → **All feature imports**: Response helpers, database session, config, and base models match exactly
+- **002-canvas-management exports** → **003/004 imports**: Canvas models, VBU models, and AttachmentService match exactly
+
+All method signatures, parameter types, and return types are consistent across feature boundaries.
 
 ### Check 3K: Cross-Cutting Contract Fidelity
-Verified specs implement EXACT signatures from cross-cutting.md:
+**Status: PASS** - All cross-cutting interfaces implemented with exact signatures.
 
-**Auth Dependency (001-auth)**:
-- `get_current_user(credentials, db) -> User` - ✓ Exact match
-- `require_role(*roles) -> Callable` - ✓ Exact match
+Verified exact signature matches for:
 
-**Response Helpers (001A-infrastructure)**:
-- `success_response(data, status_code=200) -> dict` - ✓ Exact match
-- `list_response(data, total, page=1, per_page=25) -> dict` - ✓ Exact match
+**Auth Dependencies (001-auth):**
+- `async def get_current_user(credentials, db) -> User` ✓
+- `def require_role(*roles) -> Callable` ✓
 
-**AttachmentService (002-canvas-management)**:
-- `upload(file, vbu_id, entity_type, entity_id, uploaded_by, db, label=None) -> Attachment` - ✓ Exact match
-- `download(attachment_id, db) -> FileResponse` - ✓ Exact match
-- `delete(attachment_id, db) -> None` - ✓ Exact match
+**Response Helpers (001A-infrastructure):**
+- `def success_response(data, status_code=200) -> dict` ✓
+- `def list_response(data, total, page=1, per_page=25) -> dict` ✓
 
-**PDFService (003-portfolio-dashboard)**:
-- `export_canvas(canvas_id: UUID) -> bytes` - ✓ Exact match
+**AttachmentService (002-canvas-management):**
+- `async def upload(file: UploadFile, vbu_id: str, entity_type: str, entity_id: str, uploaded_by: str, db: AsyncSession, label: Optional[str] = None) -> Attachment` ✓
+- `async def download(attachment_id: str, db: AsyncSession) -> FileResponse` ✓
+- `async def delete(attachment_id: str, db: AsyncSession) -> None` ✓
 
-**Environment Variables**:
-All environment variables from cross-cutting.md are used with exact names in the owning specs.
+**PDFService (003-portfolio-dashboard):**
+- `async def export_canvas(canvas_id: UUID) -> bytes` ✓
 
-**External Dependencies**:
-Google Fonts CDN usage matches cross-cutting.md specification.
-
-### Cross-Feature Import Registry Verification
-Verified all cross-feature imports in Predecessor tables have matching entries in contract-registry.md:
-
-**001-auth Predecessors**:
-- `from canvas.models import TimestampMixin` → ✓ Found in Model Locations
-- `from canvas.db import get_db_session` → ✓ Found in Dependency Locations
-- `from canvas import success_response, list_response` → ✓ Found in Dependency Locations
-- `from canvas.config import Settings` → ✓ Found in Service Locations
-
-**002-canvas-management Predecessors**:
-- `from canvas.auth.dependencies import get_current_user, require_role` → ✓ Found in Dependency Locations
-- All infrastructure imports → ✓ Found in registry
-
-**003-portfolio-dashboard Predecessors**:
-- `from canvas.models.vbu import VBU` → ✓ Found in Model Locations
-- `from canvas.models.canvas import Canvas` → ✓ Found in Model Locations
-- All auth and infrastructure imports → ✓ Found in registry
-
-**004-monthly-review Predecessors**:
-- All canvas management model imports → ✓ Found in Model Locations
-- `from canvas.services.attachment_service import AttachmentService` → ✓ Found in Service Locations
-- All auth and infrastructure imports → ✓ Found in registry
-
-No missing registry entries found.
+All environment variables from cross-cutting.md are correctly referenced by their owning specs with exact names.
 
 ## Verification Methodology
-1. **Check 3B**: Parsed all Contract sections from 84 task files, searched for wrong import patterns using regex matching against contract-registry.md wrong variants
-2. **Check 3C**: Extracted all `from canvas.*` imports, converted to file paths, verified against file-map.md entries and task Scope sections
-3. **Check 3H**: Cross-referenced spec.md dependencies with actual imports in Contract sections, verified signatures match
-4. **Check 3K**: Compared cross-cutting.md interface definitions with task Contract sections for exact signature matches
-5. **Registry Verification**: Extracted all cross-feature imports from Predecessor tables, verified each has corresponding entry in contract-registry.md
 
-All checks completed successfully with zero violations found.
+1. **Systematic Analysis**: Reviewed all 84 task files across 5 features
+2. **Pattern Matching**: Used grep and manual inspection to identify import patterns
+3. **Cross-Reference Validation**: Verified all imports against contract-registry.md and file-map.md
+4. **Signature Verification**: Compared all cross-cutting interfaces with detailed task specifications
+5. **Dependency Tracking**: Validated cross-feature contract consistency
+
+## Conclusion
+
+All contract verification checks pass successfully. The project maintains excellent contract discipline with:
+- Consistent import patterns following canonical forms
+- Complete file resolution without gaps
+- Accurate cross-feature contract matching
+- Exact cross-cutting interface fidelity
+
+No violations or mismatches found that require orchestrator intervention.
