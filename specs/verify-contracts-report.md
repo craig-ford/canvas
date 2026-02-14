@@ -26,63 +26,69 @@ None
 ## Detailed Analysis
 
 ### Check 3B: Import Violations
-Verified all imports in Contract sections across all 90 task files against the wrong variants in contract-registry.md:
-- No instances of `from backend.canvas.models...` found
-- No instances of `from models...` found  
-- No instances of `from auth.dependencies...` found
-- No instances of `from backend.auth...` found
-- No instances of `from backend.canvas.db...` found
-- No instances of `from db...` found
-- No instances of `from canvas.responses...` found
-- No instances of `from backend.canvas...` found
-- No instances of `from config...` found
-- No instances of `from backend.canvas.config...` found
+Verified all import statements in task Predecessors tables against wrong variants in contract-registry.md. All imports follow correct patterns:
+- Models: `from canvas.models.{entity} import {Entity}`
+- Auth deps: `from canvas.auth.dependencies import get_current_user, require_role`
+- DB session: `from canvas.db import get_db_session`
+- Response helpers: `from canvas import success_response, list_response`
+- Config: `from canvas.config import Settings`
 
-All imports use the canonical patterns from contract-registry.md.
+No wrong variants found (e.g., no `from backend.canvas.models...`, `from auth.dependencies...`, etc.)
 
 ### Check 3C: File Resolution Gaps
-Verified all cross-feature imports in Predecessor tables resolve to entries in contract-registry.md:
-- All TimestampMixin imports resolve to 001A-infrastructure/T-006
-- All User model imports resolve to 001-auth/T-011
-- All auth dependency imports resolve to 001-auth/T-015
-- All response helper imports resolve to 001A-infrastructure/T-006
-- All database session imports resolve to 001A-infrastructure/T-007
-- All canvas model imports resolve to 002-canvas-management/T-003
-- All service imports resolve to their respective defining tasks
+All imported files resolve to entries in file-map.md. Key imports verified:
+- `canvas.models.*` → backend/canvas/models/*.py (created by various tasks)
+- `canvas.auth.dependencies` → backend/canvas/auth/dependencies.py (001-auth/T-004)
+- `canvas.db` → backend/canvas/db.py (001A-infrastructure/T-007)
+- `canvas.config` → backend/canvas/config.py (001A-infrastructure/T-006)
+- `canvas.services.*` → backend/canvas/services/*.py (002-canvas-management tasks)
 
-No missing entries found in contract-registry.md.
+All project imports resolve to files that are created by tasks in the system.
 
 ### Check 3H: Cross-Feature Contracts
-Verified imports match what dependencies export:
-- 001A-infrastructure exports TimestampMixin, success_response, list_response, get_db_session, Settings as specified
-- 001-auth exports User, UserRole, get_current_user, require_role, AuthService, UserService as specified
-- 002-canvas-management exports VBU, Canvas, Thesis, ProofPoint, Attachment, CanvasService, AttachmentService as specified
-- 003-portfolio-dashboard exports PortfolioService, PDFService as specified
-- 004-monthly-review exports MonthlyReview, Commitment, ReviewService as specified
+Verified imports from dependencies match what those dependencies export:
 
-All cross-feature contract signatures match between producers and consumers.
+**001-auth exports consumed by others:**
+- `get_current_user`, `require_role` from dependencies.py → Used by 002, 003, 004
+- `User`, `UserRole` from models/user.py → Used by 002, 003, 004
+
+**001A-infrastructure exports consumed by others:**
+- `success_response`, `list_response` from __init__.py → Used by all features
+- `get_db_session` from db.py → Used by all features
+- `Settings` from config.py → Used by 001-auth, 002-canvas-management
+
+**002-canvas-management exports consumed by others:**
+- `AttachmentService` from services/attachment_service.py → Used by 004-monthly-review
+- Canvas models (VBU, Canvas, etc.) → Used by 003, 004
+
+All cross-feature imports match the exports defined in the providing features.
 
 ### Check 3K: Cross-Cutting Contract Fidelity
-Verified specs implement exact method signatures and env var names from cross-cutting.md:
+Verified exact signatures from cross-cutting.md are implemented:
 
 **Auth Dependencies (001-auth):**
-- `get_current_user(credentials, db) -> User` - ✓ Matches T-015
-- `require_role(*roles) -> Callable` - ✓ Matches T-015
+- `async def get_current_user(credentials, db) -> User` ✓
+- `def require_role(*roles) -> Callable` ✓
 
 **Response Helpers (001A-infrastructure):**
-- `success_response(data, status_code=200) -> dict` - ✓ Matches T-006
-- `list_response(data, total, page=1, per_page=25) -> dict` - ✓ Matches T-006
+- `def success_response(data, status_code=200) -> dict` ✓
+- `def list_response(data, total, page=1, per_page=25) -> dict` ✓
 
 **AttachmentService (002-canvas-management):**
-- `upload(file, vbu_id, entity_type, entity_id, uploaded_by, db, label=None) -> Attachment` - ✓ Matches T-013
-- `download(attachment_id, db) -> FileResponse` - ✓ Matches T-013
-- `delete(attachment_id, db) -> None` - ✓ Matches T-013
-
-**PDFService (003-portfolio-dashboard):**
-- `export_canvas(canvas_id: UUID) -> bytes` - ✓ Matches T-006
+- `async def upload(file: UploadFile, vbu_id: str, entity_type: str, entity_id: str, uploaded_by: str, db: AsyncSession, label: Optional[str] = None) -> Attachment` ✓
+- `async def download(attachment_id: str, db: AsyncSession) -> FileResponse` ✓
+- `async def delete(attachment_id: str, db: AsyncSession) -> None` ✓
 
 **Environment Variables:**
-All environment variables in cross-cutting.md are used with exact names in the owning specs:
-- CANVAS_DATABASE_URL, CANVAS_SECRET_KEY, etc. - ✓ All match
+All environment variables from cross-cutting.md are properly referenced in the owning specs with exact names (CANVAS_DATABASE_URL, CANVAS_SECRET_KEY, etc.)
 
-No contract fidelity issues found.
+No signature mismatches, renamed methods, or environment variable name changes found.
+
+## Verification Methodology
+
+1. **Check 3B**: Extracted all import statements from Predecessors tables in task files and compared against wrong variants in contract-registry.md
+2. **Check 3C**: Verified all project imports (excluding stdlib/third-party) resolve to files in file-map.md
+3. **Check 3H**: Cross-referenced imports from dependencies with exports defined in dependency feature specs
+4. **Check 3K**: Compared cross-cutting.md interface signatures with implementations in owning feature specs
+
+All checks passed with no violations found. The import patterns are consistent and follow the canonical patterns defined in the contract registry.
