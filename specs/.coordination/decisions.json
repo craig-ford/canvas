@@ -1,111 +1,266 @@
 {
   "phase": "tasks-detail",
   "timestamp": "2026-02-13T14:00:00Z",
-  "batch_items": ["004-monthly-review: T-001→T-018"],
+  "batch_items": [
+    "Chain 1: T-001→T-003→T-004",
+    "Chain 2: T-002",
+    "Chain 3: T-019",
+    "Chain 4: T-020", 
+    "Chain 5: T-021",
+    "Layer 1: T-005,T-006",
+    "Layer 2: T-007,T-008,T-009,T-010,T-011,T-012,T-013",
+    "Layer 3: T-014,T-015,T-016,T-017,T-018",
+    "Layer 4: T-022,T-023",
+    "Layer 5: T-024,T-025"
+  ],
   "file_ownership": {
-    "backend/canvas/models/monthly_review.py": {
-      "owner": "T-001",
+    "backend/canvas/models/vbu.py": {
+      "owner": "T-003",
       "action": "CREATE",
-      "importers": ["T-002", "T-003", "T-005", "T-007", "T-013"]
+      "importers": ["T-005", "T-007", "T-014"]
     },
-    "backend/canvas/models/commitment.py": {
-      "owner": "T-002", 
-      "action": "CREATE",
-      "importers": ["T-003", "T-005", "T-007", "T-013"]
-    },
-    "backend/canvas/reviews/service.py": {
+    "backend/canvas/models/canvas.py": {
       "owner": "T-003",
       "action": "CREATE", 
-      "importers": ["T-007", "T-008", "T-013", "T-014"]
+      "importers": ["T-005", "T-008", "T-015"]
     },
-    "backend/canvas/reviews/schemas.py": {
+    "backend/canvas/models/thesis.py": {
+      "owner": "T-003",
+      "action": "CREATE",
+      "importers": ["T-005", "T-009", "T-016"]
+    },
+    "backend/canvas/models/proof_point.py": {
+      "owner": "T-003",
+      "action": "CREATE",
+      "importers": ["T-006", "T-010", "T-017"]
+    },
+    "backend/canvas/models/attachment.py": {
+      "owner": "T-003",
+      "action": "CREATE",
+      "importers": ["T-006", "T-011", "T-018"]
+    },
+    "backend/canvas/models/__init__.py": {
+      "owner": "T-003",
+      "action": "MODIFY",
+      "importers": ["all tasks"]
+    },
+    "backend/canvas/services/canvas_service.py": {
+      "owner": "T-012",
+      "action": "CREATE",
+      "importers": ["T-014", "T-015", "T-016", "T-017", "T-023"]
+    },
+    "backend/canvas/services/attachment_service.py": {
+      "owner": "T-013",
+      "action": "CREATE",
+      "importers": ["T-018", "T-023"]
+    },
+    "backend/canvas/schemas.py": {
       "owner": "T-004",
       "action": "CREATE",
-      "importers": ["T-009", "T-012", "T-014"]
+      "importers": ["T-014", "T-015", "T-016", "T-017", "T-018", "T-023"]
     },
-    "alembic/versions/004_monthly_reviews.py": {
-      "owner": "T-005",
+    "backend/alembic/versions/002_canvas_tables.py": {
+      "owner": "T-004",
       "action": "CREATE",
       "importers": []
     },
-    "backend/canvas/reviews/router.py": {
+    "backend/canvas/routes/vbu.py": {
       "owner": "T-014",
       "action": "CREATE",
-      "importers": ["T-018"]
+      "importers": ["T-025"]
     },
-    "frontend/src/reviews/ReviewWizard.tsx": {
+    "backend/canvas/routes/canvas.py": {
       "owner": "T-015",
       "action": "CREATE",
-      "importers": ["T-017", "T-018"]
+      "importers": ["T-025"]
     },
-    "frontend/src/reviews/ReviewHistory.tsx": {
-      "owner": "T-016", 
+    "backend/canvas/routes/thesis.py": {
+      "owner": "T-016",
       "action": "CREATE",
-      "importers": ["T-018"]
+      "importers": ["T-025"]
+    },
+    "backend/canvas/routes/proof_point.py": {
+      "owner": "T-017",
+      "action": "CREATE",
+      "importers": ["T-025"]
+    },
+    "backend/canvas/routes/attachment.py": {
+      "owner": "T-018",
+      "action": "CREATE",
+      "importers": ["T-025"]
+    },
+    "frontend/src/components/InlineEdit.tsx": {
+      "owner": "T-019",
+      "action": "CREATE",
+      "importers": ["T-022"]
+    },
+    "frontend/src/components/StatusBadge.tsx": {
+      "owner": "T-020",
+      "action": "CREATE",
+      "importers": ["T-022"]
+    },
+    "frontend/src/components/FileUpload.tsx": {
+      "owner": "T-021",
+      "action": "CREATE",
+      "importers": ["T-022"]
+    },
+    "frontend/src/canvas/CanvasPage.tsx": {
+      "owner": "T-022",
+      "action": "CREATE",
+      "importers": ["T-024"]
+    },
+    "frontend/src/api/canvas.ts": {
+      "owner": "T-023",
+      "action": "CREATE",
+      "importers": ["T-024"]
+    },
+    "frontend/src/canvas/hooks/useCanvas.ts": {
+      "owner": "T-024",
+      "action": "CREATE",
+      "importers": ["T-025"]
+    },
+    "frontend/src/App.tsx": {
+      "owner": "T-025",
+      "action": "MODIFY",
+      "importers": []
     }
   },
   "interfaces": {
-    "MonthlyReview.model": {
-      "location": "backend/canvas/models/monthly_review.py",
-      "signature": "class MonthlyReview(Base, TimestampMixin)",
-      "defined_by": "T-001",
-      "consumed_by": ["T-002", "T-003", "T-005", "T-007", "T-013"]
+    "CanvasService.get_canvas_by_vbu": {
+      "location": "backend/canvas/services/canvas_service.py",
+      "signature": "async def get_canvas_by_vbu(self, vbu_id: UUID, db: AsyncSession) -> Canvas",
+      "defined_by": "T-012",
+      "consumed_by": ["T-015", "T-023"]
     },
-    "Commitment.model": {
-      "location": "backend/canvas/models/commitment.py", 
-      "signature": "class Commitment(Base, TimestampMixin)",
-      "defined_by": "T-002",
-      "consumed_by": ["T-003", "T-005", "T-007", "T-013"]
+    "CanvasService.update_canvas": {
+      "location": "backend/canvas/services/canvas_service.py", 
+      "signature": "async def update_canvas(self, vbu_id: UUID, canvas_data: CanvasUpdate, updated_by: UUID, db: AsyncSession) -> Canvas",
+      "defined_by": "T-012",
+      "consumed_by": ["T-015", "T-023"]
     },
-    "ReviewService.list_reviews": {
-      "location": "backend/canvas/reviews/service.py",
-      "signature": "async def list_reviews(self, canvas_id: UUID) -> List[MonthlyReview]",
-      "defined_by": "T-003",
-      "consumed_by": ["T-007", "T-008", "T-013", "T-014"]
+    "CanvasService.create_vbu": {
+      "location": "backend/canvas/services/canvas_service.py",
+      "signature": "async def create_vbu(self, vbu_data: VBUCreate, created_by: UUID, db: AsyncSession) -> VBU",
+      "defined_by": "T-012",
+      "consumed_by": ["T-014", "T-023"]
     },
-    "ReviewService.create_review": {
-      "location": "backend/canvas/reviews/service.py",
-      "signature": "async def create_review(self, canvas_id: UUID, review_data: dict, created_by: UUID) -> MonthlyReview",
-      "defined_by": "T-003", 
-      "consumed_by": ["T-007", "T-008", "T-013", "T-014"]
+    "CanvasService.update_vbu": {
+      "location": "backend/canvas/services/canvas_service.py",
+      "signature": "async def update_vbu(self, vbu_id: UUID, vbu_data: VBUUpdate, updated_by: UUID, db: AsyncSession) -> VBU",
+      "defined_by": "T-012",
+      "consumed_by": ["T-014", "T-023"]
     },
-    "ReviewService.get_review": {
-      "location": "backend/canvas/reviews/service.py",
-      "signature": "async def get_review(self, review_id: UUID) -> MonthlyReview",
-      "defined_by": "T-003",
-      "consumed_by": ["T-007", "T-008", "T-013", "T-014"]
+    "CanvasService.delete_vbu": {
+      "location": "backend/canvas/services/canvas_service.py",
+      "signature": "async def delete_vbu(self, vbu_id: UUID, db: AsyncSession) -> None",
+      "defined_by": "T-012",
+      "consumed_by": ["T-014", "T-023"]
     },
-    "ReviewCreateSchema": {
-      "location": "backend/canvas/reviews/schemas.py",
-      "signature": "class ReviewCreateSchema(BaseModel)",
-      "defined_by": "T-004",
-      "consumed_by": ["T-009", "T-012", "T-014"]
+    "CanvasService.list_vbus": {
+      "location": "backend/canvas/services/canvas_service.py",
+      "signature": "async def list_vbus(self, current_user: User, page: int, per_page: int, db: AsyncSession) -> Tuple[List[VBU], int]",
+      "defined_by": "T-012",
+      "consumed_by": ["T-014", "T-023"]
     },
-    "ReviewResponse": {
-      "location": "backend/canvas/reviews/schemas.py", 
-      "signature": "class ReviewResponse(BaseModel)",
-      "defined_by": "T-004",
-      "consumed_by": ["T-009", "T-012", "T-014"]
+    "CanvasService.create_thesis": {
+      "location": "backend/canvas/services/canvas_service.py",
+      "signature": "async def create_thesis(self, canvas_id: UUID, thesis_data: ThesisCreate, db: AsyncSession) -> Thesis",
+      "defined_by": "T-012",
+      "consumed_by": ["T-016", "T-023"]
+    },
+    "CanvasService.update_thesis": {
+      "location": "backend/canvas/services/canvas_service.py",
+      "signature": "async def update_thesis(self, thesis_id: UUID, thesis_data: ThesisUpdate, db: AsyncSession) -> Thesis",
+      "defined_by": "T-012",
+      "consumed_by": ["T-016", "T-023"]
+    },
+    "CanvasService.delete_thesis": {
+      "location": "backend/canvas/services/canvas_service.py",
+      "signature": "async def delete_thesis(self, thesis_id: UUID, db: AsyncSession) -> None",
+      "defined_by": "T-012",
+      "consumed_by": ["T-016", "T-023"]
+    },
+    "CanvasService.reorder_theses": {
+      "location": "backend/canvas/services/canvas_service.py",
+      "signature": "async def reorder_theses(self, canvas_id: UUID, thesis_orders: List[Dict[str, Union[UUID, int]]], db: AsyncSession) -> List[Thesis]",
+      "defined_by": "T-012",
+      "consumed_by": ["T-016", "T-023"]
+    },
+    "CanvasService.create_proof_point": {
+      "location": "backend/canvas/services/canvas_service.py",
+      "signature": "async def create_proof_point(self, thesis_id: UUID, proof_point_data: ProofPointCreate, db: AsyncSession) -> ProofPoint",
+      "defined_by": "T-012",
+      "consumed_by": ["T-017", "T-023"]
+    },
+    "CanvasService.update_proof_point": {
+      "location": "backend/canvas/services/canvas_service.py",
+      "signature": "async def update_proof_point(self, proof_point_id: UUID, proof_point_data: ProofPointUpdate, db: AsyncSession) -> ProofPoint",
+      "defined_by": "T-012",
+      "consumed_by": ["T-017", "T-023"]
+    },
+    "CanvasService.delete_proof_point": {
+      "location": "backend/canvas/services/canvas_service.py",
+      "signature": "async def delete_proof_point(self, proof_point_id: UUID, db: AsyncSession) -> None",
+      "defined_by": "T-012",
+      "consumed_by": ["T-017", "T-023"]
+    },
+    "AttachmentService.upload": {
+      "location": "backend/canvas/services/attachment_service.py",
+      "signature": "async def upload(self, file: UploadFile, vbu_id: UUID, entity_type: str, entity_id: UUID, uploaded_by: UUID, db: AsyncSession, label: Optional[str] = None) -> Attachment",
+      "defined_by": "T-013",
+      "consumed_by": ["T-018", "T-023"]
+    },
+    "AttachmentService.download": {
+      "location": "backend/canvas/services/attachment_service.py",
+      "signature": "async def download(self, attachment_id: UUID, db: AsyncSession) -> FileResponse",
+      "defined_by": "T-013",
+      "consumed_by": ["T-018", "T-023"]
+    },
+    "AttachmentService.delete": {
+      "location": "backend/canvas/services/attachment_service.py",
+      "signature": "async def delete(self, attachment_id: UUID, db: AsyncSession) -> None",
+      "defined_by": "T-013",
+      "consumed_by": ["T-018", "T-023"]
     }
   },
   "naming": {
     "table_names": "plural",
-    "module_pattern": "backend/canvas/reviews/ for review-specific code",
-    "import_base": "from canvas.{module} import {class}"
+    "module_pattern": "from canvas.{module} import {class}",
+    "import_base": "from canvas.{module} import {class}",
+    "frontend_paths": "src/{feature}/{Component}.tsx",
+    "enum_naming": "UPPER_SNAKE_CASE values, PascalCase types"
   },
   "conventions": {
-    "model_relationships": "Use SQLAlchemy relationship() with back_populates for bidirectional relationships",
-    "service_methods": "All service methods async, return domain models not dicts",
-    "schema_validation": "Pydantic v2 with Field() constraints and custom validators",
-    "database_trigger": "PostgreSQL trigger function update_canvas_currently_testing() for atomic canvas updates",
-    "file_attachments": "Use AttachmentService.upload() with monthly_review_id linkage",
-    "authorization": "Use get_current_user and require_role from canvas.auth.dependencies",
-    "response_format": "Use success_response and list_response from canvas.__init__"
+    "model_imports": "from canvas.models.{entity} import {Entity}",
+    "service_imports": "from canvas.services.{service}_service import {Service}Service",
+    "auth_imports": "from canvas.auth.dependencies import get_current_user, require_role",
+    "response_imports": "from canvas import success_response, list_response",
+    "db_imports": "from canvas.db import get_db_session",
+    "schema_imports": "from canvas.schemas import {Schema}Create, {Schema}Update, {Schema}Response",
+    "frontend_component_paths": {
+      "InlineEdit": "frontend/src/components/InlineEdit.tsx",
+      "StatusBadge": "frontend/src/components/StatusBadge.tsx", 
+      "FileUpload": "frontend/src/components/FileUpload.tsx",
+      "CanvasPage": "frontend/src/canvas/CanvasPage.tsx"
+    },
+    "frontend_api_paths": {
+      "canvas_client": "frontend/src/api/canvas.ts",
+      "canvas_hooks": "frontend/src/canvas/hooks/useCanvas.ts"
+    },
+    "enum_definitions": {
+      "LifecycleLane": "build, sell, milk, reframe",
+      "ProofPointStatus": "not_started, in_progress, observed, stalled",
+      "CurrentlyTestingType": "thesis, proof_point"
+    },
+    "file_storage_pattern": "/uploads/{vbu_id}/{entity_type}/{uuid}.{ext}",
+    "cli_command_pattern": "canvas-cli {action}-{entity}",
+    "test_file_pattern": "backend/tests/{module}/test_{feature}_{type}.py"
   },
   "deferred": [],
   "warnings": [
-    "T-006 database trigger must be created before T-007 integration tests run",
-    "T-013 ReviewService implementation depends on AttachmentService interface stability",
-    "T-017 auto-save functionality requires careful state management to avoid conflicts"
+    "T-005 and T-006 integration tests depend on T-002 service contracts and T-004 migration - ensure T-002 and T-004 complete before T-005/T-006 start",
+    "Frontend components T-019, T-020, T-021 are independent but T-022 requires all three - coordinate completion timing",
+    "T-023 API client depends on all backend routes T-015-T-018 being complete with stable interfaces",
+    "T-025 App.tsx modification requires T-024 canvas page integration to be complete with proper routing structure"
   ]
 }

@@ -4,7 +4,7 @@
 |---------|-------------|-----------------|--------|
 | 001A-infrastructure | Run 16 | Run 2 | PASS |
 | 001-auth | Run 16 | Run 2 | PASS |
-| 002-canvas-management | - | - | PENDING |
+| 002-canvas-management | - | - | RECHECK |
 | 003-portfolio-dashboard | Run 16 | Run 2 | PASS |
 | 004-monthly-review | Run 16 | Run 2 | PASS |
 
