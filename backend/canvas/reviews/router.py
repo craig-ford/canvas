@@ -43,7 +43,7 @@ async def list_reviews(
     await verify_canvas_access(canvas_id, current_user, db)
     service = ReviewService(db)
     reviews = await service.list_reviews(canvas_id)
-    return list_response([ReviewResponse.from_orm(review) for review in reviews], len(reviews))
+    return list_response([ReviewResponse.model_validate(review) for review in reviews], len(reviews))
 
 @router.post("/canvases/{canvas_id}/reviews", response_model=dict, status_code=201)
 async def create_review(
@@ -55,8 +55,8 @@ async def create_review(
     """Create new review"""
     await verify_canvas_access(canvas_id, current_user, db)
     service = ReviewService(db)
-    review = await service.create_review(canvas_id, review_data.dict(), current_user.id)
-    return success_response(ReviewResponse.from_orm(review), 201)
+    review = await service.create_review(canvas_id, review_data.model_dump(), current_user.id)
+    return success_response(ReviewResponse.model_validate(review), 201)
 
 @router.get("/reviews/{review_id}", response_model=dict)
 async def get_review(
@@ -71,4 +71,4 @@ async def get_review(
     # Verify access to the canvas this review belongs to
     await verify_canvas_access(review.canvas_id, current_user, db)
     
-    return success_response(ReviewResponse.from_orm(review))
+    return success_response(ReviewResponse.model_validate(review))

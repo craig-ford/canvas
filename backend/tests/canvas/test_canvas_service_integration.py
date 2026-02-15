@@ -1,30 +1,44 @@
 import pytest
+import pytest_asyncio
 from uuid import uuid4
-from datetime import date
 from sqlalchemy.ext.asyncio import AsyncSession
 from canvas.services.canvas_service import CanvasService
-from canvas.models.user import User
+from canvas.models.user import User, UserRole
 from canvas.models.vbu import VBU
 from canvas.models.canvas import Canvas, LifecycleLane
 from canvas.models.thesis import Thesis
 from canvas.models.proof_point import ProofPoint, ProofPointStatus
+from canvas.auth.service import AuthService
 
 @pytest.fixture
-async def canvas_service():
+def canvas_service():
     return CanvasService()
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def test_user(db_session: AsyncSession):
-    user = User(id=uuid4(), email="gm@test.com", name="Test GM", role="gm")
+    svc = AuthService()
+    user = User(
+        id=uuid4(),
+        email="svc-gm@test.com",
+        password_hash=svc._hash_password("Test1234!"),
+        name="Test GM",
+        role=UserRole.GM,
+    )
     db_session.add(user)
     await db_session.commit()
+    await db_session.refresh(user)
     return user
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def test_vbu(db_session: AsyncSession, test_user: User):
     vbu = VBU(id=uuid4(), name="Test VBU", gm_id=test_user.id)
     db_session.add(vbu)
+    await db_session.flush()
+    # Auto-create canvas for this VBU (matches CanvasService.create_vbu behavior)
+    canvas = Canvas(vbu_id=vbu.id, lifecycle_lane=LifecycleLane.BUILD, updated_by=test_user.id)
+    db_session.add(canvas)
     await db_session.commit()
+    await db_session.refresh(vbu)
     return vbu
 
 class TestCanvasServiceVBU:
@@ -81,7 +95,7 @@ class TestCanvasServiceThesis:
         canvas = await canvas_service.get_canvas_by_vbu(test_vbu.id, db_session)
         t1 = await canvas_service.create_thesis(canvas.id, "First", 1, db_session)
         t2 = await canvas_service.create_thesis(canvas.id, "Second", 2, db_session)
-        reordered = await canvas_service.reorder_theses(canvas.id, [{"id": t2.id, "order": 1}, {"id": t1.id, "order": 2}], db_session)
+        reordered = await canvas_service.reorder_theses(canvas.id, [{"id": str(t2.id), "order": 1}, {"id": str(t1.id), "order": 2}], db_session)
         assert len(reordered) == 2
 
 class TestCanvasServiceProofPoint:

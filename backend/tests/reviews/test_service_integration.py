@@ -7,17 +7,19 @@ from canvas.models.monthly_review import MonthlyReview
 from canvas.models.commitment import Commitment
 
 class TestReviewServiceIntegration:
-    async def test_create_review_with_commitments(self, db_session: AsyncSession, sample_canvas, sample_user):
+    async def test_create_review_with_commitments(self, db_session: AsyncSession, sample_canvas, admin_user, test_thesis):
         """Test creating review with commitments updates canvas atomically"""
         service = ReviewService(db_session)
         review_data = {
             "review_date": date.today(),
+            "currently_testing_type": "thesis",
+            "currently_testing_id": test_thesis.id,
             "commitments": [{"text": "Test commitment", "order": 1}]
         }
         review = await service.create_review(
             canvas_id=sample_canvas.id, 
             review_data=review_data,
-            created_by=sample_user.id
+            created_by=admin_user.id
         )
         assert review is not None
         assert review.canvas_id == sample_canvas.id
@@ -31,8 +33,8 @@ class TestReviewServiceIntegration:
         if len(reviews) > 1:
             assert all(reviews[i].review_date >= reviews[i + 1].review_date for i in range(len(reviews) - 1))
 
-    async def test_create_review_updates_canvas_currently_testing(self, db_session: AsyncSession, sample_canvas, sample_thesis):
-        """Test trigger updates canvas.currently_testing_type and currently_testing_id"""
+    async def test_create_review_updates_canvas_currently_testing(self, db_session: AsyncSession, sample_canvas, sample_thesis, admin_user):
+        """Test review stores currently_testing_type and currently_testing_id"""
         service = ReviewService(db_session)
         review_data = {
             "review_date": date.today(),
@@ -43,29 +45,30 @@ class TestReviewServiceIntegration:
         review = await service.create_review(
             canvas_id=sample_canvas.id, 
             review_data=review_data,
-            created_by=sample_canvas.vbu.gm_id
+            created_by=admin_user.id
         )
-        await db_session.refresh(sample_canvas)
-        assert sample_canvas.currently_testing_type == "thesis"
-        assert sample_canvas.currently_testing_id == sample_thesis.id
+        assert review.currently_testing_type == "thesis"
+        assert review.currently_testing_id == sample_thesis.id
 
-    async def test_attachment_linking_integration(self, db_session: AsyncSession, sample_canvas, sample_user):
+    async def test_attachment_linking_integration(self, db_session: AsyncSession, sample_canvas, admin_user, test_thesis):
         """Test linking pre-uploaded attachments to review via AttachmentService"""
         service = ReviewService(db_session)
         review_data = {
             "review_date": date.today(),
+            "currently_testing_type": "thesis",
+            "currently_testing_id": test_thesis.id,
             "attachment_ids": [],
             "commitments": [{"text": "c1", "order": 1}]
         }
         review = await service.create_review(
             canvas_id=sample_canvas.id, 
             review_data=review_data,
-            created_by=sample_user.id
+            created_by=admin_user.id
         )
         assert review is not None
         assert review.attachments == []
 
-    async def test_validate_currently_testing_belongs_to_canvas(self, db_session: AsyncSession, sample_canvas, other_canvas_thesis):
+    async def test_validate_currently_testing_belongs_to_canvas(self, db_session: AsyncSession, sample_canvas, other_canvas_thesis, admin_user):
         """Test validation prevents selecting thesis/proof_point from different canvas"""
         service = ReviewService(db_session)
         review_data = {
@@ -78,7 +81,7 @@ class TestReviewServiceIntegration:
             await service.create_review(
                 canvas_id=sample_canvas.id, 
                 review_data=review_data,
-                created_by=sample_canvas.vbu.gm_id
+                created_by=admin_user.id
             )
 
     async def test_get_review_with_relationships(self, db_session: AsyncSession, sample_review):

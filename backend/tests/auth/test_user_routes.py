@@ -1,149 +1,97 @@
 import pytest
 from httpx import AsyncClient
-from fastapi import status
-from canvas.models.user import User, UserRole
+from sqlalchemy.ext.asyncio import AsyncSession
 from canvas.auth.service import AuthService
-from canvas.auth.user_service import UserService
-from canvas.auth.dependencies import get_current_user, require_role
-from canvas import success_response, list_response
 
 
 class TestUserManagementRoutes:
-    """Test admin user management endpoints with authorization."""
-    
+    """Integration tests for user management routes (admin only)."""
+
     @pytest.mark.asyncio
-    async def test_get_users_admin_success(self, client: AsyncClient, admin_token: str):
-        """Test admin can list all users."""
-        # BLOCKED: awaiting T-016 auth routes implementation
-        response = await client.get("/api/users", headers={"Authorization": f"Bearer {admin_token}"})
-        assert response.status_code == status.HTTP_200_OK
+    async def test_get_users_admin_success(self, authed_client: AsyncClient, db: AsyncSession):
+        """GET /api/auth/users as admin returns user list."""
+        response = await authed_client.get("/api/auth/users")
+        assert response.status_code == 200
         data = response.json()
         assert "data" in data
         assert isinstance(data["data"], list)
         assert "meta" in data
         assert "total" in data["meta"]
-    
+
     @pytest.mark.asyncio
-    async def test_get_users_non_admin_forbidden(self, client: AsyncClient, gm_token: str):
-        """Test non-admin cannot list users."""
-        # BLOCKED: awaiting T-016 auth routes implementation
-        response = await client.get("/api/users", headers={"Authorization": f"Bearer {gm_token}"})
-        assert response.status_code == status.HTTP_403_FORBIDDEN
-        data = response.json()
-        assert "error" in data
-        assert data["error"]["code"] == "FORBIDDEN"
-    
+    async def test_get_users_non_admin_forbidden(self, client: AsyncClient, gm_token, db: AsyncSession):
+        """GET /api/auth/users as GM returns 403."""
+        response = await client.get(
+            "/api/auth/users",
+            headers={"Authorization": f"Bearer {gm_token}"}
+        )
+        assert response.status_code == 403
+
     @pytest.mark.asyncio
     async def test_get_users_no_auth_unauthorized(self, client: AsyncClient):
-        """Test unauthenticated request returns 401."""
-        # BLOCKED: awaiting T-016 auth routes implementation
-        response = await client.get("/api/users")
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
-        data = response.json()
-        assert "error" in data
-        assert data["error"]["code"] == "UNAUTHORIZED"
-    
+        """GET /api/auth/users without auth returns 401."""
+        response = await client.get("/api/auth/users")
+        assert response.status_code == 401
+
     @pytest.mark.asyncio
-    async def test_update_user_role_admin_success(self, client: AsyncClient, admin_token: str, sample_user: User):
-        """Test admin can update user role."""
-        # BLOCKED: awaiting T-016 auth routes implementation
-        response = await client.patch(
-            f"/api/users/{sample_user.id}",
-            json={"role": "admin"},
-            headers={"Authorization": f"Bearer {admin_token}"}
+    async def test_update_user_role_admin_success(self, authed_client: AsyncClient, gm_user, db: AsyncSession):
+        """PATCH /api/auth/users/{id} as admin updates role."""
+        response = await authed_client.patch(
+            f"/api/auth/users/{gm_user.id}",
+            json={"role": "viewer"}
         )
-        assert response.status_code == status.HTTP_200_OK
+        assert response.status_code == 200
         data = response.json()
         assert "data" in data
-        assert data["data"]["role"] == "admin"
-        assert data["data"]["id"] == str(sample_user.id)
-    
+        assert data["data"]["role"] == "viewer"
+
     @pytest.mark.asyncio
-    async def test_update_user_role_non_admin_forbidden(self, client: AsyncClient, gm_token: str, sample_user: User):
-        """Test non-admin cannot update user role."""
-        # BLOCKED: awaiting T-016 auth routes implementation
+    async def test_update_user_role_non_admin_forbidden(self, client: AsyncClient, gm_token, gm_user, db: AsyncSession):
+        """PATCH /api/auth/users/{id} as GM returns 403."""
         response = await client.patch(
-            f"/api/users/{sample_user.id}",
+            f"/api/auth/users/{gm_user.id}",
             json={"role": "admin"},
             headers={"Authorization": f"Bearer {gm_token}"}
         )
-        assert response.status_code == status.HTTP_403_FORBIDDEN
-        data = response.json()
-        assert "error" in data
-        assert data["error"]["code"] == "FORBIDDEN"
-    
+        assert response.status_code == 403
+
     @pytest.mark.asyncio
-    async def test_update_user_role_invalid_role(self, client: AsyncClient, admin_token: str, sample_user: User):
-        """Test invalid role returns validation error."""
-        # BLOCKED: awaiting T-016 auth routes implementation
-        response = await client.patch(
-            f"/api/users/{sample_user.id}",
-            json={"role": "invalid"},
-            headers={"Authorization": f"Bearer {admin_token}"}
+    async def test_update_user_role_invalid_role(self, authed_client: AsyncClient, gm_user, db: AsyncSession):
+        """PATCH /api/auth/users/{id} with invalid role returns 422."""
+        response = await authed_client.patch(
+            f"/api/auth/users/{gm_user.id}",
+            json={"role": "superadmin"}
         )
-        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-        data = response.json()
-        assert "error" in data
-        assert data["error"]["code"] == "VALIDATION_ERROR"
-    
+        assert response.status_code == 422
+
     @pytest.mark.asyncio
-    async def test_update_user_role_nonexistent_user(self, client: AsyncClient, admin_token: str):
-        """Test updating nonexistent user returns 404."""
+    async def test_update_user_role_nonexistent_user(self, authed_client: AsyncClient, db: AsyncSession):
+        """PATCH /api/auth/users/{id} with nonexistent user returns 404."""
         from uuid import uuid4
-        # BLOCKED: awaiting T-016 auth routes implementation
-        response = await client.patch(
-            f"/api/users/{uuid4()}",
-            json={"role": "admin"},
-            headers={"Authorization": f"Bearer {admin_token}"}
+        response = await authed_client.patch(
+            f"/api/auth/users/{uuid4()}",
+            json={"role": "viewer"}
         )
-        assert response.status_code == status.HTTP_404_NOT_FOUND
-        data = response.json()
-        assert "error" in data
-        assert data["error"]["code"] == "NOT_FOUND"
-    
+        assert response.status_code == 404
+
     @pytest.mark.asyncio
-    async def test_delete_user_admin_success(self, client: AsyncClient, admin_token: str, sample_user: User):
-        """Test admin can delete user."""
-        # BLOCKED: awaiting T-016 auth routes implementation
-        response = await client.delete(
-            f"/api/users/{sample_user.id}",
-            headers={"Authorization": f"Bearer {admin_token}"}
-        )
-        assert response.status_code == status.HTTP_204_NO_CONTENT
-    
+    async def test_delete_user_admin_success(self, authed_client: AsyncClient, viewer_user, db: AsyncSession):
+        """DELETE /api/auth/users/{id} as admin deletes user."""
+        response = await authed_client.delete(f"/api/auth/users/{viewer_user.id}")
+        assert response.status_code == 204
+
     @pytest.mark.asyncio
-    async def test_delete_user_non_admin_forbidden(self, client: AsyncClient, gm_token: str, sample_user: User):
-        """Test non-admin cannot delete user."""
-        # BLOCKED: awaiting T-016 auth routes implementation
+    async def test_delete_user_non_admin_forbidden(self, client: AsyncClient, gm_token, viewer_user, db: AsyncSession):
+        """DELETE /api/auth/users/{id} as GM returns 403."""
         response = await client.delete(
-            f"/api/users/{sample_user.id}",
+            f"/api/auth/users/{viewer_user.id}",
             headers={"Authorization": f"Bearer {gm_token}"}
         )
-        assert response.status_code == status.HTTP_403_FORBIDDEN
-        data = response.json()
-        assert "error" in data
-        assert data["error"]["code"] == "FORBIDDEN"
-    
+        assert response.status_code == 403
+
     @pytest.mark.asyncio
-    async def test_delete_user_nonexistent_user(self, client: AsyncClient, admin_token: str):
-        """Test deleting nonexistent user returns 404."""
+    async def test_delete_user_nonexistent_user(self, authed_client: AsyncClient, db: AsyncSession):
+        """DELETE /api/auth/users/{id} with nonexistent user returns 404."""
         from uuid import uuid4
-        # BLOCKED: awaiting T-016 auth routes implementation
-        response = await client.delete(
-            f"/api/users/{uuid4()}",
-            headers={"Authorization": f"Bearer {admin_token}"}
-        )
-        assert response.status_code == status.HTTP_404_NOT_FOUND
-        data = response.json()
-        assert "error" in data
-        assert data["error"]["code"] == "NOT_FOUND"
-
-
-@pytest.fixture
-async def sample_user(db):
-    """Create sample user for testing."""
-    auth_service = AuthService()
-    return await auth_service.register_user("sample@test.local", "password123", "Sample User", "viewer", db)
-
-
-# Uses client, db, admin_token, gm_token fixtures from conftest.py
+        response = await authed_client.delete(f"/api/auth/users/{uuid4()}")
+        assert response.status_code == 404

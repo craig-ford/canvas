@@ -19,7 +19,7 @@ class PDFService:
     def __init__(self, db: AsyncSession = None):
         self.db = db
         self.jinja_env = Environment(
-            loader=FileSystemLoader('backend/canvas/pdf/templates')
+            loader=FileSystemLoader('canvas/pdf/templates')
         )
     
     async def export_canvas(self, canvas_id: UUID) -> bytes:
