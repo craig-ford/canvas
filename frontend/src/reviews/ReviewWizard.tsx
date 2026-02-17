@@ -186,7 +186,7 @@ export const ReviewWizard: React.FC = () => {
       <StepIndicator currentStep={currentStep} totalSteps={4} />
       
       {error && (
-        <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+        <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4" aria-live="assertive">
           <p className="text-red-700">{error}</p>
         </div>
       )}

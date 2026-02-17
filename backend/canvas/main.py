@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from sqlalchemy import text
 from canvas.config import Settings
 from canvas import success_response
 from canvas.db import engine
@@ -111,12 +112,19 @@ def create_app() -> FastAPI:
     @app.get("/api/health")
     @app.options("/api/health")
     async def health() -> dict:
-        """Health check endpoint.
+        """Health check endpoint with database connectivity check.
         
         Returns:
-            dict: {"status": "ok"}
+            dict: {"status": "ok"} if healthy, 503 if database unreachable
         """
-        return {"status": "ok"}
+        try:
+            from canvas.db import get_db_session
+            async with get_db_session() as db:
+                await db.execute(text("SELECT 1"))
+            return {"status": "ok"}
+        except Exception:
+            from fastapi import HTTPException
+            raise HTTPException(status_code=503, detail={"status": "unhealthy", "reason": "database_unreachable"})
     
     # Register feature routers
     from canvas.auth.routes import router as auth_router

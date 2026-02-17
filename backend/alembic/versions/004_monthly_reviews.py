@@ -11,7 +11,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers
 revision = '004_monthly_reviews'
-down_revision = '003_canvas_management'
+down_revision = '002_canvas_tables'
 branch_labels = None
 depends_on = None
 

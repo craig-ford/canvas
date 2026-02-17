@@ -116,6 +116,7 @@ const InlineEdit: React.FC<InlineEditProps> = ({
           onKeyDown={handleKeyDown}
           onBlur={handleBlur}
           placeholder={placeholder}
+          aria-label={multiline ? "Edit text content" : "Edit text"}
           className={`w-full px-2 py-1 border border-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${
             multiline ? 'min-h-[80px] resize-vertical' : ''
           }`}
@@ -132,6 +133,11 @@ const InlineEdit: React.FC<InlineEditProps> = ({
               Retry
             </button>
           )}
+        </div>
+        <div aria-live="polite" className="sr-only">
+          {saveStatus === 'saving' && 'Saving changes'}
+          {saveStatus === 'saved' && 'Changes saved successfully'}
+          {saveStatus === 'error' && 'Save failed'}
         </div>
         {error && (
           <div className="text-xs text-red-600 mt-1">{error}</div>

@@ -120,6 +120,13 @@ const FileUpload: React.FC<FileUploadProps> = ({
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      fileInputRef.current?.click();
+    }
+  };
+
   return (
     <div className="space-y-4">
       {/* Upload Zone */}
@@ -132,6 +139,11 @@ const FileUpload: React.FC<FileUploadProps> = ({
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
+        role="button"
+        tabIndex={0}
+        aria-label="Upload file by dragging and dropping or clicking to browse"
+        onKeyDown={handleKeyDown}
+        onClick={() => fileInputRef.current?.click()}
       >
         <CloudArrowUpIcon className="mx-auto h-12 w-12 text-gray-400" />
         <div className="mt-4">

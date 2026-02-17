@@ -126,7 +126,6 @@ async def login(
     
     return success_response({
         "access_token": access_token,
-        "refresh_token": refresh_token,
         "token_type": "bearer",
         "user": user_response.model_dump()
     })

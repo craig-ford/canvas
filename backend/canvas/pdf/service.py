@@ -56,7 +56,7 @@ class PDFService:
 
         except CanvasNotFoundError:
             raise
-        except Exception as e:
+        except (OSError, IOError) as e:
             raise PDFGenerationError(f"Failed to generate PDF: {str(e)}")
 
     async def _get_canvas_with_relations(self, db: AsyncSession, canvas_id: UUID) -> Canvas:

@@ -1,7 +1,8 @@
 from typing import List
 import html
+from datetime import timedelta
 from fastapi import HTTPException
-from sqlalchemy import select, update, func, case, and_, or_, text
+from sqlalchemy import select, update, func, case, and_, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload, joinedload
 from canvas.models.user import User
@@ -43,7 +44,7 @@ class PortfolioService:
                      select(ProofPoint.description).where(ProofPoint.id == Canvas.currently_testing_id).scalar_subquery()),
                     else_=None
                 ).label('currently_testing'),
-                select(func.min(MonthlyReview.review_date + text("INTERVAL '1 month'")))
+                select(func.min(MonthlyReview.review_date + timedelta(days=30)))
                 .where(MonthlyReview.canvas_id == Canvas.id)
                 .scalar_subquery()
                 .label('next_review_date')

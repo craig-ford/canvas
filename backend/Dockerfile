@@ -21,8 +21,17 @@ RUN apt-get update && apt-get install -y \
 COPY pyproject.toml* ./
 COPY requirements.txt* ./
 
-# Install Python dependencies
-RUN pip install --no-cache-dir \
+# Copy application code
+COPY . .
+
+# Change ownership to non-root user
+RUN chown -R canvas:canvas /app
+
+# Switch to non-root user
+USER canvas
+
+# Install Python dependencies as non-root user
+RUN pip install --user --no-cache-dir \
     fastapi \
     uvicorn[standard] \
     sqlalchemy[asyncio] \
@@ -40,15 +49,6 @@ RUN pip install --no-cache-dir \
     pytest \
     "pytest-asyncio==0.24.0" \
     httpx
-
-# Copy application code
-COPY . .
-
-# Change ownership to non-root user
-RUN chown -R canvas:canvas /app
-
-# Switch to non-root user
-USER canvas
 
 # Expose port
 EXPOSE 8000
