@@ -1,12 +1,12 @@
 ---RALPH_STATUS---
 EXIT_SIGNAL: false
-CURRENT_MODE: code-review
+CURRENT_MODE: fix
 CURRENT_FEATURE: all
-ACTION_COMPLETED: Code review iteration 2 complete. 8 review agents spawned (2 batches of 4). Found 21 new issues (2 Critical, 5 High, 11 Medium, 3 Low). Triaged 25+ false positives/duplicates. Key findings: missing CSS import in main.tsx, missing ErrorBoundary wrapper, auth token refresh race condition, InlineEdit memory leak, missing tsconfig.json/tailwind config/pyproject.toml, CSRF protection gaps on 6 route files.
+ACTION_COMPLETED: Fix mode iteration 2 complete. All 21 issues from code review iteration 2 fixed by 5 review agents (2 batches). Frontend: CSS import, ErrorBoundary, token refresh race condition, memory leak, keyboard nav, ARIA live. Security: CSRF protection on all 6 route files via verify_csrf dependency, rate limiter documented. DevOps: tsconfig.json, tailwind.config.ts, pyproject.toml, graceful shutdown lifespan, structured logging. Performance: ownership verification queries optimized from 3-4 to 1 JOIN. Architect: 2 SRP violations documented as tech debt. Test suite: 275 passed, 0 failed, 0 errors (up from 262 — no regressions).
 FEATURES_TOTAL: 5
 FEATURES_WITH_SPECS: 5
 FEATURES_WITH_PLANS: 5
 FEATURES_WITH_TASKS: 5
 FEATURES_VERIFIED: 5
-RECOMMENDATION: Next session enters fix mode. 21 unchecked issues in specs/code-review.md need fixing. Group by reviewer tag and spawn fix agents. CRITICAL: Do NOT use Depends(Settings) — it breaks FastAPI with Pydantic BaseSettings. The Settings() instantiation pattern is intentional.
+RECOMMENDATION: Next session re-runs code-review mode (step 21 in state detection: all issues in code-review.md marked [x] → re-run code-review to verify). If no new issues found, .project-complete is created and project is DONE.
 ---END_RALPH_STATUS---

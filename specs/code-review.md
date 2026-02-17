@@ -11,113 +11,113 @@
 
 ### Critical
 
-- [ ] CR-048: frontend/src/main.tsx:5 - [review-frontend] Missing CSS/Tailwind entry point import
+- [x] CR-048: frontend/src/main.tsx:5 - [review-frontend] Missing CSS/Tailwind entry point import
   - **Feature:** 001A-infrastructure
   - **Task:** T-011
   - **Rationale:** App uses Tailwind classes throughout but main.tsx has no CSS import — all styling is broken
 
-- [ ] CR-049: frontend/src/App.tsx:1 - [review-frontend] Missing ErrorBoundary wrapper around application routes
+- [x] CR-049: frontend/src/App.tsx:1 - [review-frontend] Missing ErrorBoundary wrapper around application routes
   - **Feature:** 001A-infrastructure
   - **Task:** T-011
   - **Rationale:** Unhandled errors crash entire app with no recovery; ErrorBoundary component exists but is not used
 
 ### High
 
-- [ ] CR-050: frontend/src/auth/AuthContext.tsx:76 - [review-frontend] Race condition in token refresh interceptor — no isRefreshing guard
+- [x] CR-050: frontend/src/auth/AuthContext.tsx:76 - [review-frontend] Race condition in token refresh interceptor — no isRefreshing guard
   - **Feature:** 001-auth
   - **Task:** T-017
   - **Rationale:** Multiple concurrent 401 responses all trigger refreshToken() simultaneously, causing duplicate refresh calls and potential auth loops
 
-- [ ] CR-051: frontend/src/components/InlineEdit.tsx:51 - [review-frontend] Memory leak — saveTimeoutRef not cleared on unmount
+- [x] CR-051: frontend/src/components/InlineEdit.tsx:51 - [review-frontend] Memory leak — saveTimeoutRef not cleared on unmount
   - **Feature:** 002-canvas-management
   - **Task:** T-019
   - **Rationale:** debouncedSave sets timeout via saveTimeoutRef but no useEffect cleanup clears it on unmount, causing state updates on unmounted component
 
-- [ ] CR-052: frontend/tsconfig.json - [review-devops] Missing TypeScript configuration file
+- [x] CR-052: frontend/tsconfig.json - [review-devops] Missing TypeScript configuration file
   - **Feature:** 001A-infrastructure
   - **Task:** T-011
   - **Rationale:** TypeScript compilation and IDE support requires tsconfig.json; without it type checking is inconsistent
 
-- [ ] CR-053: frontend/tailwind.config.ts - [review-devops] Missing Tailwind CSS configuration and dependency
+- [x] CR-053: frontend/tailwind.config.ts - [review-devops] Missing Tailwind CSS configuration and dependency
   - **Feature:** 001A-infrastructure
   - **Task:** T-011
   - **Rationale:** Architecture specifies Tailwind CSS >=4.0 but no config exists and tailwindcss not in package.json
 
-- [ ] CR-054: backend/pyproject.toml - [review-devops] Missing pyproject.toml for Python project configuration
+- [x] CR-054: backend/pyproject.toml - [review-devops] Missing pyproject.toml for Python project configuration
   - **Feature:** 001A-infrastructure
   - **Task:** T-001
   - **Rationale:** No proper dependency management or build configuration; only requirements.txt exists
 
 ### Medium
 
-- [ ] CR-055: backend/canvas/routes/vbu.py:60 - [review-security] Missing CSRF protection on VBU state-changing operations (POST, PATCH, DELETE)
+- [x] CR-055: backend/canvas/routes/vbu.py:60 - [review-security] Missing CSRF protection on VBU state-changing operations (POST, PATCH, DELETE)
   - **Feature:** 002-canvas-management
   - **Task:** T-014
   - **Rationale:** VBU creation, updates, and deletion lack X-CSRF-Token header validation
 
-- [ ] CR-056: backend/canvas/routes/canvas.py:86 - [review-security] Missing CSRF protection on canvas update (PUT)
+- [x] CR-056: backend/canvas/routes/canvas.py:86 - [review-security] Missing CSRF protection on canvas update (PUT)
   - **Feature:** 002-canvas-management
   - **Task:** T-015
   - **Rationale:** Canvas updates can be triggered by malicious sites without user consent
 
-- [ ] CR-057: backend/canvas/routes/thesis.py:37 - [review-security] Missing CSRF protection on thesis operations (POST, PATCH, DELETE, PUT)
+- [x] CR-057: backend/canvas/routes/thesis.py:37 - [review-security] Missing CSRF protection on thesis operations (POST, PATCH, DELETE, PUT)
   - **Feature:** 002-canvas-management
   - **Task:** T-016
   - **Rationale:** Thesis CRUD operations lack CSRF protection
 
-- [ ] CR-058: backend/canvas/routes/proof_point.py:41 - [review-security] Missing CSRF protection on proof point operations (POST, PATCH, DELETE)
+- [x] CR-058: backend/canvas/routes/proof_point.py:41 - [review-security] Missing CSRF protection on proof point operations (POST, PATCH, DELETE)
   - **Feature:** 002-canvas-management
   - **Task:** T-017
   - **Rationale:** Proof point modifications vulnerable to CSRF attacks
 
-- [ ] CR-059: backend/canvas/routes/attachment.py:26 - [review-security] Missing CSRF protection on attachment operations (POST, DELETE)
+- [x] CR-059: backend/canvas/routes/attachment.py:26 - [review-security] Missing CSRF protection on attachment operations (POST, DELETE)
   - **Feature:** 002-canvas-management
   - **Task:** T-018
   - **Rationale:** File uploads and deletions vulnerable to CSRF attacks
 
-- [ ] CR-060: backend/canvas/portfolio/router.py:44 - [review-security] Missing CSRF protection on portfolio notes update (PATCH)
+- [x] CR-060: backend/canvas/portfolio/router.py:44 - [review-security] Missing CSRF protection on portfolio notes update (PATCH)
   - **Feature:** 003-portfolio-dashboard
   - **Task:** T-003
   - **Rationale:** Admin-only portfolio notes updates lack CSRF protection
 
-- [ ] CR-061: backend/canvas/services/canvas_service.py:245 - [review-performance] Multiple sequential DB queries in ownership verification instead of JOINs
+- [x] CR-061: backend/canvas/services/canvas_service.py:245 - [review-performance] Multiple sequential DB queries in ownership verification instead of JOINs
   - **Feature:** 002-canvas-management
   - **Task:** T-012
   - **Rationale:** verify_thesis_ownership, verify_proof_point_ownership perform 3-4 separate queries when a single JOIN would suffice
 
-- [ ] CR-062: frontend/src/dashboard/VBUTable.tsx:95 - [review-frontend] Missing keyboard navigation for table rows
+- [x] CR-062: frontend/src/dashboard/VBUTable.tsx:95 - [review-frontend] Missing keyboard navigation for table rows
   - **Feature:** 003-portfolio-dashboard
   - **Task:** T-015
   - **Rationale:** Table rows have tabIndex but no keyboard event handling for accessibility
 
-- [ ] CR-063: frontend/src/reviews/components/CommitmentsStep.tsx:1 - [review-frontend] Form validation errors not announced to screen readers
+- [x] CR-063: frontend/src/reviews/components/CommitmentsStep.tsx:1 - [review-frontend] Form validation errors not announced to screen readers
   - **Feature:** 004-monthly-review
   - **Task:** T-015
   - **Rationale:** Validation errors lack ARIA live regions for accessibility
 
-- [ ] CR-064: backend/canvas/main.py:20 - [review-devops] Missing graceful shutdown handling
+- [x] CR-064: backend/canvas/main.py:20 - [review-devops] Missing graceful shutdown handling
   - **Feature:** 001A-infrastructure
   - **Task:** T-008
   - **Rationale:** No signal handlers for SIGTERM/SIGINT; container shutdowns may cause data loss
 
-- [ ] CR-065: backend/canvas/main.py:1 - [review-devops] Missing structured logging configuration
+- [x] CR-065: backend/canvas/main.py:1 - [review-devops] Missing structured logging configuration
   - **Feature:** 001A-infrastructure
   - **Task:** T-008
   - **Rationale:** Architecture specifies structlog for JSON logging but only basic Python logging configured
 
 ### Low
 
-- [ ] CR-066: backend/canvas/auth/routes.py:20 - [review-security] In-memory rate limiting store not persistent across restarts
+- [x] CR-066: backend/canvas/auth/routes.py:20 - [review-security] In-memory rate limiting store not persistent across restarts
   - **Feature:** 001-auth
   - **Task:** T-016
   - **Rationale:** Rate limiting bypassed by server restarts; acceptable for MVP but should use Redis in production
 
-- [ ] CR-067: backend/canvas/services/canvas_service.py:1 - [review-architect] God class (326 lines) handling VBU, Canvas, Thesis, ProofPoint operations (DEFERRED from iteration 1: architectural improvement for future iteration)
+- [x] CR-067: backend/canvas/services/canvas_service.py:1 - [review-architect] God class (326 lines) handling VBU, Canvas, Thesis, ProofPoint operations (DEFERRED from iteration 1: architectural improvement for future iteration)
   - **Feature:** 002-canvas-management
   - **Task:** T-012
   - **Rationale:** Violates SRP but functional; splitting would be a refactor, not a bug fix
 
-- [ ] CR-068: frontend/src/canvas/CanvasPage.tsx:1 - [review-architect] Large component (431 lines) handling multiple responsibilities
+- [x] CR-068: frontend/src/canvas/CanvasPage.tsx:1 - [review-architect] Large component (431 lines) handling multiple responsibilities
   - **Feature:** 002-canvas-management
   - **Task:** T-022
   - **Rationale:** Violates SRP but functional; splitting would be a refactor

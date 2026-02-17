@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel, Field
 from canvas.db import get_db_session
-from canvas.auth.dependencies import get_current_user, require_role
+from canvas.auth.dependencies import get_current_user, require_role, verify_csrf
 from canvas.services.canvas_service import CanvasService
 from canvas.models.user import User, UserRole
 from canvas.models.proof_point import ProofPoint, ProofPointStatus
@@ -43,7 +43,8 @@ async def create_proof_point(
     thesis_id: UUID,
     proof_point_data: ProofPointCreate,
     current_user: User = Depends(require_role([UserRole.ADMIN, UserRole.GM])),
-    db: AsyncSession = Depends(get_db_session)
+    db: AsyncSession = Depends(get_db_session),
+    _: None = Depends(verify_csrf)
 ):
     """Create proof point with status validation"""
     await canvas_service.verify_thesis_ownership(thesis_id, current_user, db)
@@ -62,7 +63,8 @@ async def update_proof_point(
     proof_point_id: UUID,
     proof_point_data: ProofPointUpdate,
     current_user: User = Depends(require_role([UserRole.ADMIN, UserRole.GM])),
-    db: AsyncSession = Depends(get_db_session)
+    db: AsyncSession = Depends(get_db_session),
+    _: None = Depends(verify_csrf)
 ):
     """Update proof point fields including status changes"""
     # BLOCKED: awaiting CanvasService.verify_proof_point_ownership method
@@ -81,7 +83,8 @@ async def update_proof_point(
 async def delete_proof_point(
     proof_point_id: UUID,
     current_user: User = Depends(require_role([UserRole.ADMIN, UserRole.GM])),
-    db: AsyncSession = Depends(get_db_session)
+    db: AsyncSession = Depends(get_db_session),
+    _: None = Depends(verify_csrf)
 ):
     """Delete proof point with cascade to attachments"""
     # BLOCKED: awaiting CanvasService.verify_proof_point_ownership method

@@ -28,6 +28,14 @@ const InlineEdit: React.FC<InlineEditProps> = ({
     setCurrentValue(value);
   }, [value]);
 
+  useEffect(() => {
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const handleSave = useCallback(async () => {
     if (currentValue === value) return;
     

@@ -38,6 +38,11 @@ export const CommitmentsStep: React.FC<CommitmentsStepProps> = ({ data, onChange
     if (!data.currently_testing_id) return 'Please select what you are currently testing';
     return null;
   };
+
+  const allErrors = [
+    ...data.commitments.map(getCommitmentError).filter(Boolean),
+    getCurrentlyTestingError()
+  ].filter(Boolean);
   const addCommitment = () => {
     if (data.commitments.length < 3) {
       const newCommitments = [...data.commitments, { 
@@ -73,6 +78,11 @@ export const CommitmentsStep: React.FC<CommitmentsStepProps> = ({ data, onChange
 
   return (
     <div className="space-y-8">
+      {allErrors.length > 0 && (
+        <div aria-live="polite" aria-atomic="true" className="sr-only">
+          {allErrors.length} validation error{allErrors.length > 1 ? 's' : ''} found
+        </div>
+      )}
       <div>
         <h2 className="text-2xl font-semibold mb-4">Commitments & Focus</h2>
         

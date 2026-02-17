@@ -3,7 +3,7 @@ from typing import Optional
 from uuid import UUID
 from datetime import datetime, timezone
 from sqlalchemy.ext.asyncio import AsyncSession
-from canvas.auth.dependencies import get_current_user, require_role
+from canvas.auth.dependencies import get_current_user, require_role, verify_csrf
 from canvas.models.user import User
 from canvas.db import get_db_session
 from canvas import success_response, list_response
@@ -69,7 +69,8 @@ async def get_portfolio_summary(
 async def update_portfolio_notes(
     request: PortfolioNotesRequest,
     current_user: User = Depends(require_role("admin")),
-    db: AsyncSession = Depends(get_db_session)
+    db: AsyncSession = Depends(get_db_session),
+    _: None = Depends(verify_csrf)
 ) -> dict:
     """Update portfolio notes (admin only)"""
     portfolio_service = PortfolioService(db)

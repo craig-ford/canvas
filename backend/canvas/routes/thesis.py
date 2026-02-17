@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel, Field
 from canvas.db import get_db_session
-from canvas.auth.dependencies import get_current_user, require_role
+from canvas.auth.dependencies import get_current_user, require_role, verify_csrf
 from canvas.services.canvas_service import CanvasService
 from canvas.models.user import User, UserRole
 from canvas.models.thesis import Thesis
@@ -39,7 +39,8 @@ async def create_thesis(
     canvas_id: UUID,
     thesis_data: ThesisCreate,
     current_user: User = Depends(require_role([UserRole.ADMIN, UserRole.GM])),
-    db: AsyncSession = Depends(get_db_session)
+    db: AsyncSession = Depends(get_db_session),
+    _: None = Depends(verify_csrf)
 ):
     """Create thesis with max 5 constraint and order validation"""
     await canvas_service.verify_canvas_ownership(canvas_id, current_user, db)
@@ -51,7 +52,8 @@ async def update_thesis(
     thesis_id: UUID,
     thesis_data: ThesisUpdate,
     current_user: User = Depends(require_role([UserRole.ADMIN, UserRole.GM])),
-    db: AsyncSession = Depends(get_db_session)
+    db: AsyncSession = Depends(get_db_session),
+    _: None = Depends(verify_csrf)
 ):
     """Update thesis text with ownership verification"""
     await canvas_service.verify_thesis_ownership(thesis_id, current_user, db)
@@ -62,7 +64,8 @@ async def update_thesis(
 async def delete_thesis(
     thesis_id: UUID,
     current_user: User = Depends(require_role([UserRole.ADMIN, UserRole.GM])),
-    db: AsyncSession = Depends(get_db_session)
+    db: AsyncSession = Depends(get_db_session),
+    _: None = Depends(verify_csrf)
 ):
     """Delete thesis with cascade to proof points"""
     await canvas_service.verify_thesis_ownership(thesis_id, current_user, db)
@@ -73,7 +76,8 @@ async def reorder_theses(
     canvas_id: UUID,
     reorder_data: ThesesReorder,
     current_user: User = Depends(require_role([UserRole.ADMIN, UserRole.GM])),
-    db: AsyncSession = Depends(get_db_session)
+    db: AsyncSession = Depends(get_db_session),
+    _: None = Depends(verify_csrf)
 ):
     """Reorder theses with order constraint validation"""
     await canvas_service.verify_canvas_ownership(canvas_id, current_user, db)

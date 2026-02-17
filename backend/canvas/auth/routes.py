@@ -19,6 +19,8 @@ user_service = UserService()
 settings = Settings()
 
 # Simple in-memory rate limiting (for production, use Redis)
+# NOTE: This in-memory store is not persistent across server restarts.
+# For multi-instance deployments, use Redis-backed rate limiting.
 rate_limit_store: Dict[str, Dict[str, datetime]] = {}
 
 def check_rate_limit(key: str, limit: int = 5, window_minutes: int = 15) -> None:

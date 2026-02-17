@@ -6,7 +6,7 @@ from sqlalchemy import select, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from canvas.db import get_db_session
-from canvas.auth.dependencies import get_current_user, require_role
+from canvas.auth.dependencies import get_current_user, require_role, verify_csrf
 from canvas.models.user import User, UserRole
 from canvas.models.attachment import Attachment
 from canvas.models.proof_point import ProofPoint
@@ -31,7 +31,8 @@ async def upload_attachment(
     label: Optional[str] = Form(None),
     current_user: User = Depends(require_role(["admin", "gm"])),
     db: AsyncSession = Depends(get_db_session),
-    attachment_service: AttachmentService = Depends(get_attachment_service)
+    attachment_service: AttachmentService = Depends(get_attachment_service),
+    _: None = Depends(verify_csrf)
 ) -> dict:
     """Upload file attachment to proof point or monthly review"""
     # Validate exactly one parent is provided
@@ -152,7 +153,8 @@ async def delete_attachment(
     attachment_id: UUID,
     current_user: User = Depends(require_role(["admin", "gm"])),
     db: AsyncSession = Depends(get_db_session),
-    attachment_service: AttachmentService = Depends(get_attachment_service)
+    attachment_service: AttachmentService = Depends(get_attachment_service),
+    _: None = Depends(verify_csrf)
 ) -> None:
     """Delete attachment file and database record"""
     # Get attachment with relationships for authorization

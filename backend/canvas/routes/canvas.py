@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from canvas.db import get_db_session
-from canvas.auth.dependencies import get_current_user
+from canvas.auth.dependencies import get_current_user, verify_csrf
 from canvas.models.user import User, UserRole
 from canvas.models.vbu import VBU
 from canvas.services.canvas_service import CanvasService
@@ -88,7 +88,8 @@ async def update_canvas(
     vbu_id: UUID,
     canvas_data: CanvasUpdate,
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db_session)
+    db: AsyncSession = Depends(get_db_session),
+    _: None = Depends(verify_csrf)
 ):
     """Update canvas fields"""
     # Check VBU exists and authorization

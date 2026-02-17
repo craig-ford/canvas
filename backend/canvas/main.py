@@ -1,13 +1,51 @@
 import uuid
 import logging
 import traceback
+import structlog
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from canvas.config import Settings
 from canvas import success_response
+from canvas.db import engine
 
-logger = logging.getLogger(__name__)
+# Configure structured logging
+structlog.configure(
+    processors=[
+        structlog.stdlib.filter_by_level,
+        structlog.stdlib.add_logger_name,
+        structlog.stdlib.add_log_level,
+        structlog.stdlib.PositionalArgumentsFormatter(),
+        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.processors.StackInfoRenderer(),
+        structlog.processors.format_exc_info,
+        structlog.processors.UnicodeDecoder(),
+        structlog.processors.JSONRenderer()
+    ],
+    context_class=dict,
+    logger_factory=structlog.stdlib.LoggerFactory(),
+    wrapper_class=structlog.stdlib.BoundLogger,
+    cache_logger_on_first_use=True,
+)
+
+logging.basicConfig(
+    format="%(message)s",
+    level=logging.INFO,
+)
+
+logger = structlog.get_logger(__name__)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Manage application lifespan - startup and shutdown."""
+    # Startup
+    logger.info("Application starting up")
+    yield
+    # Shutdown
+    logger.info("Application shutting down")
+    await engine.dispose()
 
 
 def create_app() -> FastAPI:
@@ -16,7 +54,7 @@ def create_app() -> FastAPI:
     Returns:
         FastAPI: Configured app with middleware, CORS, exception handlers
     """
-    app = FastAPI(title="Canvas API")
+    app = FastAPI(title="Canvas API", lifespan=lifespan)
     settings = Settings()
     
     # Add CORS middleware

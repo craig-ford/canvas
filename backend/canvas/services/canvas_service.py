@@ -1,3 +1,8 @@
+# TODO: ARCHITECTURAL DEBT - This service violates SRP by handling VBU, Canvas, Thesis, and ProofPoint operations
+# Future refactor: Split into VBUService, CanvasService, ThesisService, ProofPointService
+# Each service should handle only its domain entity and related operations
+# This is functional code that works correctly but should be refactored for maintainability
+
 from typing import Optional, List, Dict, Any
 from uuid import UUID
 from datetime import datetime
@@ -271,24 +276,17 @@ class CanvasService:
             return
         
         result = await db.execute(
-            select(Thesis)
+            select(VBU.gm_id)
+            .select_from(Thesis)
             .join(Canvas, Thesis.canvas_id == Canvas.id)
             .join(VBU, Canvas.vbu_id == VBU.id)
             .where(Thesis.id == thesis_id)
         )
-        thesis = result.scalar_one_or_none()
-        if not thesis:
+        gm_id = result.scalar_one_or_none()
+        if not gm_id:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Thesis not found")
         
-        canvas_result = await db.execute(
-            select(Canvas)
-            .join(VBU, Canvas.vbu_id == VBU.id)
-            .where(Canvas.id == thesis.canvas_id)
-        )
-        canvas = canvas_result.scalar_one()
-        vbu_result = await db.execute(select(VBU).where(VBU.id == canvas.vbu_id))
-        vbu = vbu_result.scalar_one()
-        if vbu.gm_id != current_user.id:
+        if gm_id != current_user.id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
     async def verify_proof_point_ownership(self, proof_point_id: UUID, current_user: User, db: AsyncSession) -> None:
@@ -297,23 +295,18 @@ class CanvasService:
             return
 
         result = await db.execute(
-            select(ProofPoint)
+            select(VBU.gm_id)
+            .select_from(ProofPoint)
             .join(Thesis, ProofPoint.thesis_id == Thesis.id)
             .join(Canvas, Thesis.canvas_id == Canvas.id)
             .join(VBU, Canvas.vbu_id == VBU.id)
             .where(ProofPoint.id == proof_point_id)
         )
-        proof_point = result.scalar_one_or_none()
-        if not proof_point:
+        gm_id = result.scalar_one_or_none()
+        if not gm_id:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Proof point not found")
 
-        thesis_result = await db.execute(select(Thesis).where(Thesis.id == proof_point.thesis_id))
-        thesis = thesis_result.scalar_one()
-        canvas_result = await db.execute(select(Canvas).where(Canvas.id == thesis.canvas_id))
-        canvas = canvas_result.scalar_one()
-        vbu_result = await db.execute(select(VBU).where(VBU.id == canvas.vbu_id))
-        vbu = vbu_result.scalar_one()
-        if vbu.gm_id != current_user.id:
+        if gm_id != current_user.id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
     async def get_proof_points_by_thesis(self, thesis_id: UUID, db: AsyncSession) -> List[ProofPoint]:

@@ -118,7 +118,7 @@ const VBUTable: React.FC<VBUTableProps> = ({ vbus, onExportPDF, onViewVBU }) => 
           {paginatedVBUs.map((vbu, index) => (
             <tr 
               key={vbu.id} 
-              className="hover:bg-gray-50 focus-within:bg-gray-50"
+              className="hover:bg-gray-50 focus-within:bg-gray-50 focus:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset"
               tabIndex={0}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {

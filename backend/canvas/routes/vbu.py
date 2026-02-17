@@ -5,7 +5,7 @@ from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from canvas.db import get_db_session
-from canvas.auth.dependencies import get_current_user, require_role
+from canvas.auth.dependencies import get_current_user, require_role, verify_csrf
 from canvas.models.user import User, UserRole
 from canvas.models.vbu import VBU
 from canvas.services.canvas_service import CanvasService
@@ -61,7 +61,8 @@ async def list_vbus(
 async def create_vbu(
     vbu_data: VBUCreate,
     current_user: User = Depends(require_role(UserRole.ADMIN)),
-    db: AsyncSession = Depends(get_db_session)
+    db: AsyncSession = Depends(get_db_session),
+    _: None = Depends(verify_csrf)
 ):
     """Create VBU (admin only)"""
     service = CanvasService()
@@ -123,7 +124,8 @@ async def update_vbu(
     vbu_id: UUID,
     vbu_data: VBUUpdate,
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db_session)
+    db: AsyncSession = Depends(get_db_session),
+    _: None = Depends(verify_csrf)
 ):
     """Update VBU (admin or GM owner)"""
     # Check VBU exists and authorization
@@ -169,7 +171,8 @@ async def update_vbu(
 async def delete_vbu(
     vbu_id: UUID,
     current_user: User = Depends(require_role(UserRole.ADMIN)),
-    db: AsyncSession = Depends(get_db_session)
+    db: AsyncSession = Depends(get_db_session),
+    _: None = Depends(verify_csrf)
 ):
     """Delete VBU (admin only)"""
     service = CanvasService()

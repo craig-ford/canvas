@@ -1,11 +1,12 @@
 from typing import Callable
 from uuid import UUID
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 from canvas.models.user import User, UserRole
 from canvas.auth.service import AuthService
 from canvas.db import get_db_session
+from canvas.config import Settings
 
 security = HTTPBearer()
 auth_service = AuthService()
@@ -67,3 +68,24 @@ def require_role(*roles) -> Callable[[User], User]:
             )
         return user
     return role_checker
+
+async def verify_csrf(request: Request) -> None:
+    """Verify CSRF protection by checking Origin header for state-changing requests."""
+    settings = Settings()
+    
+    # Get Origin header
+    origin = request.headers.get("origin")
+    if not origin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Missing Origin header"
+        )
+    
+    # Check if origin is in allowed CORS origins
+    if origin not in settings.cors_origins:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Invalid Origin header"
+        )
+    
+    return None

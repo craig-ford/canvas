@@ -1,3 +1,12 @@
+// TODO: ARCHITECTURAL DEBT - This component violates SRP by handling multiple responsibilities
+// Future refactor: Extract sub-components for better separation of concerns:
+// - CanvasHeader (navigation, title, lifecycle lane)
+// - CanvasMetadata (product name, success description, etc.)
+// - ThesesSection (thesis list and management)
+// - ProofPointsSection (proof points for selected thesis)
+// - ReviewsSection (monthly reviews integration)
+// This is functional code that works correctly but should be refactored for maintainability
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeftIcon, CalendarIcon } from '@heroicons/react/24/outline';

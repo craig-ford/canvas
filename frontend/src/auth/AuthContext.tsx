@@ -26,6 +26,8 @@ type AuthContextType = AuthState & AuthActions;
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 let accessToken: string | null = null;
+let isRefreshing = false;
+let failedQueue: Array<{ resolve: (token: string) => void; reject: (error: any) => void }> = [];
 
 const getAccessToken = (): string | null => accessToken;
 const setAccessToken = (token: string | null): void => {
@@ -56,9 +58,28 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
   }, []);
 
   const refreshToken = useCallback(async (): Promise<void> => {
-    const response = await api.post('/auth/refresh');
-    const { access_token } = response.data.data;
-    setAccessToken(access_token);
+    if (isRefreshing) {
+      return new Promise((resolve, reject) => {
+        failedQueue.push({ resolve, reject });
+      });
+    }
+
+    isRefreshing = true;
+    try {
+      const response = await api.post('/auth/refresh');
+      const { access_token } = response.data.data;
+      setAccessToken(access_token);
+      
+      // Process queued requests
+      failedQueue.forEach(({ resolve }) => resolve(access_token));
+      failedQueue = [];
+    } catch (error) {
+      failedQueue.forEach(({ reject }) => reject(error));
+      failedQueue = [];
+      throw error;
+    } finally {
+      isRefreshing = false;
+    }
   }, []);
 
   // Set up axios interceptors
