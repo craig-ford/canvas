@@ -112,7 +112,6 @@ def upgrade() -> None:
         sa.Column('label', sa.String(length=255), nullable=True),
         sa.Column('uploaded_by', postgresql.UUID(as_uuid=True), nullable=False),
         sa.ForeignKeyConstraint(['proof_point_id'], ['proof_points.id'], ondelete='CASCADE'),
-        sa.ForeignKeyConstraint(['monthly_review_id'], ['monthly_reviews.id'], ondelete='CASCADE'),
         sa.ForeignKeyConstraint(['uploaded_by'], ['users.id'], ondelete='RESTRICT'),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('storage_path', name='uq_attachments_storage_path'),
@@ -131,7 +130,6 @@ def upgrade() -> None:
     op.create_index('ix_proof_points_thesis_id', 'proof_points', ['thesis_id'])
     op.create_index('ix_proof_points_status', 'proof_points', ['status'])
     op.create_index('ix_attachments_proof_point_id', 'attachments', ['proof_point_id'])
-    op.create_index('ix_attachments_monthly_review_id', 'attachments', ['monthly_review_id'])
     op.create_index('ix_attachments_uploaded_by', 'attachments', ['uploaded_by'])
     op.create_index('ix_attachments_content_type', 'attachments', ['content_type'])
 
@@ -139,7 +137,6 @@ def downgrade() -> None:
     # Drop indexes
     op.drop_index('ix_attachments_content_type', table_name='attachments')
     op.drop_index('ix_attachments_uploaded_by', table_name='attachments')
-    op.drop_index('ix_attachments_monthly_review_id', table_name='attachments')
     op.drop_index('ix_attachments_proof_point_id', table_name='attachments')
     op.drop_index('ix_proof_points_status', table_name='proof_points')
     op.drop_index('ix_proof_points_thesis_id', table_name='proof_points')

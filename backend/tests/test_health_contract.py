@@ -51,6 +51,8 @@ async def test_health_endpoint_request_id_header():
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         response = await client.get("/api/health")
         assert response.status_code == 200
+        # Actually check for X-Request-ID header
+        assert "x-request-id" in response.headers
 
 
 @pytest.mark.asyncio

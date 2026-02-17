@@ -4,3 +4,8 @@ dist/
 __pycache__/
 *.pyc
 .pytest_cache/
+.env
+*.log
+uploads/
+*.egg-info
+.coverage

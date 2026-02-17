@@ -60,8 +60,16 @@ def upgrade() -> None:
     op.create_index('ix_monthly_reviews_review_date', 'monthly_reviews', ['review_date'])
     op.create_index('ix_monthly_reviews_created_by', 'monthly_reviews', ['created_by'])
     op.create_index('ix_commitments_review_id', 'commitments', ['monthly_review_id'])
+    
+    # Add FK constraint for attachments.monthly_review_id now that monthly_reviews table exists
+    op.create_foreign_key('fk_attachments_monthly_review_id', 'attachments', 'monthly_reviews', ['monthly_review_id'], ['id'], ondelete='CASCADE')
+    op.create_index('ix_attachments_monthly_review_id', 'attachments', ['monthly_review_id'])
 
 def downgrade() -> None:
+    # Drop FK constraint and index for attachments.monthly_review_id
+    op.drop_index('ix_attachments_monthly_review_id', table_name='attachments')
+    op.drop_constraint('fk_attachments_monthly_review_id', 'attachments', type_='foreignkey')
+    
     # Drop indexes
     op.drop_index('ix_commitments_review_id', table_name='commitments')
     op.drop_index('ix_monthly_reviews_created_by', table_name='monthly_reviews')

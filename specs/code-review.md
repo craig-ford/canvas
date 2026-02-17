@@ -263,53 +263,53 @@
 
 #### Critical
 
-- [ ] CR-104: backend/alembic/versions/002_canvas_tables.py:107 - [review-data] Migration 002 creates FK constraint `monthly_review_id → monthly_reviews.id` but `monthly_reviews` table is not created until migration 004. Running `alembic upgrade head` on a fresh database will fail.
+- [x] CR-104: backend/alembic/versions/002_canvas_tables.py:107 - [review-data] Migration 002 creates FK constraint `monthly_review_id → monthly_reviews.id` but `monthly_reviews` table is not created until migration 004. Running `alembic upgrade head` on a fresh database will fail.
   - **Feature:** 002-canvas-management
   - **Task:** T-004
   - **Rationale:** Prevents fresh database setup and any clean deployment. The attachments table FK references a table that doesn't exist yet in the migration chain.
 
 #### High
 
-- [ ] CR-105: backend/tests/test_models_contract.py:6 - [review-testing] Tautological contract tests — all tests only use `hasattr()` to verify attributes exist without testing actual model behavior, constraints, or relationships
+- [x] CR-105: backend/tests/test_models_contract.py:6 - [review-testing] Tautological contract tests — all tests only use `hasattr()` to verify attributes exist without testing actual model behavior, constraints, or relationships
   - **Feature:** 001A-infrastructure
   - **Task:** T-001
   - **Rationale:** Tests provide false confidence — they pass even if models are completely broken. Need meaningful assertions testing actual functionality.
 
-- [ ] CR-106: backend/tests/canvas/test_models_contract.py:5 - [review-testing] All canvas model contract tests are tautological — only check `hasattr()` without testing FK relationships, constraints, or validation
+- [x] CR-106: backend/tests/canvas/test_models_contract.py:5 - [review-testing] All canvas model contract tests are tautological — only check `hasattr()` without testing FK relationships, constraints, or validation
   - **Feature:** 002-canvas-management
   - **Task:** T-001
   - **Rationale:** Same issue as CR-105 — tests verify structure exists but not that it works correctly.
 
-- [ ] CR-107: backend/tests/canvas/test_services_contract.py:65 - [review-testing] Service contract tests only verify method signatures exist without testing actual service behavior or error handling
+- [x] CR-107: backend/tests/canvas/test_services_contract.py:65 - [review-testing] Service contract tests only verify method signatures exist without testing actual service behavior or error handling
   - **Feature:** 002-canvas-management
   - **Task:** T-002
   - **Rationale:** Contract tests should verify behavior contracts, not just interface existence.
 
 #### Medium
 
-- [ ] CR-108: docker-compose.yml:1 - [review-devops] Missing restart policies for all services — containers won't auto-restart after crashes or host reboots
+- [x] CR-108: docker-compose.yml:1 - [review-devops] Missing restart policies for all services — containers won't auto-restart after crashes or host reboots
   - **Feature:** 001A-infrastructure
   - **Task:** T-010
   - **Rationale:** Production resilience requires `restart: unless-stopped` or similar policy.
 
-- [ ] CR-109: .gitignore:1 - [review-devops] Missing common patterns: `.env`, `*.log`, `uploads/`, `*.egg-info`, `.coverage`
+- [x] CR-109: .gitignore:1 - [review-devops] Missing common patterns: `.env`, `*.log`, `uploads/`, `*.egg-info`, `.coverage`
   - **Feature:** 001A-infrastructure
   - **Task:** T-010
   - **Rationale:** Risk of committing secrets (.env files) and build artifacts to version control.
 
-- [ ] CR-110: backend/tests/test_config_contract.py:6 - [review-testing] Config contract tests only check field existence and types without testing environment variable loading, validation, or default behavior
+- [x] CR-110: backend/tests/test_config_contract.py:6 - [review-testing] Config contract tests only check field existence and types without testing environment variable loading, validation, or default behavior
   - **Feature:** 001A-infrastructure
   - **Task:** T-002
   - **Rationale:** Configuration is critical infrastructure — tests should verify actual loading behavior.
 
-- [ ] CR-111: backend/tests/test_db_contract.py:6 - [review-testing] Database contract test only checks `hasattr` without testing actual generator behavior, session lifecycle, or error handling
+- [x] CR-111: backend/tests/test_db_contract.py:6 - [review-testing] Database contract test only checks `hasattr` without testing actual generator behavior, session lifecycle, or error handling
   - **Feature:** 001A-infrastructure
   - **Task:** T-003
   - **Rationale:** Database session management is critical — tautological tests miss real issues.
 
 #### Low
 
-- [ ] CR-112: backend/tests/test_health_contract.py:35 - [review-testing] `test_health_endpoint_request_id_header()` claims to verify X-Request-ID header but only checks 200 status code
+- [x] CR-112: backend/tests/test_health_contract.py:35 - [review-testing] `test_health_endpoint_request_id_header()` claims to verify X-Request-ID header but only checks 200 status code
   - **Feature:** 001A-infrastructure
   - **Task:** T-004
   - **Rationale:** Test name is misleading — it doesn't actually verify what it claims to test.

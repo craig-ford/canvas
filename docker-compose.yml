@@ -3,6 +3,7 @@ version: '3.8'
 services:
   db:
     image: postgres:18
+    restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-canvas}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-canvas_dev}
@@ -19,6 +20,7 @@ services:
 
   backend:
     build: ./backend
+    restart: unless-stopped
     ports:
       - "8000:8000"
     environment:
@@ -45,6 +47,7 @@ services:
 
   frontend:
     build: ./frontend
+    restart: unless-stopped
     ports:
       - "5173:5173"  # dev profile
     depends_on:
@@ -65,6 +68,7 @@ services:
     build: 
       context: ./frontend
       target: production
+    restart: unless-stopped
     ports:
       - "80:80"      # prod profile
     depends_on:

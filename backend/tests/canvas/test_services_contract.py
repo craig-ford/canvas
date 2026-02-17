@@ -107,6 +107,13 @@ def test_canvas_service_interface():
     assert 'gm_id' in create_vbu_sig.parameters
     assert 'created_by' in create_vbu_sig.parameters
     assert 'db' in create_vbu_sig.parameters
+    # Check return type annotation
+    assert create_vbu_sig.return_annotation == VBU
+    
+    # Verify async methods
+    assert inspect.iscoroutinefunction(ActualCanvasService.create_vbu)
+    assert inspect.iscoroutinefunction(ActualCanvasService.update_canvas)
+    assert inspect.iscoroutinefunction(ActualCanvasService.delete_vbu)
 
 def test_attachment_service_interface():
     """Verify AttachmentService has all required methods with correct signatures"""
@@ -125,3 +132,10 @@ def test_attachment_service_interface():
     assert 'uploaded_by' in upload_sig.parameters
     assert 'db' in upload_sig.parameters
     assert 'label' in upload_sig.parameters
+    # Check return type annotation
+    assert upload_sig.return_annotation == Attachment
+    
+    # Verify async methods
+    assert inspect.iscoroutinefunction(ActualAttachmentService.upload)
+    assert inspect.iscoroutinefunction(ActualAttachmentService.download)
+    assert inspect.iscoroutinefunction(ActualAttachmentService.delete)
