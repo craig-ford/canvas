@@ -136,10 +136,13 @@ class TestAuthRoutesIntegration:
 
     @pytest.mark.asyncio
     async def test_rate_limiting_login(self, client: AsyncClient, db: AsyncSession):
-        """Multiple failed login attempts increment failed_attempts counter."""
+        """Multiple failed login attempts trigger rate limiting."""
+        from canvas.auth.routes import rate_limit_store
+        rate_limit_store.clear()
         auth_service = AuthService()
         await auth_service.register_user("ratelimit@example.com", "Password1!", "Rate", "viewer", db)
 
+        # Make 5 requests to trigger rate limiting
         for _ in range(5):
             response = await client.post("/api/auth/login", json={
                 "email": "ratelimit@example.com",
@@ -147,9 +150,9 @@ class TestAuthRoutesIntegration:
             })
             assert response.status_code == 401
 
-        # After 5 failures, account should be locked → authenticate returns None → 401
+        # 6th request should be rate limited
         response = await client.post("/api/auth/login", json={
             "email": "ratelimit@example.com",
             "password": "Password1!"
         })
-        assert response.status_code == 401
+        assert response.status_code == 429

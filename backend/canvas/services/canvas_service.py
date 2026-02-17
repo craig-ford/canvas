@@ -1,7 +1,7 @@
 from typing import Optional, List, Dict, Any
 from uuid import UUID
 from datetime import datetime
-from sqlalchemy import select, update, delete
+from sqlalchemy import select, update, delete, text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from fastapi import HTTPException, status
@@ -140,16 +140,25 @@ class CanvasService:
         await db.commit()
 
     async def reorder_theses(self, canvas_id: UUID, thesis_orders: List[Dict[str, Any]], db: AsyncSession) -> List[Thesis]:
-        """Reorder theses using parameterized queries"""
-        # Use parameterized updates instead of raw SQL
+        """Reorder theses — drop and recreate constraint to allow reorder"""
+        if not thesis_orders:
+            result = await db.execute(
+                select(Thesis).where(Thesis.canvas_id == canvas_id).order_by(Thesis.order)
+            )
+            return list(result.scalars().all())
+
+        await db.execute(text("ALTER TABLE theses DROP CONSTRAINT IF EXISTS uq_theses_canvas_order"))
         for item in thesis_orders:
             await db.execute(
                 update(Thesis)
                 .where(Thesis.id == item["id"])
                 .values(order=item["order"])
             )
-        
+        await db.execute(text(
+            'ALTER TABLE theses ADD CONSTRAINT uq_theses_canvas_order UNIQUE (canvas_id, "order") DEFERRABLE INITIALLY IMMEDIATE'
+        ))
         await db.commit()
+        db.expire_all()
 
         result = await db.execute(
             select(Thesis)

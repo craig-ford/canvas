@@ -1,53 +1,39 @@
-# Test Failures — Attempt 2 (Post-Subagent Round 1)
+# Test Failures
 
 ## Summary
-40 failed, 222 passed, 23 warnings in 66.85s
+19 failed, 256 passed, 26 warnings in 96.03s
 
-## Progress
-- Attempt 1: 127 passed, 50 failed, 89 errors (266 total)
-- Attempt 2 start: 193 passed, 59 failed, 10 errors (after previous session fixes)
-- After shared root cause fixes: 212 passed, 50 failed, 0 errors
-- After subagent round 1: 222 passed, 40 failed, 0 errors
+## Root Cause Groups
 
-## Remaining Failures by File (40)
+### Group A: Portfolio func.INTERVAL ORM bug (4 tests)
+- FAILED tests/test_portfolio_routes.py::test_get_portfolio_summary_admin_sees_all
+- FAILED tests/test_portfolio_routes.py::test_get_portfolio_summary_gm_sees_own_only
+- FAILED tests/test_portfolio_routes.py::test_get_portfolio_summary_with_lane_filter
+- FAILED tests/test_portfolio_routes.py::test_get_portfolio_summary_with_health_filter
+Error: AttributeError: 'Comparator' object has no attribute '_is_tuple_type'
+Cause: review-security agent rewrote raw SQL to ORM using invalid func.INTERVAL syntax
 
-### tests/canvas/test_proof_point_api.py (8 failures)
-- test_get_proof_points_success, test_get_proof_points_unauthorized, test_create_proof_point_forbidden_viewer
-- test_update_proof_point_success, test_update_proof_point_status_change, test_update_proof_point_forbidden_other_gm
-- test_delete_proof_point_success, test_delete_proof_point_not_found
-- Subagent 1 rewrote to use conftest fixtures but tests still fail — likely wrong API paths or response shapes
+### Group B: Reviews 403 Forbidden (4 tests)
+- FAILED tests/reviews/test_api_integration.py::TestReviewAPIIntegration::test_create_review_admin_any_canvas
+- FAILED tests/reviews/test_api_integration.py::TestReviewAPIIntegration::test_create_review_gm_own_canvas_only
+- FAILED tests/reviews/test_commitment_validation.py::TestCommitmentValidation::test_currently_testing_validation
+- FAILED tests/reviews/test_commitment_validation.py::TestCommitmentValidation::test_duplicate_review_date_conflict
+Error: Getting 403 Forbidden instead of expected status codes
 
-### tests/test_pdf_routes.py (5 failures)
-- All 5 PDF export tests still return 500
-- PDF template path was fixed (backend/ prefix removed) but still failing — may need to check if template renders correctly or if there's another issue
+### Group C: PDFService constructor changed (3 tests)
+- FAILED tests/pdf/test_service.py::TestPDFServiceContract::test_service_instantiation
+- FAILED tests/pdf/test_service.py::TestPDFServiceContract::test_export_canvas_signature
+- FAILED tests/pdf/test_service.py::TestPDFServiceBehaviorContract::test_export_canvas_with_valid_uuid
+Error: TypeError: PDFService.__init__() missing 1 required positional argument: 'db'
 
-### tests/reviews/test_api_integration.py (4 failures)
-- test_list_reviews_gm_access_own_canvas_only, test_create_review_admin_any_canvas
-- test_create_review_gm_own_canvas_only, test_get_review_authorization_matrix
-- Subagent 2 fixed endpoints and fixtures but tests still fail
+### Group D: Canvas/thesis validation changes (5 tests)
+- FAILED tests/canvas/test_canvas_api.py::TestCanvasAPIValidation::test_update_canvas_empty_product_name (422 vs 500)
+- FAILED tests/canvas/test_canvas_service_integration.py::TestCanvasServiceThesis::test_reorder_theses (IntegrityError)
+- FAILED tests/canvas/test_thesis_api.py::TestThesisAPIValidation::test_create_thesis_duplicate_order (409 vs 201)
+- FAILED tests/canvas/test_thesis_api.py::TestThesisAPIReordering::test_reorder_theses_success (422 vs 200)
+- FAILED tests/canvas/test_thesis_api.py::TestThesisAPIReordering::test_reorder_theses_invalid_order (422 vs 200)
 
-### tests/reviews/test_service_integration.py (4 failures)
-- test_create_review_with_commitments, test_create_review_updates_canvas_currently_testing
-- test_attachment_linking_integration, test_validate_currently_testing_belongs_to_canvas
-
-### tests/canvas/test_canvas_api.py (4 failures)
-- test_update_canvas_gm_own, test_update_canvas_empty_product_name
-- test_update_portfolio_notes_admin, test_update_portfolio_notes_gm_ignored
-
-### tests/canvas/test_attachment_service_integration.py (4 failures)
-- test_upload_valid_file, test_download_existing_file, test_delete_existing_file, test_storage_path_generation
-
-### tests/canvas/test_attachment_api.py (3 failures)
-- test_download_file_not_found, test_upload_nonexistent_proof_point, test_delete_not_found
-
-### tests/canvas/test_thesis_api.py (3 failures)
-- test_create_thesis_duplicate_order, test_reorder_theses_success, test_reorder_theses_invalid_order
-
-### tests/canvas/test_vbu_api.py (2 failures)
-- test_update_vbu_gm_own, test_create_vbu_invalid_gm_id
-
-### tests/reviews/test_commitment_validation.py (2 failures)
-- test_currently_testing_validation, test_duplicate_review_date_conflict
-
-### tests/canvas/test_canvas_service_integration.py (1 failure)
-- test_reorder_theses
+### Group E: Other (3 tests)
+- FAILED tests/auth/test_auth_routes_integration.py::TestAuthRoutesIntegration::test_rate_limiting_login (429 vs 401)
+- FAILED tests/canvas/test_proof_point_api.py::TestProofPointAPI::test_create_proof_point_validation_error (response shape)
+- FAILED tests/canvas/test_vbu_api.py::TestVBUAPIValidation::test_create_vbu_invalid_gm_id (422 vs 500)

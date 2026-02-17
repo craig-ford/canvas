@@ -60,7 +60,7 @@ class TestVBUAPIValidation:
     async def test_create_vbu_invalid_gm_id(self, client: AsyncClient, admin_token: str):
         payload = {"name": "Valid Name", "gm_id": str(uuid4())}
         response = await client.post("/api/vbus", json=payload, headers={"Authorization": f"Bearer {admin_token}"})
-        assert response.status_code == 500  # Database constraint violation, not validation error
+        assert response.status_code == 422  # Service validates gm_id and returns 422 for invalid user
 
     async def test_get_vbu_not_found(self, client: AsyncClient, admin_token: str):
         response = await client.get(f"/api/vbus/{uuid4()}", headers={"Authorization": f"Bearer {admin_token}"})

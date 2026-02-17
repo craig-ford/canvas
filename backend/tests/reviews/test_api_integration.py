@@ -32,7 +32,8 @@ class TestReviewAPIIntegration:
             "currently_testing_id": str(test_thesis.id),
             "commitments": [{"text": "Test", "order": 1}]
         }
-        resp = await client.post(f"/api/canvases/{canvas.id}/reviews", json=payload, headers={"Authorization": f"Bearer {admin_token}"})
+        headers = {"Authorization": f"Bearer {admin_token}", "X-CSRF-Token": "test-token"}
+        resp = await client.post(f"/api/canvases/{canvas.id}/reviews", json=payload, headers=headers)
         assert resp.status_code == status.HTTP_201_CREATED
 
     async def test_create_review_gm_own_canvas_only(self, client: AsyncClient, gm_token, own_canvas, other_canvas, test_thesis, other_canvas_thesis):
@@ -43,7 +44,8 @@ class TestReviewAPIIntegration:
             "currently_testing_id": str(test_thesis.id),
             "commitments": [{"text": "Test", "order": 1}]
         }
-        resp = await client.post(f"/api/canvases/{own_canvas.id}/reviews", json=payload, headers={"Authorization": f"Bearer {gm_token}"})
+        headers = {"Authorization": f"Bearer {gm_token}", "X-CSRF-Token": "test-token"}
+        resp = await client.post(f"/api/canvases/{own_canvas.id}/reviews", json=payload, headers=headers)
         assert resp.status_code == status.HTTP_201_CREATED
         
         payload_other = {
@@ -52,7 +54,7 @@ class TestReviewAPIIntegration:
             "currently_testing_id": str(other_canvas_thesis.id),
             "commitments": [{"text": "Test", "order": 1}]
         }
-        resp_other = await client.post(f"/api/canvases/{other_canvas.id}/reviews", json=payload_other, headers={"Authorization": f"Bearer {gm_token}"})
+        resp_other = await client.post(f"/api/canvases/{other_canvas.id}/reviews", json=payload_other, headers=headers)
         assert resp_other.status_code == status.HTTP_403_FORBIDDEN
 
     async def test_create_review_viewer_forbidden(self, client: AsyncClient, viewer_token, canvas, test_thesis):

@@ -1,5 +1,6 @@
 import pytest
 from uuid import uuid4, UUID
+from unittest.mock import AsyncMock
 from canvas.pdf.service import PDFService, CanvasNotFoundError, PDFGenerationError
 
 class TestPDFServiceContract:
@@ -7,12 +8,14 @@ class TestPDFServiceContract:
     
     def test_service_instantiation(self):
         """Test PDFService can be instantiated"""
-        service = PDFService()
+        mock_db = AsyncMock()
+        service = PDFService(mock_db)
         assert service is not None
     
     def test_export_canvas_signature(self):
         """Test export_canvas method signature"""
-        service = PDFService()
+        mock_db = AsyncMock()
+        service = PDFService(mock_db)
         
         # Verify method exists and has correct signature
         assert hasattr(service, 'export_canvas')
@@ -75,7 +78,8 @@ class TestPDFServiceBehaviorContract:
     
     def test_export_canvas_with_valid_uuid(self):
         """Test export_canvas accepts valid UUID"""
-        service = PDFService()
+        mock_db = AsyncMock()
+        service = PDFService(mock_db)
         canvas_id = uuid4()
         
         # This is a contract test - we're verifying the interface accepts UUID

@@ -95,8 +95,12 @@ class TestCanvasServiceThesis:
         canvas = await canvas_service.get_canvas_by_vbu(test_vbu.id, db_session)
         t1 = await canvas_service.create_thesis(canvas.id, "First", 1, db_session)
         t2 = await canvas_service.create_thesis(canvas.id, "Second", 2, db_session)
-        reordered = await canvas_service.reorder_theses(canvas.id, [{"id": str(t2.id), "order": 1}, {"id": str(t1.id), "order": 2}], db_session)
+        # Swap the orders: t1 goes from 1->2, t2 goes from 2->1
+        reordered = await canvas_service.reorder_theses(canvas.id, [{"id": str(t1.id), "order": 2}, {"id": str(t2.id), "order": 1}], db_session)
         assert len(reordered) == 2
+        # Verify the reordering worked
+        assert reordered[0].id == t2.id and reordered[0].order == 1
+        assert reordered[1].id == t1.id and reordered[1].order == 2
 
 class TestCanvasServiceProofPoint:
     async def test_create_proof_point(self, canvas_service: CanvasService, test_vbu: VBU, db_session: AsyncSession):

@@ -61,7 +61,7 @@ class TestCanvasAPIValidation:
     async def test_update_canvas_empty_product_name(self, client: AsyncClient, admin_token: str, test_vbu: VBU):
         payload = {"product_name": ""}
         response = await client.put(f"/api/vbus/{test_vbu.id}/canvas", json=payload, headers={"Authorization": f"Bearer {admin_token}"})
-        assert response.status_code == 500  # DB CHECK constraint rejects empty product_name
+        assert response.status_code == 422  # Validation now catches empty product_name
 
     async def test_get_canvas_vbu_not_found(self, client: AsyncClient, admin_token: str):
         response = await client.get(f"/api/vbus/{uuid4()}/canvas", headers={"Authorization": f"Bearer {admin_token}"})

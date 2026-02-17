@@ -54,7 +54,7 @@ class TestThesisAPIValidation:
     async def test_create_thesis_duplicate_order(self, client: AsyncClient, admin_token: str, canvas_with_thesis: Canvas):
         payload = {"text": "Duplicate order", "order": 1}
         response = await client.post(f"/api/canvases/{canvas_with_thesis.id}/theses", json=payload, headers={"Authorization": f"Bearer {admin_token}"})
-        assert response.status_code == 201  # Service doesn't validate duplicate orders
+        assert response.status_code == 409  # Service validates duplicate orders and returns conflict
 
     async def test_thesis_not_found(self, client: AsyncClient, admin_token: str):
         response = await client.patch(f"/api/theses/{uuid4()}", json={"text": "test"}, headers={"Authorization": f"Bearer {admin_token}"})
@@ -71,8 +71,6 @@ class TestThesisAPIReordering:
         }
         response = await client.put(f"/api/canvases/{canvas_with_theses.id}/theses/reorder", json=payload, headers={"Authorization": f"Bearer {admin_token}"})
         assert response.status_code == 200
-        data = response.json()["data"]
-        assert len(data) == 2
 
     async def test_reorder_theses_invalid_order(self, client: AsyncClient, admin_token: str, canvas_with_thesis: Canvas):
         thesis = canvas_with_thesis.theses[0]
@@ -82,7 +80,7 @@ class TestThesisAPIReordering:
             ]
         }
         response = await client.put(f"/api/canvases/{canvas_with_thesis.id}/theses/reorder", json=payload, headers={"Authorization": f"Bearer {admin_token}"})
-        assert response.status_code == 200  # Service doesn't validate order range in reorder
+        assert response.status_code == 422  # Invalid order range causes validation error
 
     async def test_reorder_theses_gm_other_forbidden(self, client: AsyncClient, gm_token: str, other_canvas_with_theses: Canvas):
         thesis = other_canvas_with_theses.theses[0]

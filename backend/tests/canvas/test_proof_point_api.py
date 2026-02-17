@@ -83,7 +83,7 @@ class TestProofPointAPI:
         )
         assert response.status_code == 422
         data = response.json()
-        assert "error" in data
+        assert "detail" in data  # Pydantic validation errors use 'detail' key, not 'error'
     
     async def test_update_proof_point_success(self, client: AsyncClient, gm_token: str, sample_proof_point: ProofPoint):
         """Test PATCH /api/proof-points/{id} updates proof point"""
