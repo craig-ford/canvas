@@ -1,12 +1,12 @@
 ---RALPH_STATUS---
 EXIT_SIGNAL: false
-CURRENT_MODE: smoke-test (test-suite phase)
+CURRENT_MODE: code-review
 CURRENT_FEATURE: all
-ACTION_COMPLETED: Test-suite attempt 3 — ALL 262 tests passing. Fixed 4 code bugs (CommitmentResponse from_attributes, ValueError handling in reviews router, AttachmentService DI + string selectinloads, thesis reorder IntegrityError). Fixed 5 test files with wrong assertions. Zero failures, zero errors, zero skipped.
+ACTION_COMPLETED: Code review iteration 1 complete. 8 review agents spawned in 2 batches (security, backend, frontend, architect + performance, testing, data, devops). Assembled specs/code-review.md with 47 deduplicated issues: 13 Critical, 17 High, 12 Medium, 5 Low. Key findings: SQL injection (2 locations), missing auth integration in frontend, N+1 queries, duplicate test directories, unpinned deps, hardcoded secrets.
 FEATURES_TOTAL: 5
 FEATURES_WITH_SPECS: 5
 FEATURES_WITH_PLANS: 5
 FEATURES_WITH_TASKS: 5
 FEATURES_VERIFIED: 5
-RECOMMENDATION: State detection will see test-suite-report.md Result: PASS and no code-review.md → proceed to code-review mode. Spawn 8 review agents in 2 batches.
+RECOMMENDATION: Next invocation will detect unchecked issues in code-review.md → enter fix mode. Spawn fix agents grouped by reviewer tag. Check for multi-reviewer file conflicts first (canvas_service.py, portfolio/service.py, attachment routes, api/client.ts all have issues from 2+ reviewers) → run herald before fix batch.
 ---END_RALPH_STATUS---
