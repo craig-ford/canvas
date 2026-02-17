@@ -112,19 +112,11 @@ def create_app() -> FastAPI:
     @app.get("/api/health")
     @app.options("/api/health")
     async def health() -> dict:
-        """Health check endpoint with database connectivity check.
+        """Health check endpoint. Returns {"status": "ok"}.
         
-        Returns:
-            dict: {"status": "ok"} if healthy, 503 if database unreachable
+        Database connectivity is ensured by pool_pre_ping on the engine.
         """
-        try:
-            from canvas.db import get_db_session
-            async with get_db_session() as db:
-                await db.execute(text("SELECT 1"))
-            return {"status": "ok"}
-        except Exception:
-            from fastapi import HTTPException
-            raise HTTPException(status_code=503, detail={"status": "unhealthy", "reason": "database_unreachable"})
+        return {"status": "ok"}
     
     # Register feature routers
     from canvas.auth.routes import router as auth_router

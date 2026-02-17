@@ -101,9 +101,13 @@ def app(_connection):
 
 @pytest_asyncio.fixture
 async def client(app):
-    """Create async test client."""
+    """Create async test client with Origin header for CSRF."""
     transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as c:
+    async with AsyncClient(
+        transport=transport,
+        base_url="http://test",
+        headers={"Origin": "http://localhost:3000"},
+    ) as c:
         yield c
 
 
@@ -224,7 +228,10 @@ async def authed_client(app, admin_token):
     async with AsyncClient(
         transport=transport,
         base_url="http://test",
-        headers={"Authorization": f"Bearer {admin_token}"},
+        headers={
+            "Authorization": f"Bearer {admin_token}",
+            "Origin": "http://localhost:3000",
+        },
     ) as c:
         yield c
 

@@ -50,7 +50,6 @@ async def test_health_endpoint_request_id_header():
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         response = await client.get("/api/health")
-        # Request ID may not be implemented - check if endpoint works
         assert response.status_code == 200
 
 
@@ -64,5 +63,5 @@ async def test_health_endpoint_cors_headers():
             "Origin": "http://localhost:3000",
             "Access-Control-Request-Method": "GET",
         })
-        # CORS may return 200 or 405 depending on middleware config
+        # CORS may return 200 or 204 or 405 depending on middleware config
         assert response.status_code in (200, 204, 405)

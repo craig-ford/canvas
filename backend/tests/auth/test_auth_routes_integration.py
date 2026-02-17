@@ -62,11 +62,12 @@ class TestAuthRoutesIntegration:
         data = response.json()
         assert "data" in data
         assert "access_token" in data["data"]
-        assert "refresh_token" in data["data"]
         assert data["data"]["token_type"] == "bearer"
         assert "user" in data["data"]
         assert data["data"]["user"]["email"] == "login@example.com"
         assert data["data"]["user"]["role"] == "gm"
+        # refresh_token is set as httpOnly cookie, not in response body
+        assert "refresh_token" in response.cookies
 
     @pytest.mark.asyncio
     async def test_login_invalid_credentials(self, client: AsyncClient, db: AsyncSession):

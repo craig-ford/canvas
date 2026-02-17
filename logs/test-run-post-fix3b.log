@@ -1,0 +1,189 @@
+time="2026-02-17T10:01:16-08:00" level=warning msg="/home/craig/canvas/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+============================= test session starts ==============================
+platform linux -- Python 3.12.12, pytest-8.4.2, pluggy-1.6.0
+rootdir: /app
+configfile: pytest.ini
+plugins: anyio-4.12.1, asyncio-0.24.0
+asyncio: mode=Mode.AUTO, default_loop_scope=function
+collected 275 items
+
+tests/auth/test_auth_dependencies_contract.py ..........                 [  3%]
+tests/auth/test_auth_routes_integration.py ...........                   [  7%]
+tests/auth/test_auth_service_contract.py ...........                     [ 11%]
+tests/auth/test_auth_service_unit.py ..................                  [ 18%]
+tests/auth/test_user_routes.py ..........                                [ 21%]
+tests/auth/test_user_service.py .......                                  [ 24%]
+tests/canvas/test_attachment_api.py ......                               [ 26%]
+tests/canvas/test_attachment_service_integration.py .......              [ 29%]
+tests/canvas/test_canvas_api.py .............                            [ 33%]
+tests/canvas/test_canvas_service_integration.py .............            [ 38%]
+tests/canvas/test_models_contract.py ........                            [ 41%]
+tests/canvas/test_proof_point_api.py ..........                          [ 45%]
+tests/canvas/test_services_contract.py ..                                [ 45%]
+tests/canvas/test_thesis_api.py ..............                           [ 50%]
+tests/canvas/test_vbu_api.py .............                               [ 55%]
+tests/models/test_monthly_review_relationships.py ........               [ 58%]
+tests/models/test_user_contract.py ......                                [ 60%]
+tests/pdf/test_service.py .............                                  [ 65%]
+tests/reviews/test_api_integration.py ........                           [ 68%]
+tests/reviews/test_commitment_validation.py ........                     [ 71%]
+tests/reviews/test_service_integration.py ......                         [ 73%]
+tests/reviews/test_service_unit.py .......                               [ 76%]
+tests/schemas/test_commitment_validation.py ..........                   [ 79%]
+tests/test_config_contract.py .......                                    [ 82%]
+tests/test_db_contract.py ....                                           [ 83%]
+tests/test_docker_integration.py ...                                     [ 84%]
+tests/test_health_contract.py .F....                                     [ 86%]
+tests/test_models_contract.py ..                                         [ 87%]
+tests/test_pdf_routes.py .........                                       [ 90%]
+tests/test_portfolio_routes.py .............                             [ 95%]
+tests/test_responses_contract.py ...                                     [ 96%]
+tests/test_user_model.py .........                                       [100%]
+
+=================================== FAILURES ===================================
+______________________ test_health_endpoint_response_body ______________________
+tests/test_health_contract.py:23: in test_health_endpoint_response_body
+    assert response.json() == {"status": "ok"}
+E   AssertionError: assert {'error': {'c...2038112732f'}} == {'status': 'ok'}
+E     
+E     Left contains 1 more item:
+E     {'error': {'code': 503,
+E                'message': {'reason': 'database_unreachable', 'status': 'unhealthy'},
+E                'request_id': '1108b620-b72f-476c-a3b7-f2038112732f'}}
+E     Right contains 1 more item:
+E     {'status': 'ok'}
+E     Use -v to get more diff
+----------------------------- Captured stderr call -----------------------------
+Exception terminating connection <AdaptedConnection <asyncpg.connection.Connection object at 0x7dcf56869a90>>
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/site-packages/sqlalchemy/pool/base.py", line 372, in _close_connection
+    self._dialect.do_terminate(connection)
+  File "/usr/local/lib/python3.12/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py", line 1127, in do_terminate
+    dbapi_connection.terminate()
+  File "/usr/local/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py", line 402, in terminate
+    self.await_(asyncio.shield(self._terminate_graceful_close()))  # type: ignore[attr-defined] # noqa: E501
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 132, in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 196, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py", line 912, in _terminate_graceful_close
+    await self._connection.close(timeout=2)
+  File "/usr/local/lib/python3.12/site-packages/asyncpg/connection.py", line 1513, in close
+    await self._protocol.close(timeout)
+  File "asyncpg/protocol/protocol.pyx", line 617, in close
+  File "asyncpg/protocol/protocol.pyx", line 650, in asyncpg.protocol.protocol.BaseProtocol._request_cancel
+  File "/usr/local/lib/python3.12/site-packages/asyncpg/connection.py", line 1682, in _cancel_current_command
+    self._cancellations.add(self._loop.create_task(self._cancel(waiter)))
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 455, in create_task
+    self._check_closed()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 545, in _check_closed
+    raise RuntimeError('Event loop is closed')
+RuntimeError: Event loop is closed
+HTTP Request: GET http://test/api/health "HTTP/1.1 503 Service Unavailable"
+------------------------------ Captured log call -------------------------------
+ERROR    sqlalchemy.pool.impl.AsyncAdaptedQueuePool:base.py:376 Exception terminating connection <AdaptedConnection <asyncpg.connection.Connection object at 0x7dcf56869a90>>
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/site-packages/sqlalchemy/pool/base.py", line 372, in _close_connection
+    self._dialect.do_terminate(connection)
+  File "/usr/local/lib/python3.12/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py", line 1127, in do_terminate
+    dbapi_connection.terminate()
+  File "/usr/local/lib/python3.12/site-packages/sqlalchemy/connectors/asyncio.py", line 402, in terminate
+    self.await_(asyncio.shield(self._terminate_graceful_close()))  # type: ignore[attr-defined] # noqa: E501
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 132, in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 196, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py", line 912, in _terminate_graceful_close
+    await self._connection.close(timeout=2)
+  File "/usr/local/lib/python3.12/site-packages/asyncpg/connection.py", line 1513, in close
+    await self._protocol.close(timeout)
+  File "asyncpg/protocol/protocol.pyx", line 617, in close
+  File "asyncpg/protocol/protocol.pyx", line 650, in asyncpg.protocol.protocol.BaseProtocol._request_cancel
+  File "/usr/local/lib/python3.12/site-packages/asyncpg/connection.py", line 1682, in _cancel_current_command
+    self._cancellations.add(self._loop.create_task(self._cancel(waiter)))
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 455, in create_task
+    self._check_closed()
+  File "/usr/local/lib/python3.12/asyncio/base_events.py", line 545, in _check_closed
+    raise RuntimeError('Event loop is closed')
+RuntimeError: Event loop is closed
+INFO     httpx:_client.py:1740 HTTP Request: GET http://test/api/health "HTTP/1.1 503 Service Unavailable"
+=============================== warnings summary ===============================
+../usr/local/lib/python3.12/site-packages/passlib/utils/__init__.py:854
+  /usr/local/lib/python3.12/site-packages/passlib/utils/__init__.py:854: DeprecationWarning: 'crypt' is deprecated and slated for removal in Python 3.13
+    from crypt import crypt as _crypt
+
+tests/auth/test_auth_routes_integration.py::TestAuthRoutesIntegration::test_login_success
+tests/auth/test_auth_routes_integration.py::TestAuthRoutesIntegration::test_login_invalid_credentials
+tests/auth/test_auth_routes_integration.py::TestAuthRoutesIntegration::test_login_account_locked
+tests/auth/test_auth_routes_integration.py::TestAuthRoutesIntegration::test_rate_limiting_login
+tests/auth/test_auth_routes_integration.py::TestAuthRoutesIntegration::test_rate_limiting_login
+tests/auth/test_auth_routes_integration.py::TestAuthRoutesIntegration::test_rate_limiting_login
+tests/auth/test_auth_routes_integration.py::TestAuthRoutesIntegration::test_rate_limiting_login
+tests/auth/test_auth_routes_integration.py::TestAuthRoutesIntegration::test_rate_limiting_login
+tests/auth/test_auth_routes_integration.py::TestAuthRoutesIntegration::test_rate_limiting_login
+  /app/canvas/auth/routes.py:28: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    now = datetime.utcnow()
+
+tests/auth/test_auth_routes_integration.py::TestAuthRoutesIntegration::test_refresh_token_success
+tests/auth/test_auth_routes_integration.py::TestAuthRoutesIntegration::test_refresh_token_invalid
+  /usr/local/lib/python3.12/site-packages/httpx/_client.py:1859: DeprecationWarning: Setting per-request cookies=<...> is being deprecated, because the expected behaviour on cookie persistence is ambiguous. Set cookies directly on the client instance instead.
+    return await self.request(
+
+tests/auth/test_user_routes.py::TestUserManagementRoutes::test_update_user_role_invalid_role
+tests/canvas/test_attachment_api.py::TestAttachmentAPI::test_upload_missing_parent_id
+  /usr/local/lib/python3.12/site-packages/fastapi/routing.py:312: DeprecationWarning: 'HTTP_422_UNPROCESSABLE_ENTITY' is deprecated. Use 'HTTP_422_UNPROCESSABLE_CONTENT' instead.
+    return await dependant.call(**values)
+
+tests/canvas/test_canvas_api.py::TestCanvasAPIValidation::test_update_canvas_empty_product_name
+  /app/canvas/routes/canvas.py:115: DeprecationWarning: 'HTTP_422_UNPROCESSABLE_ENTITY' is deprecated. Use 'HTTP_422_UNPROCESSABLE_CONTENT' instead.
+    updated_canvas = await service.update_canvas(
+
+tests/canvas/test_vbu_api.py::TestVBUAPIValidation::test_create_vbu_invalid_gm_id
+  /app/canvas/routes/vbu.py:69: DeprecationWarning: 'HTTP_422_UNPROCESSABLE_ENTITY' is deprecated. Use 'HTTP_422_UNPROCESSABLE_CONTENT' instead.
+    vbu = await service.create_vbu(
+
+tests/models/test_monthly_review_relationships.py::TestMonthlyReviewRelationships::test_unique_constraint_canvas_review_date
+tests/models/test_monthly_review_relationships.py::TestMonthlyReviewRelationships::test_commitment_order_uniqueness_per_review
+tests/models/test_monthly_review_relationships.py::TestMonthlyReviewRelationships::test_commitment_order_check_constraint
+tests/models/test_monthly_review_relationships.py::TestMonthlyReviewRelationships::test_commitment_text_not_null
+  sys:1: SAWarning: transaction already deassociated from connection
+
+tests/reviews/test_commitment_validation.py::TestCommitmentValidation::test_create_review_requires_1_to_3_commitments
+tests/reviews/test_commitment_validation.py::TestCommitmentValidation::test_create_review_requires_1_to_3_commitments
+tests/reviews/test_commitment_validation.py::TestCommitmentValidation::test_commitment_text_length_validation
+tests/reviews/test_commitment_validation.py::TestCommitmentValidation::test_commitment_text_length_validation
+tests/reviews/test_commitment_validation.py::TestCommitmentValidation::test_commitment_order_uniqueness
+tests/reviews/test_commitment_validation.py::TestCommitmentValidation::test_commitment_order_range_validation
+tests/reviews/test_commitment_validation.py::TestCommitmentValidation::test_commitment_order_range_validation
+tests/reviews/test_commitment_validation.py::TestCommitmentValidation::test_review_date_not_future
+tests/reviews/test_commitment_validation.py::TestCommitmentValidation::test_text_field_length_limits
+  /usr/local/lib/python3.12/asyncio/events.py:88: DeprecationWarning: 'HTTP_422_UNPROCESSABLE_ENTITY' is deprecated. Use 'HTTP_422_UNPROCESSABLE_CONTENT' instead.
+    self._context.run(self._callback, *self._args)
+
+tests/test_health_contract.py::test_health_endpoint_content_type
+tests/test_health_contract.py::test_health_endpoint_request_id_header
+  /usr/local/lib/python3.12/site-packages/pydantic/fields.py:257: RuntimeWarning: coroutine 'Connection._cancel' was never awaited
+    alias_is_set = any(alias is not None for alias in (self.alias, self.validation_alias, self.serialization_alias))
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+../usr/local/lib/python3.12/site-packages/_pytest/cacheprovider.py:475
+  /usr/local/lib/python3.12/site-packages/_pytest/cacheprovider.py:475: PytestCacheWarning: cache could not write path /app/.pytest_cache/v/cache/nodeids: [Errno 13] Permission denied: '/app/.pytest_cache/v/cache/nodeids'
+    config.cache.set("cache/nodeids", sorted(self.cached_nodeids))
+
+../usr/local/lib/python3.12/site-packages/_pytest/cacheprovider.py:429
+  /usr/local/lib/python3.12/site-packages/_pytest/cacheprovider.py:429: PytestCacheWarning: cache could not write path /app/.pytest_cache/v/cache/lastfailed: [Errno 13] Permission denied: '/app/.pytest_cache/v/cache/lastfailed'
+    config.cache.set("cache/lastfailed", self.lastfailed)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_health_contract.py::test_health_endpoint_response_body - As...
+============ 1 failed, 274 passed, 33 warnings in 98.05s (0:01:38) =============

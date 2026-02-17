@@ -1,0 +1,79 @@
+time="2026-02-17T09:55:47-08:00" level=warning msg="/home/craig/canvas/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+============================= test session starts ==============================
+platform linux -- Python 3.12.12, pytest-8.4.2, pluggy-1.6.0
+rootdir: /app
+configfile: pytest.ini
+plugins: anyio-4.12.1, asyncio-0.24.0
+asyncio: mode=Mode.AUTO, default_loop_scope=function
+collected 7 items
+
+tests/test_health_contract.py FF..F.                                     [ 85%]
+tests/auth/test_auth_routes_integration.py F                             [100%]
+
+=================================== FAILURES ===================================
+_______________________ test_health_endpoint_status_200 ________________________
+tests/test_health_contract.py:13: in test_health_endpoint_status_200
+    assert response.status_code == 200
+E   assert 503 == 200
+E    +  where 503 = <Response [503 Service Unavailable]>.status_code
+----------------------------- Captured stderr call -----------------------------
+HTTP Request: GET http://test/api/health "HTTP/1.1 503 Service Unavailable"
+------------------------------ Captured log call -------------------------------
+INFO     httpx:_client.py:1740 HTTP Request: GET http://test/api/health "HTTP/1.1 503 Service Unavailable"
+______________________ test_health_endpoint_response_body ______________________
+tests/test_health_contract.py:23: in test_health_endpoint_response_body
+    assert response.json() == {"status": "ok"}
+E   AssertionError: assert {'error': {'c...c4cf443d520'}} == {'status': 'ok'}
+E     
+E     Left contains 1 more item:
+E     {'error': {'code': 503,
+E                'message': {'reason': 'database_unreachable', 'status': 'unhealthy'},
+E                'request_id': '304ae7e2-34f3-497c-9250-fc4cf443d520'}}
+E     Right contains 1 more item:
+E     {'status': 'ok'}
+E     Use -v to get more diff
+----------------------------- Captured stderr call -----------------------------
+HTTP Request: GET http://test/api/health "HTTP/1.1 503 Service Unavailable"
+------------------------------ Captured log call -------------------------------
+INFO     httpx:_client.py:1740 HTTP Request: GET http://test/api/health "HTTP/1.1 503 Service Unavailable"
+____________________ test_health_endpoint_request_id_header ____________________
+tests/test_health_contract.py:54: in test_health_endpoint_request_id_header
+    assert response.status_code == 200
+E   assert 503 == 200
+E    +  where 503 = <Response [503 Service Unavailable]>.status_code
+----------------------------- Captured stderr call -----------------------------
+HTTP Request: GET http://test/api/health "HTTP/1.1 503 Service Unavailable"
+------------------------------ Captured log call -------------------------------
+INFO     httpx:_client.py:1740 HTTP Request: GET http://test/api/health "HTTP/1.1 503 Service Unavailable"
+_________________ TestAuthRoutesIntegration.test_login_success _________________
+tests/auth/test_auth_routes_integration.py:65: in test_login_success
+    assert "refresh_token" in data["data"]
+E   AssertionError: assert 'refresh_token' in {'access_token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJiMjRjZWVjOC1jYTAyLTRiNzctOTQ2NC04ZThmZWM0ODZiZWQiLCJ...ail': 'login@example.com', 'id': 'b24ceec8-ca02-4b77-9464-8e8fec486bed', 'is_active': True, 'name': 'Login User', ...}}
+----------------------------- Captured stderr call -----------------------------
+HTTP Request: POST http://test/api/auth/login "HTTP/1.1 200 OK"
+------------------------------ Captured log call -------------------------------
+INFO     httpx:_client.py:1740 HTTP Request: POST http://test/api/auth/login "HTTP/1.1 200 OK"
+=============================== warnings summary ===============================
+../usr/local/lib/python3.12/site-packages/passlib/utils/__init__.py:854
+  /usr/local/lib/python3.12/site-packages/passlib/utils/__init__.py:854: DeprecationWarning: 'crypt' is deprecated and slated for removal in Python 3.13
+    from crypt import crypt as _crypt
+
+tests/auth/test_auth_routes_integration.py::TestAuthRoutesIntegration::test_login_success
+  /app/canvas/auth/routes.py:28: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    now = datetime.utcnow()
+
+../usr/local/lib/python3.12/site-packages/_pytest/cacheprovider.py:475
+  /usr/local/lib/python3.12/site-packages/_pytest/cacheprovider.py:475: PytestCacheWarning: cache could not write path /app/.pytest_cache/v/cache/nodeids: [Errno 13] Permission denied: '/app/.pytest_cache/v/cache/nodeids'
+    config.cache.set("cache/nodeids", sorted(self.cached_nodeids))
+
+../usr/local/lib/python3.12/site-packages/_pytest/cacheprovider.py:429
+  /usr/local/lib/python3.12/site-packages/_pytest/cacheprovider.py:429: PytestCacheWarning: cache could not write path /app/.pytest_cache/v/cache/lastfailed: [Errno 13] Permission denied: '/app/.pytest_cache/v/cache/lastfailed'
+    config.cache.set("cache/lastfailed", self.lastfailed)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_health_contract.py::test_health_endpoint_status_200 - asser...
+FAILED tests/test_health_contract.py::test_health_endpoint_response_body - As...
+FAILED tests/test_health_contract.py::test_health_endpoint_request_id_header
+FAILED tests/auth/test_auth_routes_integration.py::TestAuthRoutesIntegration::test_login_success
+=================== 4 failed, 3 passed, 4 warnings in 1.77s ====================
