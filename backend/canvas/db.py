@@ -6,7 +6,12 @@ from canvas.config import Settings
 __all__ = ['get_db_session', 'create_async_engine']
 
 settings = Settings()
-engine = create_async_engine(settings.database_url)
+engine = create_async_engine(
+    settings.database_url,
+    pool_size=20,
+    max_overflow=30,
+    pool_pre_ping=True
+)
 AsyncSessionLocal = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 

@@ -13,6 +13,7 @@ class TimestampMixin:
 
 
 # Export all models and enums
+from canvas.models.user import User, UserRole
 from canvas.models.vbu import VBU
 from canvas.models.canvas import Canvas, LifecycleLane, CurrentlyTestingType
 from canvas.models.thesis import Thesis
@@ -24,6 +25,7 @@ from canvas.models.commitment import Commitment
 __all__ = [
     "Base",
     "TimestampMixin",
+    "User", "UserRole",
     "VBU",
     "Canvas", "LifecycleLane", "CurrentlyTestingType",
     "Thesis",

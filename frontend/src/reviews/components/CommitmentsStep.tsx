@@ -28,6 +28,16 @@ interface CommitmentsStepProps {
 }
 
 export const CommitmentsStep: React.FC<CommitmentsStepProps> = ({ data, onChange, options }) => {
+  const getCommitmentError = (commitment: { text: string }) => {
+    if (!commitment.text.trim()) return 'Commitment is required';
+    if (commitment.text.length > 1000) return 'Commitment must be 1000 characters or less';
+    return null;
+  };
+
+  const getCurrentlyTestingError = () => {
+    if (!data.currently_testing_id) return 'Please select what you are currently testing';
+    return null;
+  };
   const addCommitment = () => {
     if (data.commitments.length < 3) {
       const newCommitments = [...data.commitments, { 
@@ -69,30 +79,44 @@ export const CommitmentsStep: React.FC<CommitmentsStepProps> = ({ data, onChange
         <div className="mb-6">
           <h3 className="text-lg font-medium mb-4">Commitments (1-3 required)</h3>
           <div className="space-y-3">
-            {data.commitments.map((commitment, index) => (
-              <div key={index} className="flex items-center space-x-3">
-                <span className="text-sm font-medium text-gray-600 w-6">
-                  {index + 1}.
-                </span>
-                <input
-                  type="text"
-                  value={commitment.text}
-                  onChange={(e) => updateCommitment(index, e.target.value)}
-                  className="flex-1 p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  maxLength={1000}
-                  placeholder="Enter a specific commitment..."
-                />
-                {data.commitments.length > 1 && (
-                  <button
-                    onClick={() => removeCommitment(index)}
-                    className="text-red-600 hover:text-red-700 p-2"
-                    title="Remove commitment"
-                  >
-                    ×
-                  </button>
-                )}
-              </div>
-            ))}
+            {data.commitments.map((commitment, index) => {
+              const error = getCommitmentError(commitment);
+              return (
+                <div key={index} className="space-y-1">
+                  <div className="flex items-center space-x-3">
+                    <span className="text-sm font-medium text-gray-600 w-6">
+                      {index + 1}.
+                    </span>
+                    <input
+                      type="text"
+                      value={commitment.text}
+                      onChange={(e) => updateCommitment(index, e.target.value)}
+                      className={`flex-1 p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                        error ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : ''
+                      }`}
+                      maxLength={1000}
+                      placeholder="Enter a specific commitment..."
+                      aria-invalid={error ? 'true' : 'false'}
+                      aria-describedby={error ? `commitment-error-${index}` : undefined}
+                    />
+                    {data.commitments.length > 1 && (
+                      <button
+                        onClick={() => removeCommitment(index)}
+                        className="text-red-600 hover:text-red-700 p-2"
+                        title="Remove commitment"
+                      >
+                        ×
+                      </button>
+                    )}
+                  </div>
+                  {error && (
+                    <p id={`commitment-error-${index}`} className="text-sm text-red-600 ml-9">
+                      {error}
+                    </p>
+                  )}
+                </div>
+              );
+            })}
           </div>
           
           {data.commitments.length < 3 && (
@@ -108,6 +132,11 @@ export const CommitmentsStep: React.FC<CommitmentsStepProps> = ({ data, onChange
 
       <div>
         <h3 className="text-lg font-medium mb-4">What are we currently testing? (required)</h3>
+        {getCurrentlyTestingError() && (
+          <p className="text-sm text-red-600 mb-2" role="alert">
+            {getCurrentlyTestingError()}
+          </p>
+        )}
         {options ? (
           <div className="space-y-3 border rounded-lg p-4 max-h-64 overflow-y-auto">
             {options.theses.map((thesis) => (

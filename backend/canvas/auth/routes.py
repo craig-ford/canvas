@@ -1,4 +1,6 @@
 from uuid import UUID
+from typing import Dict
+from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, HTTPException, status, Response, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
@@ -8,11 +10,40 @@ from canvas.auth.dependencies import get_current_user, require_role
 from canvas.auth.schemas import LoginRequest, TokenResponse, UserCreate, UserResponse
 from canvas.models.user import User, UserRole
 from canvas.db import get_db_session
+from canvas.config import Settings
 from canvas import success_response, list_response
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 auth_service = AuthService()
 user_service = UserService()
+settings = Settings()
+
+# Simple in-memory rate limiting (for production, use Redis)
+rate_limit_store: Dict[str, Dict[str, datetime]] = {}
+
+def check_rate_limit(key: str, limit: int = 5, window_minutes: int = 15) -> None:
+    """Check rate limit for given key"""
+    now = datetime.utcnow()
+    window_start = now - timedelta(minutes=window_minutes)
+    
+    if key not in rate_limit_store:
+        rate_limit_store[key] = {}
+    
+    # Clean old entries
+    rate_limit_store[key] = {
+        k: v for k, v in rate_limit_store[key].items() 
+        if v > window_start
+    }
+    
+    # Check limit
+    if len(rate_limit_store[key]) >= limit:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Rate limit exceeded"
+        )
+    
+    # Add current request
+    rate_limit_store[key][str(now)] = now
 
 @router.post("/register", response_model=dict, status_code=201)
 async def register_user(
@@ -46,10 +77,15 @@ async def register_user(
 @router.post("/login", response_model=dict)
 async def login(
     credentials: LoginRequest,
+    request: Request,
     response: Response,
     db: AsyncSession = Depends(get_db_session)
 ) -> dict:
     """Authenticate user and return tokens."""
+    # Rate limit by IP address
+    client_ip = request.client.host if request.client else "unknown"
+    check_rate_limit(f"login:{client_ip}", limit=5, window_minutes=15)
+    
     user = await auth_service.authenticate_user(
         email=credentials.email,
         password=credentials.password,
@@ -73,7 +109,7 @@ async def login(
         key="refresh_token",
         value=refresh_token,
         httponly=True,
-        secure=True,
+        secure=settings.environment == "production",
         samesite="strict",
         max_age=7 * 24 * 60 * 60  # 7 days
     )

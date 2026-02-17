@@ -65,8 +65,14 @@ class ReviewService:
                 await self._link_attachments(review.id, review_data['attachment_ids'])
 
             await self.db.commit()
-            await self.db.refresh(review, ["commitments", "attachments"])
-            return review
+            
+            # Use eager loading instead of refresh to avoid N+1 queries
+            result = await self.db.execute(
+                select(MonthlyReview)
+                .where(MonthlyReview.id == review.id)
+                .options(selectinload(MonthlyReview.commitments), selectinload(MonthlyReview.attachments))
+            )
+            return result.scalar_one()
         except IntegrityError as e:
             if "uq_monthly_reviews_canvas_date" in str(e):
                 raise HTTPException(

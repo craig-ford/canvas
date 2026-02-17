@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
@@ -13,6 +13,15 @@ from canvas.models.canvas import Canvas
 from canvas.models.vbu import VBU
 
 router = APIRouter(prefix="/api", tags=["reviews"])
+
+def check_csrf_token(request: Request) -> None:
+    """Basic CSRF protection - check for custom header"""
+    csrf_header = request.headers.get("X-CSRF-Token")
+    if not csrf_header:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="CSRF token required"
+        )
 
 async def verify_canvas_access(canvas_id: UUID, current_user, db: AsyncSession):
     """Verify user has access to canvas based on role"""
@@ -47,10 +56,12 @@ async def list_reviews(
 async def create_review(
     canvas_id: UUID, 
     review_data: ReviewCreateSchema, 
+    request: Request,
     current_user=Depends(require_role("admin", "gm")), 
     db: AsyncSession = Depends(get_db_session)
 ):
     """Create new review"""
+    check_csrf_token(request)
     await verify_canvas_access(canvas_id, current_user, db)
     service = ReviewService(db)
     try:

@@ -29,14 +29,6 @@ def create_app() -> FastAPI:
         expose_headers=["*"],
     )
     
-    # Custom middleware to always add CORS headers for testing
-    @app.middleware("http")
-    async def add_cors_headers(request: Request, call_next):
-        response = await call_next(request)
-        if not response.headers.get("access-control-allow-origin"):
-            response.headers["access-control-allow-origin"] = "*"
-        return response
-    
     # Add request ID middleware
     @app.middleware("http")
     async def add_request_id(request: Request, call_next):

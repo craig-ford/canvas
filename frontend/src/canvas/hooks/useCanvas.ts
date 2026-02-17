@@ -272,14 +272,15 @@ export const useCanvas = (options: UseCanvasOptions): UseCanvasReturn => {
     await updateCanvas(updates);
   }, [canvas, updateCanvas]);
 
-  // Cleanup timeout on unmount
+  // Cleanup timeout on unmount and when dependencies change
   useEffect(() => {
     return () => {
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
+        saveTimeoutRef.current = null;
       }
     };
-  }, []);
+  }, [vbuId, autoSave, debounceMs]);
 
   return {
     canvas,

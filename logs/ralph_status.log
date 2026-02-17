@@ -1,12 +1,12 @@
 ---RALPH_STATUS---
 EXIT_SIGNAL: false
-CURRENT_MODE: code-review
+CURRENT_MODE: fix
 CURRENT_FEATURE: all
-ACTION_COMPLETED: Code review iteration 1 complete. 8 review agents spawned in 2 batches (security, backend, frontend, architect + performance, testing, data, devops). Assembled specs/code-review.md with 47 deduplicated issues: 13 Critical, 17 High, 12 Medium, 5 Low. Key findings: SQL injection (2 locations), missing auth integration in frontend, N+1 queries, duplicate test directories, unpinned deps, hardcoded secrets.
+ACTION_COMPLETED: Fixed 47/47 code review issues across 8 review agents. 19 test failures introduced by fix agents (was 262 passing, now 256 passed 19 failed). Deleted test-suite-report.md to trigger test-suite re-entry. Key breakages: (1) review-architect broke auth/dependencies.py with Depends(Settings) causing Pydantic NameError - FIXED by orchestrator, (2) review-security rewrote portfolio/service.py from raw SQL to ORM with invalid func.INTERVAL usage, (3) review-security rate limiting code used _rate_limit_store underscore variable.
 FEATURES_TOTAL: 5
 FEATURES_WITH_SPECS: 5
 FEATURES_WITH_PLANS: 5
 FEATURES_WITH_TASKS: 5
 FEATURES_VERIFIED: 5
-RECOMMENDATION: Next invocation will detect unchecked issues in code-review.md → enter fix mode. Spawn fix agents grouped by reviewer tag. Check for multi-reviewer file conflicts first (canvas_service.py, portfolio/service.py, attachment routes, api/client.ts all have issues from 2+ reviewers) → run herald before fix batch.
+RECOMMENDATION: Next session enters smoke-test mode (test-suite phase) to fix 19 test failures caused by code review fixes. Primary issues: portfolio service ORM rewrite broke 4 portfolio tests, canvas service changes broke thesis reorder tests, attachment content type validation broke proof point tests. After tests pass, re-run code-review to check for remaining issues.
 ---END_RALPH_STATUS---

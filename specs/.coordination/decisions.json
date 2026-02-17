@@ -1,172 +1,100 @@
 {
-  "phase": "execute",
-  "timestamp": "2026-02-13T14:00:00Z",
+  "phase": "fix",
+  "timestamp": "2026-02-17T15:57:00Z",
   "batch_items": [
-    "Chain A: 002-canvas-management/T-011→T-018→T-023→T-024→T-025",
-    "Chain B: 003-portfolio-dashboard/T-007+T-008",
-    "Chain C: 003-portfolio-dashboard/T-014",
-    "Chain D: 003-portfolio-dashboard/T-016+T-017"
+    "review-security: CR-001,CR-002,CR-014,CR-015,CR-016,CR-031,CR-032,CR-033",
+    "review-backend: CR-003,CR-011,CR-012,CR-017,CR-018,CR-019", 
+    "review-performance: CR-004,CR-005,CR-006,CR-020,CR-021,CR-034,CR-035",
+    "review-architect: CR-010,CR-029,CR-030",
+    "review-data: CR-013,CR-041,CR-042,CR-047"
   ],
   "file_ownership": {
-    "backend/tests/canvas/test_attachment_api.py": {
-      "owner": "Chain A",
-      "action": "CREATE",
-      "importers": []
+    "backend/canvas/services/canvas_service.py": {
+      "owner": "review-security",
+      "action": "MODIFY",
+      "issues": ["CR-001", "CR-005", "CR-018", "CR-030"],
+      "primary_fix": "CR-001 SQL injection fix",
+      "deferred_to_owner": ["CR-005", "CR-018", "CR-030"]
+    },
+    "backend/canvas/portfolio/service.py": {
+      "owner": "review-security", 
+      "action": "MODIFY",
+      "issues": ["CR-002", "CR-006"],
+      "primary_fix": "CR-002 SQL injection fix",
+      "deferred_to_owner": ["CR-006"]
     },
     "backend/canvas/routes/attachment.py": {
-      "owner": "Chain A",
-      "action": "CREATE",
-      "importers": []
+      "owner": "review-security",
+      "action": "MODIFY", 
+      "issues": ["CR-014", "CR-019"],
+      "primary_fix": "CR-014 path traversal fix",
+      "deferred_to_owner": ["CR-019"]
     },
-    "frontend/src/api/canvas.ts": {
-      "owner": "Chain A",
-      "action": "CREATE",
-      "importers": ["Chain C"]
-    },
-    "frontend/src/canvas/hooks/useCanvas.ts": {
-      "owner": "Chain A",
-      "action": "CREATE",
-      "importers": []
-    },
-    "frontend/src/App.tsx": {
-      "owner": "Chain A",
+    "backend/canvas/main.py": {
+      "owner": "review-security",
       "action": "MODIFY",
-      "importers": []
+      "issues": ["CR-016", "CR-017"],
+      "primary_fix": "CR-016 CORS security fix",
+      "deferred_to_owner": ["CR-017"]
     },
-    "backend/canvas/portfolio/router.py": {
-      "owner": "Chain B",
+    "backend/alembic/versions/002_canvas_tables.py": {
+      "owner": "review-data",
       "action": "MODIFY",
-      "importers": []
-    },
-    "tests/test_portfolio_routes.py": {
-      "owner": "Chain B",
-      "action": "CREATE",
-      "importers": []
-    },
-    "backend/canvas/vbus/test_pdf_routes.py": {
-      "owner": "Chain B",
-      "action": "CREATE",
-      "importers": []
-    },
-    "backend/canvas/routes/vbu.py": {
-      "owner": "Chain B",
-      "action": "MODIFY",
-      "importers": []
-    },
-    "frontend/src/dashboard/DashboardPage.tsx": {
-      "owner": "Chain C",
-      "action": "MODIFY",
-      "importers": []
-    },
-    "frontend/src/dashboard/hooks/usePortfolio.ts": {
-      "owner": "Chain C",
-      "action": "CREATE",
-      "importers": []
-    },
-    "frontend/src/dashboard/HealthIndicator.tsx": {
-      "owner": "Chain D",
-      "action": "MODIFY",
-      "importers": ["Chain C"]
-    },
-    "frontend/src/dashboard/PortfolioNotes.tsx": {
-      "owner": "Chain D",
-      "action": "MODIFY",
-      "importers": ["Chain C"]
+      "issues": ["CR-013", "CR-034"],
+      "primary_fix": "CR-013 missing FK constraint",
+      "deferred_to_owner": ["CR-034"]
     }
   },
-  "interfaces": {
-    "AttachmentService.upload": {
-      "location": "backend/canvas/services/attachment_service.py",
-      "signature": "async def upload(file: UploadFile, proof_point_id: Optional[UUID], monthly_review_id: Optional[UUID], uploaded_by: UUID, db: AsyncSession, label: Optional[str] = None) -> Attachment",
-      "defined_by": "previous batch",
-      "consumed_by": ["Chain A"]
-    },
-    "AttachmentService.download": {
-      "location": "backend/canvas/services/attachment_service.py",
-      "signature": "async def download(attachment_id: UUID, db: AsyncSession) -> FileResponse",
-      "defined_by": "previous batch",
-      "consumed_by": ["Chain A"]
-    },
-    "AttachmentService.delete": {
-      "location": "backend/canvas/services/attachment_service.py",
-      "signature": "async def delete(attachment_id: UUID, db: AsyncSession) -> None",
-      "defined_by": "previous batch",
-      "consumed_by": ["Chain A"]
-    },
-    "PortfolioService.get_summary": {
-      "location": "backend/canvas/portfolio/service.py",
-      "signature": "async def get_summary(current_user: User, filters: PortfolioFilters) -> List[VBUSummary]",
-      "defined_by": "previous batch",
-      "consumed_by": ["Chain B", "Chain C"]
-    },
-    "PortfolioService.update_portfolio_notes": {
-      "location": "backend/canvas/portfolio/service.py",
-      "signature": "async def update_portfolio_notes(notes: str, current_user: User) -> None",
-      "defined_by": "previous batch",
-      "consumed_by": ["Chain B", "Chain D"]
-    },
-    "PDFService.export_canvas": {
-      "location": "backend/canvas/pdf/service.py",
-      "signature": "async def export_canvas(canvas_id: UUID) -> bytes",
-      "defined_by": "previous batch",
-      "consumed_by": ["Chain B"]
-    },
-    "useAuth": {
-      "location": "frontend/src/auth/useAuth.ts",
-      "signature": "const useAuth = (): { user: User | null; isAuthenticated: boolean }",
-      "defined_by": "previous batch",
-      "consumed_by": ["Chain C", "Chain D"]
-    },
-    "apiClient": {
-      "location": "frontend/src/api/client.ts",
-      "signature": "const apiClient: AxiosInstance",
-      "defined_by": "previous batch",
-      "consumed_by": ["Chain A", "Chain C", "Chain D"]
-    }
-  },
+  "interfaces": {},
   "naming": {
-    "table_names": "plural",
-    "module_pattern": "from canvas.{module} import {Class}",
     "import_base": "canvas",
-    "env_prefix": "CANVAS_",
-    "docker_services": "db/backend/frontend",
-    "api_endpoints": "/api/{resource} and /api/{resource}/{id}",
-    "response_envelopes": "success_response() and list_response()",
-    "file_upload_content_type": "multipart/form-data"
+    "table_names": "plural",
+    "env_prefix": "CANVAS_"
   },
   "conventions": {
-    "backend_imports": {
-      "models": "from canvas.models.{entity} import {Entity}",
-      "auth_deps": "from canvas.auth.dependencies import get_current_user, require_role",
-      "db_session": "from canvas.db import get_db_session",
-      "response_helpers": "from canvas import success_response, list_response",
-      "config": "from canvas.config import Settings"
-    },
-    "frontend_imports": {
-      "api_client": "import { apiClient } from '../api/client'",
-      "auth_hook": "import { useAuth } from '../auth/useAuth'",
-      "app_shell": "import { AppShell } from '../components/AppShell'"
-    },
-    "file_upload": {
-      "endpoint": "POST /api/attachments",
-      "content_type": "multipart/form-data",
-      "form_fields": ["file", "proof_point_id", "monthly_review_id", "label"]
-    },
-    "pdf_export": {
-      "endpoint": "GET /api/vbus/{vbu_id}/canvas/pdf",
-      "response_type": "application/pdf",
-      "headers": ["Content-Disposition", "Content-Length"]
-    },
-    "portfolio_api": {
-      "summary_endpoint": "GET /api/portfolio/summary",
-      "notes_endpoint": "PATCH /api/portfolio/notes",
-      "filter_params": ["lane", "gm_id", "health_status"]
-    }
+    "import_pattern": "from canvas.{module} import {Class}",
+    "established_patterns": "Maintain consistency with execute phase patterns"
   },
-  "deferred": [],
+  "deferred": [
+    {
+      "issue": "CR-030",
+      "reason": "Architect god class refactoring conflicts with security fixes CR-001, CR-005, CR-018",
+      "sequence": "Must happen after security fixes are complete"
+    },
+    {
+      "issue": "CR-005", 
+      "reason": "Performance N+1 fix deferred to security owner to avoid merge conflicts",
+      "sequence": "Security owner will address after CR-001"
+    },
+    {
+      "issue": "CR-006",
+      "reason": "Performance unbounded query fix deferred to security owner", 
+      "sequence": "Security owner will address after CR-002"
+    },
+    {
+      "issue": "CR-017",
+      "reason": "Backend CORS middleware fix deferred to security owner",
+      "sequence": "Security owner will address after CR-016"
+    },
+    {
+      "issue": "CR-018",
+      "reason": "Backend constraint handling deferred to security owner",
+      "sequence": "Security owner will address after CR-001"
+    },
+    {
+      "issue": "CR-019", 
+      "reason": "Backend auth optimization deferred to security owner",
+      "sequence": "Security owner will address after CR-014"
+    },
+    {
+      "issue": "CR-034",
+      "reason": "Performance index optimization deferred to data owner",
+      "sequence": "Data owner will address after CR-013"
+    }
+  ],
   "warnings": [
-    "Chain D modifies PortfolioNotes.tsx which has mock imports - these need to be replaced with actual imports from previous batches",
-    "Chain C creates usePortfolio.ts hook which must integrate with existing DashboardPage.tsx partial implementation",
-    "Chain A modifies App.tsx for routing - ensure no conflicts with existing routes from previous batches"
+    "CR-030 architect refactoring of canvas_service.py conflicts with 3 other reviewers' fixes - strongly recommend deferring to separate batch",
+    "Multiple performance issues (CR-005, CR-006, CR-034) deferred to primary owners - may require coordination in subsequent batch",
+    "Security fixes take precedence over performance optimizations to address critical vulnerabilities first"
   ]
 }

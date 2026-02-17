@@ -115,8 +115,19 @@ const VBUTable: React.FC<VBUTableProps> = ({ vbus, onExportPDF, onViewVBU }) => 
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {paginatedVBUs.map((vbu) => (
-            <tr key={vbu.id} className="hover:bg-gray-50">
+          {paginatedVBUs.map((vbu, index) => (
+            <tr 
+              key={vbu.id} 
+              className="hover:bg-gray-50 focus-within:bg-gray-50"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onViewVBU(vbu.id);
+                }
+              }}
+              aria-label={`VBU: ${vbu.name}, GM: ${vbu.gm_name}, Lane: ${vbu.lifecycle_lane}`}
+            >
               <td className="px-6 py-4 whitespace-nowrap">
                 <div>
                   <div className="text-sm font-medium text-gray-900">{vbu.name}</div>

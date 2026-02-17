@@ -6,7 +6,16 @@ This script creates development users and sample data.
 import asyncio
 import json
 import sys
+import os
 from canvas.db import AsyncSessionLocal
+
+# Configuration from environment variables
+SEED_ADMIN_EMAIL = os.getenv("SEED_ADMIN_EMAIL", "admin@example.com")
+SEED_ADMIN_NAME = os.getenv("SEED_ADMIN_NAME", "Admin User")
+SEED_GM_EMAIL = os.getenv("SEED_GM_EMAIL", "gm@example.com")
+SEED_GM_NAME = os.getenv("SEED_GM_NAME", "General Manager")
+SEED_VBU_NAME = os.getenv("SEED_VBU_NAME", "Sample VBU")
+SEED_PRODUCT_NAME = os.getenv("SEED_PRODUCT_NAME", "Sample Product")
 
 # BLOCKED: awaiting 001-auth/T-011 for User model
 # BLOCKED: awaiting 002-canvas-management/T-003 for VBU, Canvas models

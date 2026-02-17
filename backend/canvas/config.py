@@ -13,3 +13,4 @@ class Settings(BaseSettings):
     refresh_token_expire_days: int = 7
     upload_dir: str = "/uploads"
     max_upload_size_mb: int = 10
+    environment: str = "development"  # development, production

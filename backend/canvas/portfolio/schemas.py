@@ -12,15 +12,15 @@ class LifecycleLane(str, Enum):
 
 class VBUSummary(BaseModel):
     id: UUID
-    name: str
-    gm_name: str
+    name: str = Field(..., max_length=255)
+    gm_name: str = Field(..., max_length=255)
     lifecycle_lane: LifecycleLane
-    success_description: Optional[str]
-    currently_testing: Optional[str]
+    success_description: Optional[str] = Field(None, max_length=10000)
+    currently_testing: Optional[str] = Field(None, max_length=1000)
     next_review_date: Optional[date]
-    primary_constraint: Optional[str]
-    health_indicator: str
-    portfolio_notes: Optional[str]
+    primary_constraint: Optional[str] = Field(None, max_length=10000)
+    health_indicator: str = Field(..., max_length=50)
+    portfolio_notes: Optional[str] = Field(None, max_length=10000)
 
 class PortfolioFilters(BaseModel):
     lane: Optional[List[LifecycleLane]] = None

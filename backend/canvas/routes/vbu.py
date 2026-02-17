@@ -1,7 +1,7 @@
 from typing import List, Optional
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status, Query, Response
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from canvas.db import get_db_session
@@ -23,13 +23,25 @@ async def list_vbus(
     db: AsyncSession = Depends(get_db_session)
 ):
     """List VBUs filtered by user role"""
-    service = CanvasService()
-    vbus = await service.list_vbus(current_user, db)
+    # Build query with role-based filtering
+    query = select(VBU).options(selectinload(VBU.gm))
+    if current_user.role == UserRole.GM:
+        query = query.where(VBU.gm_id == current_user.id)
     
-    # Apply pagination
-    start = (page - 1) * per_page
-    end = start + per_page
-    paginated_vbus = vbus[start:end]
+    # Get total count
+    count_query = select(func.count(VBU.id))
+    if current_user.role == UserRole.GM:
+        count_query = count_query.where(VBU.gm_id == current_user.id)
+    
+    total_result = await db.execute(count_query)
+    total = total_result.scalar()
+    
+    # Apply database-level pagination
+    offset = (page - 1) * per_page
+    paginated_query = query.order_by(VBU.name).offset(offset).limit(per_page)
+    
+    result = await db.execute(paginated_query)
+    vbus = list(result.scalars().all())
     
     vbu_responses = [
         VBUResponse(
@@ -40,10 +52,10 @@ async def list_vbus(
             created_at=vbu.created_at,
             updated_at=vbu.updated_at,
             updated_by=vbu.updated_by
-        ) for vbu in paginated_vbus
+        ) for vbu in vbus
     ]
     
-    return list_response(vbu_responses, len(vbus), page, per_page)
+    return list_response(vbu_responses, total, page, per_page)
 
 @router.post("", response_model=dict, status_code=status.HTTP_201_CREATED)
 async def create_vbu(

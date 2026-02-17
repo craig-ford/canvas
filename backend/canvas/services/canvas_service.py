@@ -56,8 +56,11 @@ class CanvasService:
         await db.commit()
 
     async def list_vbus(self, current_user: User, db: AsyncSession) -> List[VBU]:
-        """List VBUs filtered by user role"""
-        query = select(VBU).options(selectinload(VBU.gm))
+        """List VBUs filtered by user role with eager loading"""
+        query = select(VBU).options(
+            selectinload(VBU.gm),
+            selectinload(VBU.canvas).selectinload(Canvas.theses).selectinload(Thesis.proof_points)
+        )
         if current_user.role == UserRole.GM:
             query = query.where(VBU.gm_id == current_user.id)
         
@@ -137,12 +140,8 @@ class CanvasService:
         await db.commit()
 
     async def reorder_theses(self, canvas_id: UUID, thesis_orders: List[Dict[str, Any]], db: AsyncSession) -> List[Thesis]:
-        """Reorder theses — drop and recreate constraint to allow reorder"""
-        from sqlalchemy import text
-        
-        # Drop the unique constraint, reorder, then recreate
-        await db.execute(text("ALTER TABLE theses DROP CONSTRAINT IF EXISTS uq_theses_canvas_order"))
-        
+        """Reorder theses using parameterized queries"""
+        # Use parameterized updates instead of raw SQL
         for item in thesis_orders:
             await db.execute(
                 update(Thesis)
@@ -150,9 +149,6 @@ class CanvasService:
                 .values(order=item["order"])
             )
         
-        await db.execute(text(
-            "ALTER TABLE theses ADD CONSTRAINT uq_theses_canvas_order UNIQUE (canvas_id, \"order\") DEFERRABLE INITIALLY IMMEDIATE"
-        ))
         await db.commit()
 
         result = await db.execute(

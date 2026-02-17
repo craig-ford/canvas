@@ -1,5 +1,8 @@
 FROM python:3.12-slim
 
+# Create non-root user
+RUN groupadd -r canvas && useradd -r -g canvas canvas
+
 # Set working directory
 WORKDIR /app
 
@@ -40,6 +43,12 @@ RUN pip install --no-cache-dir \
 
 # Copy application code
 COPY . .
+
+# Change ownership to non-root user
+RUN chown -R canvas:canvas /app
+
+# Switch to non-root user
+USER canvas
 
 # Expose port
 EXPOSE 8000

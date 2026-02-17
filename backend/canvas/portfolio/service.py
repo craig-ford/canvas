@@ -1,10 +1,15 @@
 from typing import List
 import html
 from fastapi import HTTPException
-from sqlalchemy import text, update, func
+from sqlalchemy import select, update, func, case, and_, or_
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload, joinedload
 from canvas.models.user import User
+from canvas.models.vbu import VBU
 from canvas.models.canvas import Canvas
+from canvas.models.thesis import Thesis
+from canvas.models.proof_point import ProofPoint
+from canvas.models.monthly_review import MonthlyReview
 from canvas.db import get_db_session
 from .schemas import VBUSummary, PortfolioFilters
 
@@ -20,50 +25,62 @@ class PortfolioService:
         return await self._get_summary_impl(self.db, user, filters)
     
     async def _get_summary_impl(self, db: AsyncSession, user: User, filters: PortfolioFilters) -> List[VBUSummary]:
-        where_conditions = ["1=1"]
-        params = {}
+        # Build query using SQLAlchemy ORM
+        query = (
+            select(
+                VBU.id,
+                VBU.name,
+                User.name.label('gm_name'),
+                Canvas.lifecycle_lane,
+                Canvas.success_description,
+                Canvas.primary_constraint,
+                Canvas.portfolio_notes,
+                func.coalesce(Canvas.health_indicator_cache, 'Not Started').label('health_indicator'),
+                case(
+                    (Canvas.currently_testing_type == 'thesis', 
+                     select(Thesis.text).where(Thesis.id == Canvas.currently_testing_id).scalar_subquery()),
+                    (Canvas.currently_testing_type == 'proof_point',
+                     select(ProofPoint.description).where(ProofPoint.id == Canvas.currently_testing_id).scalar_subquery()),
+                    else_=None
+                ).label('currently_testing'),
+                select(func.min(MonthlyReview.review_date + func.cast('1 month', func.INTERVAL)))
+                .where(MonthlyReview.canvas_id == Canvas.id)
+                .scalar_subquery()
+                .label('next_review_date')
+            )
+            .select_from(VBU)
+            .join(User, VBU.gm_id == User.id)
+            .join(Canvas, Canvas.vbu_id == VBU.id)
+        )
+        
+        # Apply filters using parameterized conditions
+        conditions = []
         
         # Role-based filtering
         if user.role == "gm":
-            where_conditions.append("v.gm_id = :user_id")
-            params["user_id"] = user.id
+            conditions.append(VBU.gm_id == user.id)
         
         # Lane filtering
         if filters.lane:
-            where_conditions.append("c.lifecycle_lane = ANY(:lanes)")
-            params["lanes"] = [lane.value for lane in filters.lane]
+            conditions.append(Canvas.lifecycle_lane.in_([lane.value for lane in filters.lane]))
         
         # GM filtering
         if filters.gm_id:
-            where_conditions.append("v.gm_id = ANY(:gm_ids)")
-            params["gm_ids"] = filters.gm_id
+            conditions.append(VBU.gm_id.in_(filters.gm_id))
         
         # Health status filtering
         if filters.health_status:
-            where_conditions.append("COALESCE(c.health_indicator_cache, 'Not Started') = ANY(:health_statuses)")
-            params["health_statuses"] = filters.health_status
+            conditions.append(
+                func.coalesce(Canvas.health_indicator_cache, 'Not Started').in_(filters.health_status)
+            )
         
-        query = f"""
-        SELECT v.id, v.name, u.name as gm_name, c.lifecycle_lane,
-               c.success_description, c.primary_constraint, c.portfolio_notes,
-               COALESCE(c.health_indicator_cache, 'Not Started') as health_indicator,
-               CASE 
-                   WHEN c.currently_testing_type = 'thesis' THEN 
-                       (SELECT t.text FROM theses t WHERE t.id = c.currently_testing_id)
-                   WHEN c.currently_testing_type = 'proof_point' THEN
-                       (SELECT pp.description FROM proof_points pp WHERE pp.id = c.currently_testing_id)
-                   ELSE NULL
-               END as currently_testing,
-               (SELECT MIN(mr.review_date + INTERVAL '1 month') 
-                FROM monthly_reviews mr WHERE mr.canvas_id = c.id) as next_review_date
-        FROM vbus v
-        JOIN users u ON v.gm_id = u.id  
-        JOIN canvases c ON c.vbu_id = v.id
-        WHERE {' AND '.join(where_conditions)}
-        ORDER BY v.name
-        """
+        if conditions:
+            query = query.where(and_(*conditions))
         
-        result = await db.execute(text(query), params)
+        # Add pagination limit
+        query = query.order_by(VBU.name).limit(1000)
+        
+        result = await db.execute(query)
         return [VBUSummary(
             id=row.id,
             name=row.name,

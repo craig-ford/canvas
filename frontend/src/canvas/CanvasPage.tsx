@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeftIcon, CalendarIcon } from '@heroicons/react/24/outline';
+import ErrorBoundary from '../components/ErrorBoundary';
 import InlineEdit from '../components/InlineEdit';
 import StatusBadge from '../components/StatusBadge';
 import FileUpload from '../components/FileUpload';
@@ -221,7 +222,8 @@ const CanvasPage: React.FC = () => {
   ];
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-8">
+    <ErrorBoundary>
+      <div className="max-w-6xl mx-auto p-6 space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
@@ -422,6 +424,7 @@ const CanvasPage: React.FC = () => {
       {/* Review History Section */}
       <ReviewHistory canvasId={canvas.id} />
     </div>
+    </ErrorBoundary>
   );
 };
 

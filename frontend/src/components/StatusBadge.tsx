@@ -74,6 +74,7 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status, onChange, readonly = 
         role={canInteract ? 'button' : undefined}
         aria-haspopup={canInteract ? 'listbox' : undefined}
         aria-expanded={canInteract ? isOpen : undefined}
+        aria-label={`Status: ${currentConfig.text}${canInteract ? '. Click to change status' : ''}`}
       >
         {currentConfig.text}
         {canInteract && (

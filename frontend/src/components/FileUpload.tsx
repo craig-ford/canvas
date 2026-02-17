@@ -41,10 +41,13 @@ const FileUpload: React.FC<FileUploadProps> = ({
 
   const validateFile = (file: File): string | null => {
     if (file.size > maxSize) {
-      return `File size exceeds ${formatFileSize(maxSize)} limit`;
+      return `File size ${formatFileSize(file.size)} exceeds ${formatFileSize(maxSize)} limit`;
     }
     if (!allowedTypes.includes(file.type)) {
-      return `File type ${file.type} is not allowed`;
+      return `File type "${file.type}" is not allowed. Allowed types: ${allowedTypes.join(', ')}`;
+    }
+    if (file.size === 0) {
+      return 'File is empty';
     }
     return null;
   };

@@ -56,7 +56,7 @@ async def get_portfolio_summary(
         summary = await portfolio_service.get_summary(current_user, filters)
         
         return list_response(
-            data=[s.dict() for s in summary], 
+            data=[s.model_dump() for s in summary], 
             total=len(summary),
             page=1,
             per_page=25
