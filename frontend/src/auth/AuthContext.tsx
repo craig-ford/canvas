@@ -27,7 +27,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 let accessToken: string | null = null;
 let isRefreshing = false;
-let failedQueue: Array<{ resolve: (token: string) => void; reject: (error: any) => void }> = [];
+let failedQueue: Array<{ resolve: () => void; reject: (error: any) => void }> = [];
 
 const getAccessToken = (): string | null => accessToken;
 const setAccessToken = (token: string | null): void => {
@@ -60,7 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
   const refreshToken = useCallback(async (): Promise<void> => {
     if (isRefreshing) {
       return new Promise((resolve, reject) => {
-        failedQueue.push({ resolve, reject });
+        failedQueue.push({ resolve: () => resolve(), reject });
       });
     }
 
@@ -71,7 +71,7 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
       setAccessToken(access_token);
       
       // Process queued requests
-      failedQueue.forEach(({ resolve }) => resolve(access_token));
+      failedQueue.forEach(({ resolve }) => resolve());
       failedQueue = [];
     } catch (error) {
       failedQueue.forEach(({ reject }) => reject(error));

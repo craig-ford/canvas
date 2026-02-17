@@ -78,11 +78,9 @@ export const CommitmentsStep: React.FC<CommitmentsStepProps> = ({ data, onChange
 
   return (
     <div className="space-y-8">
-      {allErrors.length > 0 && (
-        <div aria-live="polite" aria-atomic="true" className="sr-only">
-          {allErrors.length} validation error{allErrors.length > 1 ? 's' : ''} found
-        </div>
-      )}
+      <div aria-live="polite" aria-atomic="true" className="sr-only">
+        {allErrors.length > 0 && `${allErrors.length} validation error${allErrors.length > 1 ? 's' : ''} found`}
+      </div>
       <div>
         <h2 className="text-2xl font-semibold mb-4">Commitments & Focus</h2>
         

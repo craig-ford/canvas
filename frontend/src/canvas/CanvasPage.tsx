@@ -352,14 +352,14 @@ const CanvasPage: React.FC = () => {
         <h2 className="text-lg font-medium mb-4">Strategic Theses</h2>
         <div className="space-y-6">
           {canvas.theses.map((thesis) => (
-            <div
-              key={thesis.id}
-              draggable
-              onDragStart={() => handleThesisDragStart(thesis.id)}
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={() => handleThesisDrop(thesis.id)}
-              className="border rounded-lg p-4 cursor-move hover:shadow-md transition-shadow"
-            >
+            <ErrorBoundary key={thesis.id} fallback={<div className="text-red-600 text-sm">Thesis error. Please refresh.</div>}>
+              <div
+                draggable
+                onDragStart={() => handleThesisDragStart(thesis.id)}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={() => handleThesisDrop(thesis.id)}
+                className="border rounded-lg p-4 cursor-move hover:shadow-md transition-shadow"
+              >
               <div className="flex items-start space-x-3">
                 <div className="flex-shrink-0 w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center text-sm font-medium">
                   {thesis.order}
@@ -401,19 +401,21 @@ const CanvasPage: React.FC = () => {
                           </div>
                         )}
                         
-                        <FileUpload
-                          onUpload={(file, label) => handleFileUpload(proofPoint.id, file, label)}
-                          attachments={proofPoint.attachments}
-                          onDelete={(attachmentId) => handleFileDelete(proofPoint.id, attachmentId)}
-                          maxSize={10485760} // 10MB
-                          allowedTypes={['image/jpeg', 'image/png', 'image/gif', 'application/pdf']}
-                        />
+                        <ErrorBoundary fallback={<div className="text-red-600 text-sm">File upload error. Please refresh.</div>}>
+                          <FileUpload
+                            onUpload={(file, label) => handleFileUpload(proofPoint.id, file, label)}
+                            attachments={proofPoint.attachments}
+                            onDelete={(attachmentId) => handleFileDelete(proofPoint.id, attachmentId)}
+                            maxSize={10485760} // 10MB
+                            allowedTypes={['image/jpeg', 'image/png', 'image/gif', 'application/pdf']}
+                          />
+                        </ErrorBoundary>
                       </div>
                     ))}
                   </div>
                 </div>
               </div>
-            </div>
+            </ErrorBoundary>
           ))}
         </div>
       </div>

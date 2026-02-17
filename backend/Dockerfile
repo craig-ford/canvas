@@ -21,12 +21,6 @@ RUN apt-get update && apt-get install -y \
 COPY pyproject.toml* ./
 COPY requirements.txt* ./
 
-# Copy application code
-COPY . .
-
-# Change ownership to non-root user
-RUN chown -R canvas:canvas /app
-
 # Switch to non-root user
 USER canvas
 
@@ -49,6 +43,14 @@ RUN pip install --user --no-cache-dir \
     pytest \
     "pytest-asyncio==0.24.0" \
     httpx
+
+# Copy application code
+COPY . .
+
+# Change ownership to non-root user
+USER root
+RUN chown -R canvas:canvas /app
+USER canvas
 
 # Expose port
 EXPOSE 8000

@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field, field_validator
 from typing import List, Optional
 from datetime import date, datetime
 from uuid import UUID
+from canvas.models.canvas import CurrentlyTestingType
 
 class CommitmentCreate(BaseModel):
     text: str = Field(..., min_length=1, max_length=1000)
@@ -12,7 +13,7 @@ class ReviewCreateSchema(BaseModel):
     what_moved: Optional[str] = Field(None, max_length=5000)
     what_learned: Optional[str] = Field(None, max_length=5000)
     what_threatens: Optional[str] = Field(None, max_length=5000)
-    currently_testing_type: str = Field(..., pattern="^(thesis|proof_point)$")
+    currently_testing_type: str = Field(..., pattern=f"^({'|'.join([e.value for e in CurrentlyTestingType])})$")
     currently_testing_id: UUID
     commitments: List[CommitmentCreate] = Field(..., min_length=1, max_length=3)
     attachment_ids: List[UUID] = Field(default_factory=list, max_length=10)

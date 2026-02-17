@@ -2,6 +2,7 @@ from sqlalchemy import Column, Date, Text, ForeignKey, Enum, Index, UniqueConstr
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from canvas.models import Base, TimestampMixin
+from canvas.models.canvas import CurrentlyTestingType
 
 class MonthlyReview(Base, TimestampMixin):
     __tablename__ = "monthly_reviews"
@@ -11,7 +12,7 @@ class MonthlyReview(Base, TimestampMixin):
     what_moved = Column(Text, nullable=True)
     what_learned = Column(Text, nullable=True)
     what_threatens = Column(Text, nullable=True)
-    currently_testing_type = Column(Enum("thesis", "proof_point", name="testing_type"), nullable=True)
+    currently_testing_type = Column(Enum(CurrentlyTestingType, values_callable=lambda e: [x.value for x in e]), nullable=True)
     currently_testing_id = Column(UUID(as_uuid=True), nullable=True)
     created_by = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="RESTRICT"), nullable=False)
     

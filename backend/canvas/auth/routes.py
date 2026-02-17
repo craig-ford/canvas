@@ -1,3 +1,4 @@
+import threading
 from uuid import UUID
 from typing import Dict
 from datetime import datetime, timedelta
@@ -22,30 +23,32 @@ settings = Settings()
 # NOTE: This in-memory store is not persistent across server restarts.
 # For multi-instance deployments, use Redis-backed rate limiting.
 rate_limit_store: Dict[str, Dict[str, datetime]] = {}
+rate_limit_lock = threading.Lock()
 
 def check_rate_limit(key: str, limit: int = 5, window_minutes: int = 15) -> None:
     """Check rate limit for given key"""
     now = datetime.utcnow()
     window_start = now - timedelta(minutes=window_minutes)
     
-    if key not in rate_limit_store:
-        rate_limit_store[key] = {}
-    
-    # Clean old entries
-    rate_limit_store[key] = {
-        k: v for k, v in rate_limit_store[key].items() 
-        if v > window_start
-    }
-    
-    # Check limit
-    if len(rate_limit_store[key]) >= limit:
-        raise HTTPException(
-            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-            detail="Rate limit exceeded"
-        )
-    
-    # Add current request
-    rate_limit_store[key][str(now)] = now
+    with rate_limit_lock:
+        if key not in rate_limit_store:
+            rate_limit_store[key] = {}
+        
+        # Clean old entries
+        rate_limit_store[key] = {
+            k: v for k, v in rate_limit_store[key].items() 
+            if v > window_start
+        }
+        
+        # Check limit
+        if len(rate_limit_store[key]) >= limit:
+            raise HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail="Rate limit exceeded"
+            )
+        
+        # Add current request
+        rate_limit_store[key][str(now)] = now
 
 @router.post("/register", response_model=dict, status_code=201)
 async def register_user(
@@ -98,7 +101,7 @@ async def login(
         await auth_service.increment_failed_attempts(credentials.email, db)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid email or password"
+            detail="Invalid credentials"
         )
     
     await auth_service.reset_failed_attempts(user, db)

@@ -139,106 +139,106 @@
 
 ### High
 
-- [ ] CR-084: backend/canvas/routes/attachment.py:51 - [review-security] Authorization bypass: attachment download endpoint doesn't verify requesting user owns the parent canvas
+- [x] CR-084: backend/canvas/routes/attachment.py:51 - [review-security] Authorization bypass: attachment download endpoint doesn't verify requesting user owns the parent canvas
   - **Feature:** 002-canvas-management
   - **Task:** T-018
   - **Rationale:** Any authenticated user can download any attachment by ID, bypassing canvas ownership checks
 
-- [ ] CR-085: frontend/src/reviews/components/CommitmentsStep.tsx:25 - [review-frontend] Form validation errors not announced to screen readers — missing aria-live regions
+- [x] CR-085: frontend/src/reviews/components/CommitmentsStep.tsx:25 - [review-frontend] Form validation errors not announced to screen readers — missing aria-live regions
   - **Feature:** 004-monthly-review
   - **Task:** T-015
   - **Rationale:** Screen readers don't announce validation errors, making form unusable for visually impaired users (WCAG violation)
 
-- [ ] CR-086: frontend/src/canvas/CanvasPage.tsx:1 - [review-frontend] Missing error boundary around drag/drop and file upload operations
+- [x] CR-086: frontend/src/canvas/CanvasPage.tsx:1 - [review-frontend] Missing error boundary around drag/drop and file upload operations
   - **Feature:** 002-canvas-management
   - **Task:** T-022
   - **Rationale:** Unhandled errors in drag/drop or file operations crash the entire canvas page, losing user work
 
-- [ ] CR-087: backend/canvas/models/monthly_review.py:11 - [review-data] MonthlyReview uses raw Enum("thesis","proof_point") instead of importing CurrentlyTestingType from Canvas model
+- [x] CR-087: backend/canvas/models/monthly_review.py:11 - [review-data] MonthlyReview uses raw Enum("thesis","proof_point") instead of importing CurrentlyTestingType from Canvas model
   - **Feature:** 004-monthly-review
   - **Task:** T-001
   - **Rationale:** Two different enum definitions for same concept creates data inconsistency risk and DRY violation
 
-- [ ] CR-088: backend/Dockerfile:25 - [review-devops] Copies entire app before installing deps — requirements.txt COPY is followed by full COPY . . before pip install
+- [x] CR-088: backend/Dockerfile:25 - [review-devops] Copies entire app before installing deps — requirements.txt COPY is followed by full COPY . . before pip install
   - **Feature:** 001A-infrastructure
   - **Task:** T-010
   - **Rationale:** Docker layer caching broken — any source change invalidates dependency install layer, slowing builds
 
 ### Medium
 
-- [ ] CR-089: backend/canvas/auth/routes.py:24 - [review-security] In-memory rate limiting dict not thread-safe and resets on worker restart
+- [x] CR-089: backend/canvas/auth/routes.py:24 - [review-security] In-memory rate limiting dict not thread-safe and resets on worker restart
   - **Feature:** 001-auth
   - **Task:** T-015
   - **Rationale:** Rate limiting ineffective in multi-worker deployment; dict operations not atomic under concurrent requests
 
-- [ ] CR-090: backend/canvas/auth/routes.py:89 - [review-security] User enumeration via different error messages for invalid email vs invalid password
+- [x] CR-090: backend/canvas/auth/routes.py:89 - [review-security] User enumeration via different error messages for invalid email vs invalid password
   - **Feature:** 001-auth
   - **Task:** T-015
   - **Rationale:** Attackers can determine valid email addresses by observing different error responses
 
-- [ ] CR-091: frontend/src/components/FileUpload.tsx:145 - [review-frontend] Drag/drop zone missing keyboard event handlers for Enter/Space activation
+- [x] CR-091: frontend/src/components/FileUpload.tsx:145 - [review-frontend] Drag/drop zone missing keyboard event handlers for Enter/Space activation
   - **Feature:** 002-canvas-management
   - **Task:** T-021
   - **Rationale:** Keyboard-only users cannot activate file upload zone (WCAG 2.1.1 violation)
 
-- [ ] CR-092: frontend/src/auth/AuthContext.tsx:85 - [review-frontend] Token refresh race condition — multiple simultaneous requests trigger duplicate refresh attempts
+- [x] CR-092: frontend/src/auth/AuthContext.tsx:85 - [review-frontend] Token refresh race condition — multiple simultaneous requests trigger duplicate refresh attempts
   - **Feature:** 001-auth
   - **Task:** T-017
   - **Rationale:** Race condition can cause auth failures and session loss during concurrent API calls
 
-- [ ] CR-093: backend/canvas/routes/vbu.py:27 - [review-architect] Direct database access in route handler violates layered architecture
+- [x] CR-093: backend/canvas/routes/vbu.py:27 - [review-architect] Direct database access in route handler violates layered architecture
   - **Feature:** 002-canvas-management
   - **Task:** T-014
   - **Rationale:** Route handlers should delegate to services, not execute raw SQLAlchemy queries directly
 
-- [ ] CR-094: backend/canvas/portfolio/service.py:46 - [review-performance] Scalar subqueries in SELECT clause cause N+1 pattern for currently_testing and next_review_date
+- [x] CR-094: backend/canvas/portfolio/service.py:46 - [review-performance] Scalar subqueries in SELECT clause cause N+1 pattern for currently_testing and next_review_date
   - **Feature:** 003-portfolio-dashboard
   - **Task:** T-005
   - **Rationale:** Each VBU row triggers separate subqueries; with 100+ VBUs this becomes 200+ additional queries
 
-- [ ] CR-095: backend/canvas/services/canvas_service.py:85 - [review-performance] Missing eager loading in get_canvas_by_vbu causes N+1 for theses and proof_points
+- [x] CR-095: backend/canvas/services/canvas_service.py:85 - [review-performance] Missing eager loading in get_canvas_by_vbu causes N+1 for theses and proof_points
   - **Feature:** 002-canvas-management
   - **Task:** T-012
   - **Rationale:** 5 theses × 3 proof_points = 15+ additional queries per canvas load
 
-- [ ] CR-096: backend/canvas/reviews/schemas.py:13 - [review-data] Hardcoded regex "^(thesis|proof_point)$" instead of using CurrentlyTestingType enum
+- [x] CR-096: backend/canvas/reviews/schemas.py:13 - [review-data] Hardcoded regex "^(thesis|proof_point)$" instead of using CurrentlyTestingType enum
   - **Feature:** 004-monthly-review
   - **Task:** T-004
   - **Rationale:** Schema validation doesn't match model enum definition; if enum values change, validation is out of sync
 
-- [ ] CR-097: backend/canvas/portfolio/schemas.py:7 - [review-data] Duplicate LifecycleLane enum definition instead of importing from canvas.models.canvas
+- [x] CR-097: backend/canvas/portfolio/schemas.py:7 - [review-data] Duplicate LifecycleLane enum definition instead of importing from canvas.models.canvas
   - **Feature:** 003-portfolio-dashboard
   - **Task:** T-001
   - **Rationale:** Enum value inconsistency risk between portfolio schemas and canvas models; DRY violation
 
-- [ ] CR-098: docker-compose.yml:21 - [review-devops] Backend port mapping 8001:8000 conflicts with architecture.md specification of 8000:8000
+- [x] CR-098: docker-compose.yml:21 - [review-devops] Backend port mapping 8001:8000 conflicts with architecture.md specification of 8000:8000
   - **Feature:** 001A-infrastructure
   - **Task:** T-010
   - **Rationale:** Port inconsistency between documentation and deployment causes confusion
 
 ### Low
 
-- [ ] CR-099: frontend/src/canvas/hooks/useCanvas.ts:180 - [review-frontend] Missing cleanup for debounced save timeout on component unmount
+- [x] CR-099: frontend/src/canvas/hooks/useCanvas.ts:180 - [review-frontend] Missing cleanup for debounced save timeout on component unmount
   - **Feature:** 002-canvas-management
   - **Task:** T-024
   - **Rationale:** Timeout may fire after unmount causing memory leak and state update on unmounted component
 
-- [ ] CR-100: frontend/src/dashboard/DashboardPage.tsx:60 - [review-architect] Console.log statement in production code
+- [x] CR-100: frontend/src/dashboard/DashboardPage.tsx:60 - [review-architect] Console.log statement in production code
   - **Feature:** 003-portfolio-dashboard
   - **Task:** T-014
   - **Rationale:** Debug logging should be removed or replaced with proper logging
 
-- [ ] CR-101: frontend/src/components/StatusBadge.tsx:85 - [review-frontend] Dropdown menu missing focus trap for keyboard navigation
+- [x] CR-101: frontend/src/components/StatusBadge.tsx:85 - [review-frontend] Dropdown menu missing focus trap for keyboard navigation
   - **Feature:** 002-canvas-management
   - **Task:** T-020
   - **Rationale:** Keyboard users can tab out of dropdown, breaking expected focus management
 
-- [ ] CR-102: frontend/src/dashboard/VBUTable.tsx:150 - [review-frontend] Table rows missing proper ARIA labels for screen readers
+- [x] CR-102: frontend/src/dashboard/VBUTable.tsx:150 - [review-frontend] Table rows missing proper ARIA labels for screen readers
   - **Feature:** 003-portfolio-dashboard
   - **Task:** T-015
   - **Rationale:** Screen readers cannot properly announce row content
 
-- [ ] CR-103: frontend/src/reviews/ReviewWizard.tsx:45 - [review-frontend] Step validation errors not announced to screen readers
+- [x] CR-103: frontend/src/reviews/ReviewWizard.tsx:45 - [review-frontend] Step validation errors not announced to screen readers
   - **Feature:** 004-monthly-review
   - **Task:** T-015
   - **Rationale:** Users with screen readers don't receive feedback when step validation fails

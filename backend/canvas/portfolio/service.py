@@ -27,6 +27,29 @@ class PortfolioService:
     
     async def _get_summary_impl(self, db: AsyncSession, user: User, filters: PortfolioFilters) -> List[VBUSummary]:
         # Build query using SQLAlchemy ORM
+        # Create lateral subqueries for better performance
+        currently_testing_subq = (
+            select(
+                case(
+                    (Canvas.currently_testing_type == 'thesis', Thesis.text),
+                    (Canvas.currently_testing_type == 'proof_point', ProofPoint.description),
+                    else_=None
+                ).label('currently_testing_text'),
+                Canvas.id.label('canvas_id')
+            )
+            .select_from(Canvas)
+            .outerjoin(Thesis, and_(Canvas.currently_testing_type == 'thesis', Canvas.currently_testing_id == Thesis.id))
+            .outerjoin(ProofPoint, and_(Canvas.currently_testing_type == 'proof_point', Canvas.currently_testing_id == ProofPoint.id))
+        ).lateral('ct')
+        
+        next_review_subq = (
+            select(
+                func.min(MonthlyReview.review_date + timedelta(days=30)).label('next_review_date'),
+                MonthlyReview.canvas_id
+            )
+            .group_by(MonthlyReview.canvas_id)
+        ).lateral('nr')
+        
         query = (
             select(
                 VBU.id,
@@ -37,21 +60,14 @@ class PortfolioService:
                 Canvas.primary_constraint,
                 Canvas.portfolio_notes,
                 func.coalesce(Canvas.health_indicator_cache, 'Not Started').label('health_indicator'),
-                case(
-                    (Canvas.currently_testing_type == 'thesis', 
-                     select(Thesis.text).where(Thesis.id == Canvas.currently_testing_id).scalar_subquery()),
-                    (Canvas.currently_testing_type == 'proof_point',
-                     select(ProofPoint.description).where(ProofPoint.id == Canvas.currently_testing_id).scalar_subquery()),
-                    else_=None
-                ).label('currently_testing'),
-                select(func.min(MonthlyReview.review_date + timedelta(days=30)))
-                .where(MonthlyReview.canvas_id == Canvas.id)
-                .scalar_subquery()
-                .label('next_review_date')
+                currently_testing_subq.c.currently_testing_text.label('currently_testing'),
+                next_review_subq.c.next_review_date
             )
             .select_from(VBU)
             .join(User, VBU.gm_id == User.id)
             .join(Canvas, Canvas.vbu_id == VBU.id)
+            .outerjoin(currently_testing_subq, Canvas.id == currently_testing_subq.c.canvas_id)
+            .outerjoin(next_review_subq, Canvas.id == next_review_subq.c.canvas_id)
         )
         
         # Apply filters using parameterized conditions

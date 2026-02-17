@@ -1,12 +1,12 @@
 ---RALPH_STATUS---
 EXIT_SIGNAL: false
-CURRENT_MODE: code-review
+CURRENT_MODE: fix
 CURRENT_FEATURE: all
-ACTION_COMPLETED: Code review iteration 4 complete. 8 review agents spawned in 2 batches. review-testing found 0 new issues. Other 7 agents found 51 raw issues, deduplicated to 20 unique new issues (0 Critical, 5 High, 10 Medium, 5 Low). Key findings: attachment authorization bypass, accessibility gaps (aria-live, keyboard nav), enum/schema DRY violations, N+1 query patterns, Docker layer caching broken. Appended to specs/code-review.md.
+ACTION_COMPLETED: Starting fix mode for 20 unchecked code-review issues (iteration 4 issues)
 FEATURES_TOTAL: 5
 FEATURES_WITH_SPECS: 5
 FEATURES_WITH_PLANS: 5
 FEATURES_WITH_TASKS: 5
 FEATURES_VERIFIED: 5
-RECOMMENDATION: Next invocation detects unchecked issues in code-review.md → fix mode. Spawn fix agents grouped by reviewer tag to resolve 20 issues. Run herald first if multi-reviewer file conflicts exist. After fixes, re-run tests to verify no breakage.
+RECOMMENDATION: Spawning fix agents in 2 batches (4+2) for 6 reviewers with issues
 ---END_RALPH_STATUS---

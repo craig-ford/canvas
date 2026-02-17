@@ -57,7 +57,6 @@ export const DashboardPage: React.FC = () => {
 
   const handleExportPDF = (vbuId: string) => {
     // PDF export functionality will be implemented
-    console.log('Export PDF for VBU:', vbuId);
   };
 
   const handleViewVBU = (vbuId: string) => {

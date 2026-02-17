@@ -51,11 +51,47 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status, onChange, readonly = 
       if (!readonly && onChange) {
         setIsOpen(!isOpen);
       }
-    } else if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+    } else if (event.key === 'ArrowDown') {
       event.preventDefault();
       if (!isOpen && !readonly && onChange) {
         setIsOpen(true);
+      } else if (isOpen) {
+        // Focus first option
+        const firstOption = dropdownRef.current?.querySelector('button[role="option"]') as HTMLElement;
+        firstOption?.focus();
       }
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      if (!isOpen && !readonly && onChange) {
+        setIsOpen(true);
+      } else if (isOpen) {
+        // Focus last option
+        const options = dropdownRef.current?.querySelectorAll('button[role="option"]');
+        const lastOption = options?.[options.length - 1] as HTMLElement;
+        lastOption?.focus();
+      }
+    }
+  };
+
+  const handleOptionKeyDown = (event: React.KeyboardEvent, statusOption: string, index: number) => {
+    if (event.key === 'Escape') {
+      setIsOpen(false);
+      // Return focus to trigger
+      const trigger = dropdownRef.current?.querySelector('[role="button"]') as HTMLElement;
+      trigger?.focus();
+    } else if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      handleStatusSelect(statusOption);
+    } else if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      const options = dropdownRef.current?.querySelectorAll('button[role="option"]');
+      const nextIndex = (index + 1) % options.length;
+      (options[nextIndex] as HTMLElement)?.focus();
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      const options = dropdownRef.current?.querySelectorAll('button[role="option"]');
+      const prevIndex = index === 0 ? options.length - 1 : index - 1;
+      (options[prevIndex] as HTMLElement)?.focus();
     }
   };
 
@@ -87,17 +123,19 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status, onChange, readonly = 
       {isOpen && canInteract && (
         <div className="absolute z-10 mt-1 w-32 bg-white border border-gray-200 rounded-md shadow-lg">
           <div className="py-1" role="listbox">
-            {allStatuses.map((statusOption) => {
+            {allStatuses.map((statusOption, index) => {
               const config = statusConfig[statusOption];
               return (
                 <button
                   key={statusOption}
-                  className={`w-full text-left px-3 py-2 text-xs hover:bg-gray-50 ${
+                  className={`w-full text-left px-3 py-2 text-xs hover:bg-gray-50 focus:bg-gray-50 focus:outline-none ${
                     statusOption === status ? 'bg-gray-50' : ''
                   }`}
                   onClick={() => handleStatusSelect(statusOption)}
+                  onKeyDown={(e) => handleOptionKeyDown(e, statusOption, index)}
                   role="option"
                   aria-selected={statusOption === status}
+                  tabIndex={0}
                 >
                   <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${config.color}`}>
                     {config.text}

@@ -72,6 +72,31 @@ class CanvasService:
         result = await db.execute(query.order_by(VBU.name))
         return list(result.scalars().all())
 
+    async def list_vbus_paginated(self, current_user: User, page: int, per_page: int, db: AsyncSession) -> tuple[List[VBU], int]:
+        """List VBUs with pagination and role-based filtering"""
+        from sqlalchemy import func
+        
+        # Build query with role-based filtering
+        query = select(VBU).options(selectinload(VBU.gm))
+        count_query = select(func.count(VBU.id))
+        
+        if current_user.role == UserRole.GM:
+            query = query.where(VBU.gm_id == current_user.id)
+            count_query = count_query.where(VBU.gm_id == current_user.id)
+        
+        # Get total count
+        total_result = await db.execute(count_query)
+        total = total_result.scalar()
+        
+        # Apply pagination
+        offset = (page - 1) * per_page
+        paginated_query = query.order_by(VBU.name).offset(offset).limit(per_page)
+        
+        result = await db.execute(paginated_query)
+        vbus = list(result.scalars().all())
+        
+        return vbus, total
+
     async def get_canvas_by_vbu(self, vbu_id: UUID, db: AsyncSession) -> Canvas:
         """Get canvas with nested theses and proof points"""
         result = await db.execute(
@@ -226,6 +251,9 @@ class CanvasService:
         """Get canvas with authorization check"""
         result = await db.execute(
             select(Canvas)
+            .options(
+                selectinload(Canvas.theses).selectinload(Thesis.proof_points)
+            )
             .join(VBU, Canvas.vbu_id == VBU.id)
             .where(Canvas.id == canvas_id)
         )

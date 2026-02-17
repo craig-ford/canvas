@@ -2,13 +2,7 @@ from pydantic import BaseModel, Field
 from typing import Optional, List
 from uuid import UUID
 from datetime import date
-from enum import Enum
-
-class LifecycleLane(str, Enum):
-    build = "build"
-    sell = "sell"
-    milk = "milk"
-    reframe = "reframe"
+from canvas.models.canvas import LifecycleLane
 
 class VBUSummary(BaseModel):
     id: UUID

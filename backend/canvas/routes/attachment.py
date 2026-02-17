@@ -145,7 +145,14 @@ async def download_attachment(
         if gm_id != current_user.id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
     
-    # Viewer can access any attachment (no additional check needed)
+    # For viewer, verify attachment exists before allowing access
+    result = await db.execute(
+        select(Attachment).where(Attachment.id == attachment_id)
+    )
+    attachment = result.scalar_one_or_none()
+    if not attachment:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Attachment not found")
+    
     return await attachment_service.download(attachment_id, db)
 
 @router.delete("/{attachment_id}", status_code=204)

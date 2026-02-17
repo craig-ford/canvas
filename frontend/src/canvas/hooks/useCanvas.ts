@@ -280,7 +280,7 @@ export const useCanvas = (options: UseCanvasOptions): UseCanvasReturn => {
         saveTimeoutRef.current = null;
       }
     };
-  }, [vbuId, autoSave, debounceMs]);
+  }, []);
 
   return {
     canvas,

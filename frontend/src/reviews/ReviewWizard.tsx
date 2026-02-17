@@ -191,6 +191,10 @@ export const ReviewWizard: React.FC = () => {
         </div>
       )}
 
+      <div aria-live="polite" aria-atomic="true" className="sr-only">
+        {!isStepValid() && currentStep === 4 && 'Step validation failed: Please complete all required fields'}
+      </div>
+
       <div className="mb-8">
         {renderStep()}
       </div>

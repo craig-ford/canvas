@@ -126,7 +126,7 @@ const VBUTable: React.FC<VBUTableProps> = ({ vbus, onExportPDF, onViewVBU }) => 
                   onViewVBU(vbu.id);
                 }
               }}
-              aria-label={`VBU: ${vbu.name}, GM: ${vbu.gm_name}, Lane: ${vbu.lifecycle_lane}`}
+              aria-label={`VBU: ${vbu.name}, GM: ${vbu.gm_name}, Lane: ${vbu.lifecycle_lane}, Health: ${vbu.health_indicator}${vbu.currently_testing ? `, Testing: ${vbu.currently_testing}` : ''}${vbu.next_review_date ? `, Next Review: ${vbu.next_review_date}` : ''}`}
             >
               <td className="px-6 py-4 whitespace-nowrap">
                 <div>

@@ -20,7 +20,7 @@ services:
   backend:
     build: ./backend
     ports:
-      - "8001:8000"
+      - "8000:8000"
     environment:
       - CANVAS_DATABASE_URL=${CANVAS_DATABASE_URL:-postgresql+asyncpg://canvas:canvas_dev@db:5432/canvas}
       - CANVAS_CORS_ORIGINS=${CANVAS_CORS_ORIGINS:-["http://localhost:5173","http://localhost:3000"]}
