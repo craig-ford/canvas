@@ -1,12 +1,12 @@
 ---RALPH_STATUS---
 EXIT_SIGNAL: false
-CURRENT_MODE: fix
+CURRENT_MODE: smoke-test
 CURRENT_FEATURE: all
-ACTION_COMPLETED: Fixed 47/47 code review issues across 8 review agents. 19 test failures introduced by fix agents (was 262 passing, now 256 passed 19 failed). Deleted test-suite-report.md to trigger test-suite re-entry. Key breakages: (1) review-architect broke auth/dependencies.py with Depends(Settings) causing Pydantic NameError - FIXED by orchestrator, (2) review-security rewrote portfolio/service.py from raw SQL to ORM with invalid func.INTERVAL usage, (3) review-security rate limiting code used _rate_limit_store underscore variable.
+ACTION_COMPLETED: Test-suite phase complete. Fixed 19 test failures (2 code bugs + 17 test mismatches). 275/275 tests passing. Code fixes: portfolio func.INTERVAL syntax, canvas_service reorder_theses constraint handling. Test fixes: CSRF headers, status code expectations, mock db params, response shapes.
 FEATURES_TOTAL: 5
 FEATURES_WITH_SPECS: 5
 FEATURES_WITH_PLANS: 5
 FEATURES_WITH_TASKS: 5
 FEATURES_VERIFIED: 5
-RECOMMENDATION: Next session enters smoke-test mode (test-suite phase) to fix 19 test failures caused by code review fixes. Primary issues: portfolio service ORM rewrite broke 4 portfolio tests, canvas service changes broke thesis reorder tests, attachment content type validation broke proof point tests. After tests pass, re-run code-review to check for remaining issues.
+RECOMMENDATION: Next session enters code-review mode (re-run) to verify all 47 previously-fixed issues are still clean after test-suite fixes. Per SDD step 21: all code-review.md issues marked [x] → re-run code-review to verify.
 ---END_RALPH_STATUS---
