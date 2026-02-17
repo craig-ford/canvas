@@ -1,12 +1,12 @@
 ---RALPH_STATUS---
 EXIT_SIGNAL: false
-CURRENT_MODE: smoke-test (test-suite phase)
+CURRENT_MODE: code-review
 CURRENT_FEATURE: all
-ACTION_COMPLETED: Fixed 34 broken tests caused by code-review fix agents. Three root causes: (1) verify_csrf dependency added to routes but tests lacked Origin header - fixed in conftest.py, (2) health endpoint DB check broke test isolation - reverted to simple status ok, (3) login refresh_token moved to cookie - updated test assertion. 275/275 tests passing. Wrote test-suite-report.md with Result: PASS.
+ACTION_COMPLETED: Code review iteration 4 complete. 8 review agents spawned in 2 batches. review-testing found 0 new issues. Other 7 agents found 51 raw issues, deduplicated to 20 unique new issues (0 Critical, 5 High, 10 Medium, 5 Low). Key findings: attachment authorization bypass, accessibility gaps (aria-live, keyboard nav), enum/schema DRY violations, N+1 query patterns, Docker layer caching broken. Appended to specs/code-review.md.
 FEATURES_TOTAL: 5
 FEATURES_WITH_SPECS: 5
 FEATURES_WITH_PLANS: 5
 FEATURES_WITH_TASKS: 5
 FEATURES_VERIFIED: 5
-RECOMMENDATION: Next invocation detects test-suite-report PASS + code-review.md with all [x] → code-review mode (re-run to verify fixes). Run 8 review agents to check if fix agent changes + test fixes introduced new issues. If zero issues found, create .project-complete marker.
+RECOMMENDATION: Next invocation detects unchecked issues in code-review.md → fix mode. Spawn fix agents grouped by reviewer tag to resolve 20 issues. Run herald first if multi-reviewer file conflicts exist. After fixes, re-run tests to verify no breakage.
 ---END_RALPH_STATUS---
