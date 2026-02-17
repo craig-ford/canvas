@@ -104,7 +104,7 @@ async def update_canvas(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
     
     # Filter update data based on role
-    update_data = canvas_data.dict(exclude_unset=True)
+    update_data = canvas_data.model_dump(exclude_unset=True)
     
     # Remove portfolio_notes for non-admin users
     if current_user.role != UserRole.ADMIN and "portfolio_notes" in update_data:

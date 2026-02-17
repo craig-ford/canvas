@@ -28,12 +28,15 @@ RUN pip install --no-cache-dir \
     pydantic-settings \
     python-jose[cryptography] \
     passlib[bcrypt] \
-    "bcrypt<5" \
+    "bcrypt==4.0.1" \
     alembic \
     aiosqlite \
     python-multipart \
     weasyprint \
-    jinja2
+    jinja2 \
+    pytest \
+    "pytest-asyncio==0.24.0" \
+    httpx
 
 # Copy application code
 COPY . .

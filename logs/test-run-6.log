@@ -1,0 +1,366 @@
+..........EFEEEFEFEFEFE.EFE.EFE.............................EEEE.EEEEEEE [ 18%]
+EEEEEEEFEEEFEEEFEEEFEEEEE.EEEEEEEEEEEEFEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE [ 29%]
+EEEEEEEEEEEEEEEEEEEEEEEEEE........EEEEEEEEEEEEEEEEEEEE..EEEEEEEEEEEEEEEE [ 42%]
+EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE......EEEEEEEEEEEE [ 55%]
+EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE..........................FE...FE....... [ 72%]
+.EEEEEEEEEEEEEEEEEEEEEEFEEEEEFE.FEEEEEEEEEEEEEEEEEEEEEE................. [ 89%]
+..EEEEEEEEEEEE.E..................                                       [100%]
+=============================== warnings summary ===============================
+../usr/local/lib/python3.12/site-packages/passlib/utils/__init__.py:854
+  /usr/local/lib/python3.12/site-packages/passlib/utils/__init__.py:854: DeprecationWarning: 'crypt' is deprecated and slated for removal in Python 3.13
+    from crypt import crypt as _crypt
+
+tests/auth/test_auth_routes_integration.py::TestAuthRoutesIntegration::test_register_user_success
+  /app/canvas/auth/schemas.py:14: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class UserResponse(BaseModel):
+
+tests/auth/test_auth_routes_integration.py::TestAuthRoutesIntegration::test_refresh_token_invalid
+  /usr/local/lib/python3.12/site-packages/httpx/_client.py:1859: DeprecationWarning: Setting per-request cookies=<...> is being deprecated, because the expected behaviour on cookie persistence is ambiguous. Set cookies directly on the client instance instead.
+    return await self.request(
+
+tests/test_portfolio_routes.py::test_update_portfolio_notes_admin_success
+  /usr/local/lib/python3.12/site-packages/pydantic_settings/main.py:490: RuntimeWarning: coroutine 'AsyncClient.get' was never awaited
+    def warn_if_not_used(source_type: type[PydanticBaseSettingsSource], keys: tuple[str, ...]) -> None:
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/test_portfolio_routes.py::test_update_portfolio_notes_admin_success
+  /usr/local/lib/python3.12/site-packages/pydantic_settings/main.py:490: RuntimeWarning: coroutine 'AsyncClient.patch' was never awaited
+    def warn_if_not_used(source_type: type[PydanticBaseSettingsSource], keys: tuple[str, ...]) -> None:
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/auth/test_auth_routes_integration.py::TestAuthRoutesIntegration::test_register_duplicate_email
+FAILED tests/auth/test_auth_routes_integration.py::TestAuthRoutesIntegration::test_login_success
+FAILED tests/auth/test_auth_routes_integration.py::TestAuthRoutesIntegration::test_login_invalid_credentials
+FAILED tests/auth/test_auth_routes_integration.py::TestAuthRoutesIntegration::test_login_account_locked
+FAILED tests/auth/test_auth_routes_integration.py::TestAuthRoutesIntegration::test_refresh_token_success
+FAILED tests/auth/test_auth_routes_integration.py::TestAuthRoutesIntegration::test_get_current_user_success
+FAILED tests/auth/test_auth_routes_integration.py::TestAuthRoutesIntegration::test_rate_limiting_login
+FAILED tests/auth/test_user_service.py::TestUserService::test_list_users_returns_all_users
+FAILED tests/auth/test_user_service.py::TestUserService::test_update_user_role_nonexistent_raises_error
+FAILED tests/auth/test_user_service.py::TestUserService::test_delete_user_nonexistent_raises_error
+FAILED tests/auth/test_user_service.py::TestUserService::test_get_user_by_email_nonexistent_returns_none
+FAILED tests/canvas/test_attachment_service_integration.py::TestAttachmentServiceIntegration::test_download_nonexistent_file
+FAILED tests/test_db_contract.py::test_session_can_execute_query - sqlalchemy...
+FAILED tests/test_docker_integration.py::test_backend_connects_to_db - sqlalc...
+FAILED tests/test_portfolio_api.py::TestPortfolioSummaryEndpoint::test_get_summary_unauthorized
+FAILED tests/test_portfolio_api.py::TestPortfolioNotesEndpoint::test_update_notes_unauthorized
+FAILED tests/test_portfolio_api.py::TestPortfolioRouterIntegration::test_endpoints_exist
+ERROR tests/auth/test_auth_routes_integration.py::TestAuthRoutesIntegration::test_register_user_success
+ERROR tests/auth/test_auth_routes_integration.py::TestAuthRoutesIntegration::test_register_duplicate_email
+ERROR tests/auth/test_auth_routes_integration.py::TestAuthRoutesIntegration::test_register_requires_admin
+ERROR tests/auth/test_auth_routes_integration.py::TestAuthRoutesIntegration::test_register_requires_admin
+ERROR tests/auth/test_auth_routes_integration.py::TestAuthRoutesIntegration::test_login_success
+ERROR tests/auth/test_auth_routes_integration.py::TestAuthRoutesIntegration::test_login_invalid_credentials
+ERROR tests/auth/test_auth_routes_integration.py::TestAuthRoutesIntegration::test_login_account_locked
+ERROR tests/auth/test_auth_routes_integration.py::TestAuthRoutesIntegration::test_refresh_token_success
+ERROR tests/auth/test_auth_routes_integration.py::TestAuthRoutesIntegration::test_refresh_token_invalid
+ERROR tests/auth/test_auth_routes_integration.py::TestAuthRoutesIntegration::test_get_current_user_success
+ERROR tests/auth/test_auth_routes_integration.py::TestAuthRoutesIntegration::test_get_current_user_invalid_token
+ERROR tests/auth/test_auth_routes_integration.py::TestAuthRoutesIntegration::test_rate_limiting_login
+ERROR tests/auth/test_user_routes.py::TestUserManagementRoutes::test_get_users_admin_success
+ERROR tests/auth/test_user_routes.py::TestUserManagementRoutes::test_get_users_admin_success
+ERROR tests/auth/test_user_routes.py::TestUserManagementRoutes::test_get_users_non_admin_forbidden
+ERROR tests/auth/test_user_routes.py::TestUserManagementRoutes::test_get_users_non_admin_forbidden
+ERROR tests/auth/test_user_routes.py::TestUserManagementRoutes::test_update_user_role_admin_success
+ERROR tests/auth/test_user_routes.py::TestUserManagementRoutes::test_update_user_role_admin_success
+ERROR tests/auth/test_user_routes.py::TestUserManagementRoutes::test_update_user_role_non_admin_forbidden
+ERROR tests/auth/test_user_routes.py::TestUserManagementRoutes::test_update_user_role_non_admin_forbidden
+ERROR tests/auth/test_user_routes.py::TestUserManagementRoutes::test_update_user_role_invalid_role
+ERROR tests/auth/test_user_routes.py::TestUserManagementRoutes::test_update_user_role_invalid_role
+ERROR tests/auth/test_user_routes.py::TestUserManagementRoutes::test_update_user_role_nonexistent_user
+ERROR tests/auth/test_user_routes.py::TestUserManagementRoutes::test_update_user_role_nonexistent_user
+ERROR tests/auth/test_user_routes.py::TestUserManagementRoutes::test_delete_user_admin_success
+ERROR tests/auth/test_user_routes.py::TestUserManagementRoutes::test_delete_user_admin_success
+ERROR tests/auth/test_user_routes.py::TestUserManagementRoutes::test_delete_user_non_admin_forbidden
+ERROR tests/auth/test_user_routes.py::TestUserManagementRoutes::test_delete_user_non_admin_forbidden
+ERROR tests/auth/test_user_routes.py::TestUserManagementRoutes::test_delete_user_nonexistent_user
+ERROR tests/auth/test_user_routes.py::TestUserManagementRoutes::test_delete_user_nonexistent_user
+ERROR tests/auth/test_user_service.py::TestUserService::test_list_users_returns_all_users
+ERROR tests/auth/test_user_service.py::TestUserService::test_update_user_role_changes_role
+ERROR tests/auth/test_user_service.py::TestUserService::test_update_user_role_changes_role
+ERROR tests/auth/test_user_service.py::TestUserService::test_update_user_role_nonexistent_raises_error
+ERROR tests/auth/test_user_service.py::TestUserService::test_delete_user_removes_user
+ERROR tests/auth/test_user_service.py::TestUserService::test_delete_user_removes_user
+ERROR tests/auth/test_user_service.py::TestUserService::test_delete_user_nonexistent_raises_error
+ERROR tests/auth/test_user_service.py::TestUserService::test_get_user_by_email_case_insensitive
+ERROR tests/auth/test_user_service.py::TestUserService::test_get_user_by_email_case_insensitive
+ERROR tests/auth/test_user_service.py::TestUserService::test_get_user_by_email_nonexistent_returns_none
+ERROR tests/canvas/test_attachment_api.py::TestAttachmentAPI::test_download_file_not_found
+ERROR tests/canvas/test_attachment_api.py::TestAttachmentAPI::test_download_file_not_found
+ERROR tests/canvas/test_attachment_api.py::TestAttachmentAPI::test_download_file_invalid_uuid
+ERROR tests/canvas/test_attachment_api.py::TestAttachmentAPI::test_download_file_invalid_uuid
+ERROR tests/canvas/test_attachment_api.py::TestAttachmentAPI::test_upload_missing_parent_id
+ERROR tests/canvas/test_attachment_api.py::TestAttachmentAPI::test_upload_missing_parent_id
+ERROR tests/canvas/test_attachment_api.py::TestAttachmentAPI::test_upload_nonexistent_proof_point
+ERROR tests/canvas/test_attachment_api.py::TestAttachmentAPI::test_upload_nonexistent_proof_point
+ERROR tests/canvas/test_attachment_api.py::TestAttachmentAPI::test_delete_not_found
+ERROR tests/canvas/test_attachment_api.py::TestAttachmentAPI::test_delete_not_found
+ERROR tests/canvas/test_attachment_service_integration.py::TestAttachmentServiceIntegration::test_upload_valid_file
+ERROR tests/canvas/test_attachment_service_integration.py::TestAttachmentServiceIntegration::test_upload_valid_file
+ERROR tests/canvas/test_attachment_service_integration.py::TestAttachmentServiceIntegration::test_upload_file_too_large
+ERROR tests/canvas/test_attachment_service_integration.py::TestAttachmentServiceIntegration::test_upload_file_too_large
+ERROR tests/canvas/test_attachment_service_integration.py::TestAttachmentServiceIntegration::test_upload_invalid_content_type
+ERROR tests/canvas/test_attachment_service_integration.py::TestAttachmentServiceIntegration::test_upload_invalid_content_type
+ERROR tests/canvas/test_attachment_service_integration.py::TestAttachmentServiceIntegration::test_download_nonexistent_file
+ERROR tests/canvas/test_attachment_service_integration.py::TestAttachmentServiceIntegration::test_download_existing_file
+ERROR tests/canvas/test_attachment_service_integration.py::TestAttachmentServiceIntegration::test_download_existing_file
+ERROR tests/canvas/test_attachment_service_integration.py::TestAttachmentServiceIntegration::test_delete_existing_file
+ERROR tests/canvas/test_attachment_service_integration.py::TestAttachmentServiceIntegration::test_delete_existing_file
+ERROR tests/canvas/test_attachment_service_integration.py::TestAttachmentServiceIntegration::test_storage_path_generation
+ERROR tests/canvas/test_attachment_service_integration.py::TestAttachmentServiceIntegration::test_storage_path_generation
+ERROR tests/canvas/test_canvas_api.py::TestCanvasAPIAuth::test_get_canvas_admin
+ERROR tests/canvas/test_canvas_api.py::TestCanvasAPIAuth::test_get_canvas_admin
+ERROR tests/canvas/test_canvas_api.py::TestCanvasAPIAuth::test_get_canvas_gm_own
+ERROR tests/canvas/test_canvas_api.py::TestCanvasAPIAuth::test_get_canvas_gm_own
+ERROR tests/canvas/test_canvas_api.py::TestCanvasAPIAuth::test_get_canvas_gm_other_forbidden
+ERROR tests/canvas/test_canvas_api.py::TestCanvasAPIAuth::test_get_canvas_gm_other_forbidden
+ERROR tests/canvas/test_canvas_api.py::TestCanvasAPIAuth::test_get_canvas_viewer
+ERROR tests/canvas/test_canvas_api.py::TestCanvasAPIAuth::test_get_canvas_viewer
+ERROR tests/canvas/test_canvas_api.py::TestCanvasAPIAuth::test_update_canvas_gm_own
+ERROR tests/canvas/test_canvas_api.py::TestCanvasAPIAuth::test_update_canvas_gm_own
+ERROR tests/canvas/test_canvas_api.py::TestCanvasAPIAuth::test_update_canvas_viewer_forbidden
+ERROR tests/canvas/test_canvas_api.py::TestCanvasAPIAuth::test_update_canvas_viewer_forbidden
+ERROR tests/canvas/test_canvas_api.py::TestCanvasAPINestedData::test_get_canvas_with_theses
+ERROR tests/canvas/test_canvas_api.py::TestCanvasAPINestedData::test_get_canvas_with_theses
+ERROR tests/canvas/test_canvas_api.py::TestCanvasAPINestedData::test_get_canvas_with_proof_points
+ERROR tests/canvas/test_canvas_api.py::TestCanvasAPINestedData::test_get_canvas_with_proof_points
+ERROR tests/canvas/test_canvas_api.py::TestCanvasAPIValidation::test_update_canvas_invalid_lifecycle_lane
+ERROR tests/canvas/test_canvas_api.py::TestCanvasAPIValidation::test_update_canvas_invalid_lifecycle_lane
+ERROR tests/canvas/test_canvas_api.py::TestCanvasAPIValidation::test_update_canvas_empty_product_name
+ERROR tests/canvas/test_canvas_api.py::TestCanvasAPIValidation::test_update_canvas_empty_product_name
+ERROR tests/canvas/test_canvas_api.py::TestCanvasAPIValidation::test_get_canvas_vbu_not_found
+ERROR tests/canvas/test_canvas_api.py::TestCanvasAPIValidation::test_get_canvas_vbu_not_found
+ERROR tests/canvas/test_canvas_api.py::TestCanvasAPIPortfolioNotes::test_update_portfolio_notes_admin
+ERROR tests/canvas/test_canvas_api.py::TestCanvasAPIPortfolioNotes::test_update_portfolio_notes_admin
+ERROR tests/canvas/test_canvas_api.py::TestCanvasAPIPortfolioNotes::test_update_portfolio_notes_gm_ignored
+ERROR tests/canvas/test_canvas_api.py::TestCanvasAPIPortfolioNotes::test_update_portfolio_notes_gm_ignored
+ERROR tests/canvas/test_canvas_service_integration.py::TestCanvasServiceVBU::test_create_vbu
+ERROR tests/canvas/test_canvas_service_integration.py::TestCanvasServiceVBU::test_create_vbu
+ERROR tests/canvas/test_canvas_service_integration.py::TestCanvasServiceVBU::test_update_vbu
+ERROR tests/canvas/test_canvas_service_integration.py::TestCanvasServiceVBU::test_update_vbu
+ERROR tests/canvas/test_canvas_service_integration.py::TestCanvasServiceVBU::test_delete_vbu
+ERROR tests/canvas/test_canvas_service_integration.py::TestCanvasServiceVBU::test_delete_vbu
+ERROR tests/canvas/test_canvas_service_integration.py::TestCanvasServiceVBU::test_list_vbus
+ERROR tests/canvas/test_canvas_service_integration.py::TestCanvasServiceVBU::test_list_vbus
+ERROR tests/canvas/test_canvas_service_integration.py::TestCanvasServiceCanvas::test_get_canvas_by_vbu
+ERROR tests/canvas/test_canvas_service_integration.py::TestCanvasServiceCanvas::test_get_canvas_by_vbu
+ERROR tests/canvas/test_canvas_service_integration.py::TestCanvasServiceCanvas::test_update_canvas
+ERROR tests/canvas/test_canvas_service_integration.py::TestCanvasServiceCanvas::test_update_canvas
+ERROR tests/canvas/test_canvas_service_integration.py::TestCanvasServiceThesis::test_create_thesis
+ERROR tests/canvas/test_canvas_service_integration.py::TestCanvasServiceThesis::test_create_thesis
+ERROR tests/canvas/test_canvas_service_integration.py::TestCanvasServiceThesis::test_update_thesis
+ERROR tests/canvas/test_canvas_service_integration.py::TestCanvasServiceThesis::test_update_thesis
+ERROR tests/canvas/test_canvas_service_integration.py::TestCanvasServiceThesis::test_delete_thesis
+ERROR tests/canvas/test_canvas_service_integration.py::TestCanvasServiceThesis::test_delete_thesis
+ERROR tests/canvas/test_canvas_service_integration.py::TestCanvasServiceThesis::test_reorder_theses
+ERROR tests/canvas/test_canvas_service_integration.py::TestCanvasServiceThesis::test_reorder_theses
+ERROR tests/canvas/test_canvas_service_integration.py::TestCanvasServiceProofPoint::test_create_proof_point
+ERROR tests/canvas/test_canvas_service_integration.py::TestCanvasServiceProofPoint::test_create_proof_point
+ERROR tests/canvas/test_canvas_service_integration.py::TestCanvasServiceProofPoint::test_update_proof_point
+ERROR tests/canvas/test_canvas_service_integration.py::TestCanvasServiceProofPoint::test_update_proof_point
+ERROR tests/canvas/test_canvas_service_integration.py::TestCanvasServiceProofPoint::test_delete_proof_point
+ERROR tests/canvas/test_canvas_service_integration.py::TestCanvasServiceProofPoint::test_delete_proof_point
+ERROR tests/canvas/test_proof_point_api.py::TestProofPointAPI::test_get_proof_points_success
+ERROR tests/canvas/test_proof_point_api.py::TestProofPointAPI::test_get_proof_points_success
+ERROR tests/canvas/test_proof_point_api.py::TestProofPointAPI::test_get_proof_points_unauthorized
+ERROR tests/canvas/test_proof_point_api.py::TestProofPointAPI::test_get_proof_points_unauthorized
+ERROR tests/canvas/test_proof_point_api.py::TestProofPointAPI::test_create_proof_point_success
+ERROR tests/canvas/test_proof_point_api.py::TestProofPointAPI::test_create_proof_point_success
+ERROR tests/canvas/test_proof_point_api.py::TestProofPointAPI::test_create_proof_point_forbidden_viewer
+ERROR tests/canvas/test_proof_point_api.py::TestProofPointAPI::test_create_proof_point_forbidden_viewer
+ERROR tests/canvas/test_proof_point_api.py::TestProofPointAPI::test_create_proof_point_validation_error
+ERROR tests/canvas/test_proof_point_api.py::TestProofPointAPI::test_create_proof_point_validation_error
+ERROR tests/canvas/test_proof_point_api.py::TestProofPointAPI::test_update_proof_point_success
+ERROR tests/canvas/test_proof_point_api.py::TestProofPointAPI::test_update_proof_point_success
+ERROR tests/canvas/test_proof_point_api.py::TestProofPointAPI::test_update_proof_point_status_change
+ERROR tests/canvas/test_proof_point_api.py::TestProofPointAPI::test_update_proof_point_status_change
+ERROR tests/canvas/test_proof_point_api.py::TestProofPointAPI::test_update_proof_point_forbidden_other_gm
+ERROR tests/canvas/test_proof_point_api.py::TestProofPointAPI::test_update_proof_point_forbidden_other_gm
+ERROR tests/canvas/test_proof_point_api.py::TestProofPointAPI::test_delete_proof_point_success
+ERROR tests/canvas/test_proof_point_api.py::TestProofPointAPI::test_delete_proof_point_success
+ERROR tests/canvas/test_proof_point_api.py::TestProofPointAPI::test_delete_proof_point_not_found
+ERROR tests/canvas/test_proof_point_api.py::TestProofPointAPI::test_delete_proof_point_not_found
+ERROR tests/canvas/test_thesis_api.py::TestThesisAPIAuth::test_get_theses_admin
+ERROR tests/canvas/test_thesis_api.py::TestThesisAPIAuth::test_get_theses_admin
+ERROR tests/canvas/test_thesis_api.py::TestThesisAPIAuth::test_get_theses_gm_own
+ERROR tests/canvas/test_thesis_api.py::TestThesisAPIAuth::test_get_theses_gm_own
+ERROR tests/canvas/test_thesis_api.py::TestThesisAPIAuth::test_get_theses_gm_other_forbidden
+ERROR tests/canvas/test_thesis_api.py::TestThesisAPIAuth::test_get_theses_gm_other_forbidden
+ERROR tests/canvas/test_thesis_api.py::TestThesisAPIAuth::test_create_thesis_gm_own
+ERROR tests/canvas/test_thesis_api.py::TestThesisAPIAuth::test_create_thesis_gm_own
+ERROR tests/canvas/test_thesis_api.py::TestThesisAPIAuth::test_create_thesis_viewer_forbidden
+ERROR tests/canvas/test_thesis_api.py::TestThesisAPIAuth::test_create_thesis_viewer_forbidden
+ERROR tests/canvas/test_thesis_api.py::TestThesisAPIAuth::test_update_thesis_gm_own
+ERROR tests/canvas/test_thesis_api.py::TestThesisAPIAuth::test_update_thesis_gm_own
+ERROR tests/canvas/test_thesis_api.py::TestThesisAPIAuth::test_delete_thesis_admin
+ERROR tests/canvas/test_thesis_api.py::TestThesisAPIAuth::test_delete_thesis_admin
+ERROR tests/canvas/test_thesis_api.py::TestThesisAPIValidation::test_create_thesis_empty_text
+ERROR tests/canvas/test_thesis_api.py::TestThesisAPIValidation::test_create_thesis_empty_text
+ERROR tests/canvas/test_thesis_api.py::TestThesisAPIValidation::test_create_thesis_invalid_order
+ERROR tests/canvas/test_thesis_api.py::TestThesisAPIValidation::test_create_thesis_invalid_order
+ERROR tests/canvas/test_thesis_api.py::TestThesisAPIValidation::test_create_thesis_duplicate_order
+ERROR tests/canvas/test_thesis_api.py::TestThesisAPIValidation::test_create_thesis_duplicate_order
+ERROR tests/canvas/test_thesis_api.py::TestThesisAPIValidation::test_thesis_not_found
+ERROR tests/canvas/test_thesis_api.py::TestThesisAPIValidation::test_thesis_not_found
+ERROR tests/canvas/test_thesis_api.py::TestThesisAPIReordering::test_reorder_theses_success
+ERROR tests/canvas/test_thesis_api.py::TestThesisAPIReordering::test_reorder_theses_success
+ERROR tests/canvas/test_thesis_api.py::TestThesisAPIReordering::test_reorder_theses_invalid_order
+ERROR tests/canvas/test_thesis_api.py::TestThesisAPIReordering::test_reorder_theses_invalid_order
+ERROR tests/canvas/test_thesis_api.py::TestThesisAPIReordering::test_reorder_theses_gm_other_forbidden
+ERROR tests/canvas/test_thesis_api.py::TestThesisAPIReordering::test_reorder_theses_gm_other_forbidden
+ERROR tests/canvas/test_vbu_api.py::TestVBUAPIAuth::test_list_vbus_admin - sq...
+ERROR tests/canvas/test_vbu_api.py::TestVBUAPIAuth::test_list_vbus_admin - sq...
+ERROR tests/canvas/test_vbu_api.py::TestVBUAPIAuth::test_list_vbus_gm_filtered
+ERROR tests/canvas/test_vbu_api.py::TestVBUAPIAuth::test_list_vbus_gm_filtered
+ERROR tests/canvas/test_vbu_api.py::TestVBUAPIAuth::test_list_vbus_viewer - s...
+ERROR tests/canvas/test_vbu_api.py::TestVBUAPIAuth::test_list_vbus_viewer - s...
+ERROR tests/canvas/test_vbu_api.py::TestVBUAPIAuth::test_create_vbu_admin_success
+ERROR tests/canvas/test_vbu_api.py::TestVBUAPIAuth::test_create_vbu_admin_success
+ERROR tests/canvas/test_vbu_api.py::TestVBUAPIAuth::test_create_vbu_gm_forbidden
+ERROR tests/canvas/test_vbu_api.py::TestVBUAPIAuth::test_create_vbu_gm_forbidden
+ERROR tests/canvas/test_vbu_api.py::TestVBUAPIAuth::test_update_vbu_gm_own - ...
+ERROR tests/canvas/test_vbu_api.py::TestVBUAPIAuth::test_update_vbu_gm_own - ...
+ERROR tests/canvas/test_vbu_api.py::TestVBUAPIAuth::test_update_vbu_gm_other_forbidden
+ERROR tests/canvas/test_vbu_api.py::TestVBUAPIAuth::test_update_vbu_gm_other_forbidden
+ERROR tests/canvas/test_vbu_api.py::TestVBUAPIAuth::test_delete_vbu_admin_success
+ERROR tests/canvas/test_vbu_api.py::TestVBUAPIAuth::test_delete_vbu_admin_success
+ERROR tests/canvas/test_vbu_api.py::TestVBUAPIAuth::test_delete_vbu_gm_forbidden
+ERROR tests/canvas/test_vbu_api.py::TestVBUAPIAuth::test_delete_vbu_gm_forbidden
+ERROR tests/canvas/test_vbu_api.py::TestVBUAPIValidation::test_create_vbu_invalid_name
+ERROR tests/canvas/test_vbu_api.py::TestVBUAPIValidation::test_create_vbu_invalid_name
+ERROR tests/canvas/test_vbu_api.py::TestVBUAPIValidation::test_create_vbu_invalid_gm_id
+ERROR tests/canvas/test_vbu_api.py::TestVBUAPIValidation::test_create_vbu_invalid_gm_id
+ERROR tests/canvas/test_vbu_api.py::TestVBUAPIValidation::test_get_vbu_not_found
+ERROR tests/canvas/test_vbu_api.py::TestVBUAPIValidation::test_get_vbu_not_found
+ERROR tests/canvas/test_vbu_api.py::TestVBUAPIPagination::test_list_vbus_pagination
+ERROR tests/canvas/test_vbu_api.py::TestVBUAPIPagination::test_list_vbus_pagination
+ERROR tests/models/test_monthly_review_relationships.py::TestMonthlyReviewRelationships::test_monthly_review_canvas_relationship
+ERROR tests/models/test_monthly_review_relationships.py::TestMonthlyReviewRelationships::test_monthly_review_canvas_relationship
+ERROR tests/models/test_monthly_review_relationships.py::TestMonthlyReviewRelationships::test_monthly_review_commitments_cascade_delete
+ERROR tests/models/test_monthly_review_relationships.py::TestMonthlyReviewRelationships::test_monthly_review_commitments_cascade_delete
+ERROR tests/models/test_monthly_review_relationships.py::TestMonthlyReviewRelationships::test_commitment_monthly_review_relationship
+ERROR tests/models/test_monthly_review_relationships.py::TestMonthlyReviewRelationships::test_commitment_monthly_review_relationship
+ERROR tests/models/test_monthly_review_relationships.py::TestMonthlyReviewRelationships::test_unique_constraint_canvas_review_date
+ERROR tests/models/test_monthly_review_relationships.py::TestMonthlyReviewRelationships::test_unique_constraint_canvas_review_date
+ERROR tests/models/test_monthly_review_relationships.py::TestMonthlyReviewRelationships::test_commitment_order_uniqueness_per_review
+ERROR tests/models/test_monthly_review_relationships.py::TestMonthlyReviewRelationships::test_commitment_order_uniqueness_per_review
+ERROR tests/models/test_monthly_review_relationships.py::TestMonthlyReviewRelationships::test_commitment_order_check_constraint
+ERROR tests/models/test_monthly_review_relationships.py::TestMonthlyReviewRelationships::test_commitment_order_check_constraint
+ERROR tests/models/test_monthly_review_relationships.py::TestMonthlyReviewRelationships::test_commitment_text_not_null
+ERROR tests/models/test_monthly_review_relationships.py::TestMonthlyReviewRelationships::test_commitment_text_not_null
+ERROR tests/models/test_monthly_review_relationships.py::TestMonthlyReviewRelationships::test_monthly_review_created_by_foreign_key
+ERROR tests/models/test_monthly_review_relationships.py::TestMonthlyReviewRelationships::test_monthly_review_created_by_foreign_key
+ERROR tests/reviews/test_api_integration.py::TestReviewAPIIntegration::test_list_reviews_admin_access_all_canvases
+ERROR tests/reviews/test_api_integration.py::TestReviewAPIIntegration::test_list_reviews_admin_access_all_canvases
+ERROR tests/reviews/test_api_integration.py::TestReviewAPIIntegration::test_list_reviews_gm_access_own_canvas_only
+ERROR tests/reviews/test_api_integration.py::TestReviewAPIIntegration::test_list_reviews_gm_access_own_canvas_only
+ERROR tests/reviews/test_api_integration.py::TestReviewAPIIntegration::test_list_reviews_viewer_access_all_readonly
+ERROR tests/reviews/test_api_integration.py::TestReviewAPIIntegration::test_list_reviews_viewer_access_all_readonly
+ERROR tests/reviews/test_api_integration.py::TestReviewAPIIntegration::test_create_review_admin_any_canvas
+ERROR tests/reviews/test_api_integration.py::TestReviewAPIIntegration::test_create_review_admin_any_canvas
+ERROR tests/reviews/test_api_integration.py::TestReviewAPIIntegration::test_create_review_gm_own_canvas_only
+ERROR tests/reviews/test_api_integration.py::TestReviewAPIIntegration::test_create_review_gm_own_canvas_only
+ERROR tests/reviews/test_api_integration.py::TestReviewAPIIntegration::test_create_review_viewer_forbidden
+ERROR tests/reviews/test_api_integration.py::TestReviewAPIIntegration::test_create_review_viewer_forbidden
+ERROR tests/reviews/test_api_integration.py::TestReviewAPIIntegration::test_get_review_authorization_matrix
+ERROR tests/reviews/test_api_integration.py::TestReviewAPIIntegration::test_get_review_authorization_matrix
+ERROR tests/reviews/test_api_integration.py::TestReviewAPIIntegration::test_unauthorized_access_returns_401
+ERROR tests/reviews/test_api_integration.py::TestReviewAPIIntegration::test_unauthorized_access_returns_401
+ERROR tests/reviews/test_commitment_validation.py::TestCommitmentValidation::test_create_review_requires_1_to_3_commitments
+ERROR tests/reviews/test_commitment_validation.py::TestCommitmentValidation::test_create_review_requires_1_to_3_commitments
+ERROR tests/reviews/test_commitment_validation.py::TestCommitmentValidation::test_commitment_text_length_validation
+ERROR tests/reviews/test_commitment_validation.py::TestCommitmentValidation::test_commitment_text_length_validation
+ERROR tests/reviews/test_commitment_validation.py::TestCommitmentValidation::test_commitment_order_uniqueness
+ERROR tests/reviews/test_commitment_validation.py::TestCommitmentValidation::test_commitment_order_uniqueness
+ERROR tests/reviews/test_commitment_validation.py::TestCommitmentValidation::test_commitment_order_range_validation
+ERROR tests/reviews/test_commitment_validation.py::TestCommitmentValidation::test_commitment_order_range_validation
+ERROR tests/reviews/test_commitment_validation.py::TestCommitmentValidation::test_review_date_not_future
+ERROR tests/reviews/test_commitment_validation.py::TestCommitmentValidation::test_review_date_not_future
+ERROR tests/reviews/test_commitment_validation.py::TestCommitmentValidation::test_currently_testing_validation
+ERROR tests/reviews/test_commitment_validation.py::TestCommitmentValidation::test_currently_testing_validation
+ERROR tests/reviews/test_commitment_validation.py::TestCommitmentValidation::test_text_field_length_limits
+ERROR tests/reviews/test_commitment_validation.py::TestCommitmentValidation::test_text_field_length_limits
+ERROR tests/reviews/test_commitment_validation.py::TestCommitmentValidation::test_duplicate_review_date_conflict
+ERROR tests/reviews/test_commitment_validation.py::TestCommitmentValidation::test_duplicate_review_date_conflict
+ERROR tests/reviews/test_service_integration.py::TestReviewServiceIntegration::test_create_review_with_commitments
+ERROR tests/reviews/test_service_integration.py::TestReviewServiceIntegration::test_create_review_with_commitments
+ERROR tests/reviews/test_service_integration.py::TestReviewServiceIntegration::test_list_reviews_ordered_by_date
+ERROR tests/reviews/test_service_integration.py::TestReviewServiceIntegration::test_list_reviews_ordered_by_date
+ERROR tests/reviews/test_service_integration.py::TestReviewServiceIntegration::test_create_review_updates_canvas_currently_testing
+ERROR tests/reviews/test_service_integration.py::TestReviewServiceIntegration::test_create_review_updates_canvas_currently_testing
+ERROR tests/reviews/test_service_integration.py::TestReviewServiceIntegration::test_attachment_linking_integration
+ERROR tests/reviews/test_service_integration.py::TestReviewServiceIntegration::test_attachment_linking_integration
+ERROR tests/reviews/test_service_integration.py::TestReviewServiceIntegration::test_validate_currently_testing_belongs_to_canvas
+ERROR tests/reviews/test_service_integration.py::TestReviewServiceIntegration::test_validate_currently_testing_belongs_to_canvas
+ERROR tests/reviews/test_service_integration.py::TestReviewServiceIntegration::test_get_review_with_relationships
+ERROR tests/reviews/test_service_integration.py::TestReviewServiceIntegration::test_get_review_with_relationships
+ERROR tests/test_db_contract.py::test_session_can_execute_query - sqlalchemy....
+ERROR tests/test_docker_integration.py::test_backend_connects_to_db - sqlalch...
+ERROR tests/test_pdf_routes.py::test_export_canvas_pdf_success_admin - sqlalc...
+ERROR tests/test_pdf_routes.py::test_export_canvas_pdf_success_admin - sqlalc...
+ERROR tests/test_pdf_routes.py::test_export_canvas_pdf_success_gm_own_vbu - s...
+ERROR tests/test_pdf_routes.py::test_export_canvas_pdf_success_gm_own_vbu - s...
+ERROR tests/test_pdf_routes.py::test_export_canvas_pdf_gm_other_vbu_forbidden
+ERROR tests/test_pdf_routes.py::test_export_canvas_pdf_gm_other_vbu_forbidden
+ERROR tests/test_pdf_routes.py::test_export_canvas_pdf_viewer_can_export - sq...
+ERROR tests/test_pdf_routes.py::test_export_canvas_pdf_viewer_can_export - sq...
+ERROR tests/test_pdf_routes.py::test_export_canvas_pdf_vbu_not_found - sqlalc...
+ERROR tests/test_pdf_routes.py::test_export_canvas_pdf_vbu_not_found - sqlalc...
+ERROR tests/test_pdf_routes.py::test_export_canvas_pdf_no_canvas - sqlalchemy...
+ERROR tests/test_pdf_routes.py::test_export_canvas_pdf_no_canvas - sqlalchemy...
+ERROR tests/test_pdf_routes.py::test_export_canvas_pdf_unauthorized - sqlalch...
+ERROR tests/test_pdf_routes.py::test_export_canvas_pdf_unauthorized - sqlalch...
+ERROR tests/test_pdf_routes.py::test_export_canvas_pdf_filename_sanitization
+ERROR tests/test_pdf_routes.py::test_export_canvas_pdf_filename_sanitization
+ERROR tests/test_pdf_routes.py::test_export_canvas_pdf_content_headers - sqla...
+ERROR tests/test_pdf_routes.py::test_export_canvas_pdf_content_headers - sqla...
+ERROR tests/test_portfolio_api.py::TestPortfolioSummaryEndpoint::test_get_summary_success
+ERROR tests/test_portfolio_api.py::TestPortfolioSummaryEndpoint::test_get_summary_with_filters
+ERROR tests/test_portfolio_api.py::TestPortfolioSummaryEndpoint::test_get_summary_gm_access
+ERROR tests/test_portfolio_api.py::TestPortfolioSummaryEndpoint::test_get_summary_viewer_access
+ERROR tests/test_portfolio_api.py::TestPortfolioSummaryEndpoint::test_get_summary_invalid_uuid_filter
+ERROR tests/test_portfolio_api.py::TestPortfolioNotesEndpoint::test_update_notes_admin_success
+ERROR tests/test_portfolio_api.py::TestPortfolioNotesEndpoint::test_update_notes_empty_notes
+ERROR tests/test_portfolio_api.py::TestPortfolioNotesEndpoint::test_update_notes_gm_forbidden
+ERROR tests/test_portfolio_api.py::TestPortfolioNotesEndpoint::test_update_notes_viewer_forbidden
+ERROR tests/test_portfolio_api.py::TestPortfolioNotesEndpoint::test_update_notes_too_long
+ERROR tests/test_portfolio_routes.py::test_get_portfolio_summary_admin_sees_all
+ERROR tests/test_portfolio_routes.py::test_get_portfolio_summary_admin_sees_all
+ERROR tests/test_portfolio_routes.py::test_get_portfolio_summary_gm_sees_own_only
+ERROR tests/test_portfolio_routes.py::test_get_portfolio_summary_gm_sees_own_only
+ERROR tests/test_portfolio_routes.py::test_get_portfolio_summary_with_lane_filter
+ERROR tests/test_portfolio_routes.py::test_get_portfolio_summary_with_lane_filter
+ERROR tests/test_portfolio_routes.py::test_get_portfolio_summary_with_health_filter
+ERROR tests/test_portfolio_routes.py::test_get_portfolio_summary_with_health_filter
+ERROR tests/test_portfolio_routes.py::test_get_portfolio_summary_invalid_lane_filter
+ERROR tests/test_portfolio_routes.py::test_get_portfolio_summary_invalid_lane_filter
+ERROR tests/test_portfolio_routes.py::test_get_portfolio_summary_invalid_health_filter
+ERROR tests/test_portfolio_routes.py::test_get_portfolio_summary_invalid_health_filter
+ERROR tests/test_portfolio_routes.py::test_get_portfolio_summary_invalid_gm_id_filter
+ERROR tests/test_portfolio_routes.py::test_get_portfolio_summary_invalid_gm_id_filter
+ERROR tests/test_portfolio_routes.py::test_update_portfolio_notes_admin_success
+ERROR tests/test_portfolio_routes.py::test_update_portfolio_notes_admin_success
+ERROR tests/test_portfolio_routes.py::test_update_portfolio_notes_gm_forbidden
+ERROR tests/test_portfolio_routes.py::test_update_portfolio_notes_gm_forbidden
+ERROR tests/test_portfolio_routes.py::test_update_portfolio_notes_viewer_forbidden
+ERROR tests/test_portfolio_routes.py::test_update_portfolio_notes_viewer_forbidden
+ERROR tests/test_portfolio_routes.py::test_update_portfolio_notes_too_long - ...
+ERROR tests/test_portfolio_routes.py::test_update_portfolio_notes_too_long - ...
+ERROR tests/test_portfolio_service_impl.py::TestPortfolioServiceGetSummary::test_get_summary_admin_sees_all
+ERROR tests/test_portfolio_service_impl.py::TestPortfolioServiceGetSummary::test_get_summary_gm_sees_own_only
+ERROR tests/test_portfolio_service_impl.py::TestPortfolioServiceGetSummary::test_get_summary_viewer_sees_all
+ERROR tests/test_portfolio_service_impl.py::TestPortfolioServiceGetSummary::test_get_summary_with_lane_filter
+ERROR tests/test_portfolio_service_impl.py::TestPortfolioServiceGetSummary::test_get_summary_with_gm_filter
+ERROR tests/test_portfolio_service_impl.py::TestPortfolioServiceGetSummary::test_get_summary_with_health_filter
+ERROR tests/test_portfolio_service_impl.py::TestPortfolioServiceGetSummary::test_get_summary_combined_filters
+ERROR tests/test_portfolio_service_impl.py::TestPortfolioServiceUpdateNotes::test_update_notes_admin_success
+ERROR tests/test_portfolio_service_impl.py::TestPortfolioServiceUpdateNotes::test_update_notes_html_escaping
+ERROR tests/test_portfolio_service_impl.py::TestPortfolioServiceUpdateNotes::test_update_notes_empty_notes
+ERROR tests/test_portfolio_service_impl.py::TestPortfolioServiceUpdateNotes::test_update_notes_gm_forbidden
+ERROR tests/test_portfolio_service_impl.py::TestPortfolioServiceUpdateNotes::test_update_notes_viewer_forbidden
+ERROR tests/test_portfolio_service_impl.py::TestPortfolioServiceIntegration::test_query_structure
+17 failed, 135 passed, 5 warnings, 314 errors in 31.70s

@@ -11,10 +11,17 @@ from canvas.models.user import User, UserRole
 from canvas.models.attachment import Attachment
 from canvas.models.proof_point import ProofPoint
 from canvas.models.monthly_review import MonthlyReview
+from canvas.models.thesis import Thesis
+from canvas.models.canvas import Canvas
+from canvas.models.vbu import VBU
 from canvas.services.attachment_service import AttachmentService
 from canvas import success_response
 
 router = APIRouter(prefix="/api/attachments", tags=["attachments"])
+
+def get_attachment_service() -> AttachmentService:
+    from canvas.config import Settings
+    return AttachmentService(Settings())
 
 @router.post("", status_code=201)
 async def upload_attachment(
@@ -24,7 +31,7 @@ async def upload_attachment(
     label: Optional[str] = Form(None),
     current_user: User = Depends(require_role(["admin", "gm"])),
     db: AsyncSession = Depends(get_db_session),
-    attachment_service: AttachmentService = Depends()
+    attachment_service: AttachmentService = Depends(get_attachment_service)
 ) -> dict:
     """Upload file attachment to proof point or monthly review"""
     # Validate exactly one parent is provided
@@ -42,7 +49,7 @@ async def upload_attachment(
     if proof_point_id:
         result = await db.execute(
             select(ProofPoint)
-            .options(selectinload(ProofPoint.thesis).selectinload("canvas"))
+            .options(selectinload(ProofPoint.thesis).selectinload(Thesis.canvas))
             .where(ProofPoint.id == proof_point_id)
         )
         proof_point = result.scalar_one_or_none()
@@ -93,14 +100,14 @@ async def download_attachment(
     attachment_id: UUID,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db_session),
-    attachment_service: AttachmentService = Depends()
+    attachment_service: AttachmentService = Depends(get_attachment_service)
 ) -> FileResponse:
     """Download attachment file with proper MIME headers"""
     # Get attachment with relationships for authorization
     result = await db.execute(
         select(Attachment)
         .options(
-            selectinload(Attachment.proof_point).selectinload("thesis").selectinload("canvas").selectinload("vbu")
+            selectinload(Attachment.proof_point).selectinload(ProofPoint.thesis).selectinload(Thesis.canvas).selectinload(Canvas.vbu)
         )
         .where(Attachment.id == attachment_id)
     )
@@ -117,7 +124,7 @@ async def download_attachment(
         # Need to load monthly review relationship
         result = await db.execute(
             select(MonthlyReview)
-            .options(selectinload(MonthlyReview.canvas).selectinload("vbu"))
+            .options(selectinload(MonthlyReview.canvas).selectinload(Canvas.vbu))
             .where(MonthlyReview.id == attachment.monthly_review_id)
         )
         monthly_review = result.scalar_one_or_none()
@@ -138,14 +145,14 @@ async def delete_attachment(
     attachment_id: UUID,
     current_user: User = Depends(require_role(["admin", "gm"])),
     db: AsyncSession = Depends(get_db_session),
-    attachment_service: AttachmentService = Depends()
+    attachment_service: AttachmentService = Depends(get_attachment_service)
 ) -> None:
     """Delete attachment file and database record"""
     # Get attachment with relationships for authorization
     result = await db.execute(
         select(Attachment)
         .options(
-            selectinload(Attachment.proof_point).selectinload("thesis").selectinload("canvas").selectinload("vbu")
+            selectinload(Attachment.proof_point).selectinload(ProofPoint.thesis).selectinload(Thesis.canvas).selectinload(Canvas.vbu)
         )
         .where(Attachment.id == attachment_id)
     )
@@ -162,7 +169,7 @@ async def delete_attachment(
         # Need to load monthly review relationship
         result = await db.execute(
             select(MonthlyReview)
-            .options(selectinload(MonthlyReview.canvas).selectinload("vbu"))
+            .options(selectinload(MonthlyReview.canvas).selectinload(Canvas.vbu))
             .where(MonthlyReview.id == attachment.monthly_review_id)
         )
         monthly_review = result.scalar_one_or_none()

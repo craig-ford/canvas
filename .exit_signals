@@ -1,8 +1,5 @@
 {
-  "test_only_loops": [
-    1,
-    1
-  ],
+  "test_only_loops": [],
   "done_signals": [
     4
   ],

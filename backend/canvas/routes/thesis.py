@@ -77,5 +77,10 @@ async def reorder_theses(
 ):
     """Reorder theses with order constraint validation"""
     await canvas_service.verify_canvas_ownership(canvas_id, current_user, db)
-    theses = await canvas_service.reorder_theses(canvas_id, reorder_data.thesis_orders, db)
+    try:
+        theses = await canvas_service.reorder_theses(canvas_id, reorder_data.thesis_orders, db)
+    except Exception as e:
+        if "IntegrityError" in type(e).__name__ or "CheckViolation" in str(e):
+            raise HTTPException(status_code=422, detail="Order values must be between 1 and 5")
+        raise
     return success_response(theses)

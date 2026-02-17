@@ -1,0 +1,126 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.12, pytest-8.4.2, pluggy-1.6.0
+rootdir: /app
+configfile: pytest.ini
+plugins: anyio-4.12.1, asyncio-0.24.0
+asyncio: mode=Mode.AUTO, default_loop_scope=function
+collected 262 items
+
+tests/auth/test_auth_dependencies_contract.py ..........                 [  3%]
+tests/auth/test_auth_routes_integration.py ...........                   [  8%]
+tests/auth/test_auth_service_contract.py ...........                     [ 12%]
+tests/auth/test_auth_service_unit.py ..................                  [ 19%]
+tests/auth/test_user_routes.py ..........                                [ 22%]
+tests/auth/test_user_service.py .......                                  [ 25%]
+tests/canvas/test_attachment_api.py F..FFF                               [ 27%]
+tests/canvas/test_attachment_service_integration.py .......              [ 30%]
+tests/canvas/test_canvas_api.py .........F...                            [ 35%]
+tests/canvas/test_canvas_service_integration.py .............            [ 40%]
+tests/canvas/test_models_contract.py ........                            [ 43%]
+tests/canvas/test_proof_point_api.py ....F.....                          [ 47%]
+tests/canvas/test_services_contract.py ..                                [ 48%]
+tests/canvas/test_thesis_api.py .........F.FF.                           [ 53%]
+tests/canvas/test_vbu_api.py ..........F..                               [ 58%]
+tests/models/test_monthly_review_relationships.py ........               [ 61%]
+tests/models/test_user_contract.py ......                                [ 63%]
+tests/reviews/test_api_integration.py ...FF.F.                           [ 66%]
+tests/reviews/test_commitment_validation.py .....F.F                     [ 69%]
+tests/reviews/test_service_integration.py ......                         [ 72%]
+tests/reviews/test_service_unit.py .......                               [ 74%]
+tests/schemas/test_commitment_validation.py ..........                   [ 78%]
+tests/test_config_contract.py .......                                    [ 81%]
+tests/test_db_contract.py ....                                           [ 82%]
+tests/test_docker_integration.py ...                                     [ 83%]
+tests/test_health_contract.py ......                                     [ 86%]
+tests/test_models_contract.py ..                                         [ 87%]
+tests/test_pdf_routes.py .........                                       [ 90%]
+tests/test_portfolio_routes.py .............                             [ 95%]
+tests/test_responses_contract.py ...                                     [ 96%]
+tests/test_user_model.py .........                                       [100%]
+
+=================================== FAILURES ===================================
+/app/tests/canvas/test_attachment_api.py:16: assert 422 == 404
+/app/tests/canvas/test_attachment_api.py:43: AssertionError: assert 'error' in {'detail': [{'input': None, 'loc': ['body', 'settings'], 'msg': 'Field required', 'type': 'missing'}]}
+/app/tests/canvas/test_attachment_api.py:52: assert 422 == 404
+/app/tests/canvas/test_attachment_api.py:61: assert 422 == 404
+/app/tests/canvas/test_canvas_api.py:64: assert 422 == 500
+/app/tests/canvas/test_proof_point_api.py:86: assert 'error' in {'detail': [{'ctx': {'min_length': 1}, 'input': '', 'loc': ['body', 'description'], 'msg': 'String should have at leas...tus', 'loc': ['body', 'status'], 'msg': "Input should be 'not_started', 'in_progress', 'observed' or 'stalled'", ...}]}
+/app/tests/canvas/test_thesis_api.py:57: assert 409 == 201
+/app/tests/canvas/test_thesis_api.py:75: AssertionError: assert 3 == 2
+/usr/local/lib/python3.12/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:797: sqlalchemy.exc.IntegrityError: (sqlalchemy.dialects.postgresql.asyncpg.IntegrityError) <class 'asyncpg.exceptions.CheckViolationError'>: new row for relation "theses" violates check constraint "ck_thesis_order_range"
+/app/tests/canvas/test_vbu_api.py:63: assert 422 == 500
+/app/canvas/reviews/router.py:57: pydantic_core._pydantic_core.ValidationError: 1 validation error for ReviewResponse
+/app/canvas/reviews/router.py:57: pydantic_core._pydantic_core.ValidationError: 1 validation error for ReviewResponse
+/app/canvas/reviews/router.py:71: pydantic_core._pydantic_core.ValidationError: 1 validation error for ReviewResponse
+/app/canvas/reviews/service.py:137: ValueError: Selected thesis/proof point does not belong to canvas
+/app/canvas/reviews/router.py:57: pydantic_core._pydantic_core.ValidationError: 1 validation error for ReviewResponse
+=============================== warnings summary ===============================
+../usr/local/lib/python3.12/site-packages/passlib/utils/__init__.py:854
+  /usr/local/lib/python3.12/site-packages/passlib/utils/__init__.py:854: DeprecationWarning: 'crypt' is deprecated and slated for removal in Python 3.13
+    from crypt import crypt as _crypt
+
+tests/auth/test_auth_routes_integration.py::TestAuthRoutesIntegration::test_register_user_success
+  /app/canvas/auth/schemas.py:14: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class UserResponse(BaseModel):
+
+tests/auth/test_auth_routes_integration.py::TestAuthRoutesIntegration::test_refresh_token_success
+tests/auth/test_auth_routes_integration.py::TestAuthRoutesIntegration::test_refresh_token_invalid
+  /usr/local/lib/python3.12/site-packages/httpx/_client.py:1859: DeprecationWarning: Setting per-request cookies=<...> is being deprecated, because the expected behaviour on cookie persistence is ambiguous. Set cookies directly on the client instance instead.
+    return await self.request(
+
+tests/auth/test_user_routes.py::TestUserManagementRoutes::test_update_user_role_invalid_role
+  /usr/local/lib/python3.12/site-packages/fastapi/routing.py:312: DeprecationWarning: 'HTTP_422_UNPROCESSABLE_ENTITY' is deprecated. Use 'HTTP_422_UNPROCESSABLE_CONTENT' instead.
+    return await dependant.call(**values)
+
+tests/canvas/test_canvas_api.py::TestCanvasAPIValidation::test_update_canvas_empty_product_name
+  /app/canvas/routes/canvas.py:114: DeprecationWarning: 'HTTP_422_UNPROCESSABLE_ENTITY' is deprecated. Use 'HTTP_422_UNPROCESSABLE_CONTENT' instead.
+    updated_canvas = await service.update_canvas(
+
+tests/canvas/test_vbu_api.py::TestVBUAPIValidation::test_create_vbu_invalid_gm_id
+  /app/canvas/routes/vbu.py:56: DeprecationWarning: 'HTTP_422_UNPROCESSABLE_ENTITY' is deprecated. Use 'HTTP_422_UNPROCESSABLE_CONTENT' instead.
+    vbu = await service.create_vbu(
+
+tests/models/test_monthly_review_relationships.py::TestMonthlyReviewRelationships::test_unique_constraint_canvas_review_date
+tests/models/test_monthly_review_relationships.py::TestMonthlyReviewRelationships::test_commitment_order_uniqueness_per_review
+tests/models/test_monthly_review_relationships.py::TestMonthlyReviewRelationships::test_commitment_order_check_constraint
+tests/models/test_monthly_review_relationships.py::TestMonthlyReviewRelationships::test_commitment_text_not_null
+  sys:1: SAWarning: transaction already deassociated from connection
+
+tests/reviews/test_commitment_validation.py::TestCommitmentValidation::test_create_review_requires_1_to_3_commitments
+tests/reviews/test_commitment_validation.py::TestCommitmentValidation::test_create_review_requires_1_to_3_commitments
+tests/reviews/test_commitment_validation.py::TestCommitmentValidation::test_commitment_text_length_validation
+tests/reviews/test_commitment_validation.py::TestCommitmentValidation::test_commitment_text_length_validation
+tests/reviews/test_commitment_validation.py::TestCommitmentValidation::test_commitment_order_uniqueness
+tests/reviews/test_commitment_validation.py::TestCommitmentValidation::test_commitment_order_range_validation
+tests/reviews/test_commitment_validation.py::TestCommitmentValidation::test_commitment_order_range_validation
+tests/reviews/test_commitment_validation.py::TestCommitmentValidation::test_review_date_not_future
+tests/reviews/test_commitment_validation.py::TestCommitmentValidation::test_text_field_length_limits
+  /usr/local/lib/python3.12/asyncio/events.py:88: DeprecationWarning: 'HTTP_422_UNPROCESSABLE_ENTITY' is deprecated. Use 'HTTP_422_UNPROCESSABLE_CONTENT' instead.
+    self._context.run(self._callback, *self._args)
+
+tests/test_portfolio_routes.py::test_get_portfolio_summary_admin_sees_all
+tests/test_portfolio_routes.py::test_get_portfolio_summary_admin_sees_all
+tests/test_portfolio_routes.py::test_get_portfolio_summary_gm_sees_own_only
+tests/test_portfolio_routes.py::test_get_portfolio_summary_with_lane_filter
+tests/test_portfolio_routes.py::test_get_portfolio_summary_with_health_filter
+  /app/canvas/portfolio/router.py:59: PydanticDeprecatedSince20: The `dict` method is deprecated; use `model_dump` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    data=[s.dict() for s in summary],
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/canvas/test_attachment_api.py::TestAttachmentAPI::test_download_file_not_found
+FAILED tests/canvas/test_attachment_api.py::TestAttachmentAPI::test_upload_missing_parent_id
+FAILED tests/canvas/test_attachment_api.py::TestAttachmentAPI::test_upload_nonexistent_proof_point
+FAILED tests/canvas/test_attachment_api.py::TestAttachmentAPI::test_delete_not_found
+FAILED tests/canvas/test_canvas_api.py::TestCanvasAPIValidation::test_update_canvas_empty_product_name
+FAILED tests/canvas/test_proof_point_api.py::TestProofPointAPI::test_create_proof_point_validation_error
+FAILED tests/canvas/test_thesis_api.py::TestThesisAPIValidation::test_create_thesis_duplicate_order
+FAILED tests/canvas/test_thesis_api.py::TestThesisAPIReordering::test_reorder_theses_success
+FAILED tests/canvas/test_thesis_api.py::TestThesisAPIReordering::test_reorder_theses_invalid_order
+FAILED tests/canvas/test_vbu_api.py::TestVBUAPIValidation::test_create_vbu_invalid_gm_id
+FAILED tests/reviews/test_api_integration.py::TestReviewAPIIntegration::test_create_review_admin_any_canvas
+FAILED tests/reviews/test_api_integration.py::TestReviewAPIIntegration::test_create_review_gm_own_canvas_only
+FAILED tests/reviews/test_api_integration.py::TestReviewAPIIntegration::test_get_review_authorization_matrix
+FAILED tests/reviews/test_commitment_validation.py::TestCommitmentValidation::test_currently_testing_validation
+FAILED tests/reviews/test_commitment_validation.py::TestCommitmentValidation::test_duplicate_review_date_conflict
+================= 15 failed, 247 passed, 25 warnings in 50.67s =================

@@ -12,13 +12,5 @@ AsyncSessionLocal = async_sessionmaker(engine, class_=AsyncSession, expire_on_co
 
 async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
     """Get database session for dependency injection."""
-    session = AsyncSessionLocal()
-    try:
-        # Start a transaction to satisfy test assertion
-        await session.begin()
+    async with AsyncSessionLocal() as session:
         yield session
-    finally:
-        # Rollback any pending transaction and close session
-        if session.in_transaction():
-            await session.rollback()
-        await session.aclose()

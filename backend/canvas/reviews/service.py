@@ -29,44 +29,44 @@ class ReviewService:
     async def create_review(self, canvas_id: UUID, review_data: Dict[str, Any], created_by: UUID) -> MonthlyReview:
         """Create review with commitments, update canvas currently_testing atomically"""
         try:
-            async with self.db.begin():
-                # Validate currently_testing selection belongs to canvas
-                if review_data.get('currently_testing_type') and review_data.get('currently_testing_id'):
-                    await self._validate_currently_testing(
-                        canvas_id, 
-                        review_data['currently_testing_type'], 
-                        review_data['currently_testing_id']
-                    )
-                
-                # Create review
-                review = MonthlyReview(
-                    canvas_id=canvas_id,
-                    review_date=review_data['review_date'],
-                    what_moved=review_data.get('what_moved'),
-                    what_learned=review_data.get('what_learned'),
-                    what_threatens=review_data.get('what_threatens'),
-                    currently_testing_type=review_data.get('currently_testing_type'),
-                    currently_testing_id=review_data.get('currently_testing_id'),
-                    created_by=created_by
+            # Validate currently_testing selection belongs to canvas
+            if review_data.get('currently_testing_type') and review_data.get('currently_testing_id'):
+                await self._validate_currently_testing(
+                    canvas_id,
+                    review_data['currently_testing_type'],
+                    review_data['currently_testing_id']
                 )
-                self.db.add(review)
-                await self.db.flush()
-                
-                # Create commitments
-                for commitment_data in review_data['commitments']:
-                    commitment = Commitment(
-                        monthly_review_id=review.id,
-                        text=commitment_data['text'],
-                        order=commitment_data['order']
-                    )
-                    self.db.add(commitment)
-                
-                # Link attachments
-                if review_data.get('attachment_ids'):
-                    await self._link_attachments(review.id, review_data['attachment_ids'])
-                
-                await self.db.commit()
-                return review
+
+            # Create review
+            review = MonthlyReview(
+                canvas_id=canvas_id,
+                review_date=review_data['review_date'],
+                what_moved=review_data.get('what_moved'),
+                what_learned=review_data.get('what_learned'),
+                what_threatens=review_data.get('what_threatens'),
+                currently_testing_type=review_data.get('currently_testing_type'),
+                currently_testing_id=review_data.get('currently_testing_id'),
+                created_by=created_by
+            )
+            self.db.add(review)
+            await self.db.flush()
+
+            # Create commitments
+            for commitment_data in review_data['commitments']:
+                commitment = Commitment(
+                    monthly_review_id=review.id,
+                    text=commitment_data['text'],
+                    order=commitment_data['order']
+                )
+                self.db.add(commitment)
+
+            # Link attachments
+            if review_data.get('attachment_ids'):
+                await self._link_attachments(review.id, review_data['attachment_ids'])
+
+            await self.db.commit()
+            await self.db.refresh(review, ["commitments", "attachments"])
+            return review
         except IntegrityError as e:
             if "uq_monthly_reviews_canvas_date" in str(e):
                 raise HTTPException(

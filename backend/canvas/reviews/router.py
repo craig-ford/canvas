@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from uuid import UUID
 from typing import List
 from canvas.auth.dependencies import get_current_user, require_role
@@ -15,19 +16,16 @@ router = APIRouter(prefix="/api", tags=["reviews"])
 
 async def verify_canvas_access(canvas_id: UUID, current_user, db: AsyncSession):
     """Verify user has access to canvas based on role"""
-    # Get canvas with VBU relationship
     result = await db.execute(
-        select(Canvas).join(VBU).where(Canvas.id == canvas_id)
+        select(Canvas).options(selectinload(Canvas.vbu)).where(Canvas.id == canvas_id)
     )
     canvas = result.scalar_one_or_none()
     if not canvas:
         raise HTTPException(status_code=404, detail="Canvas not found")
     
-    # Admin and viewer have access to all canvases
     if current_user.role in ["admin", "viewer"]:
         return canvas
     
-    # GM only has access to own VBUs
     if current_user.role == "gm" and canvas.vbu.gm_id != current_user.id:
         raise HTTPException(status_code=403, detail="Access denied")
     
@@ -55,7 +53,10 @@ async def create_review(
     """Create new review"""
     await verify_canvas_access(canvas_id, current_user, db)
     service = ReviewService(db)
-    review = await service.create_review(canvas_id, review_data.model_dump(), current_user.id)
+    try:
+        review = await service.create_review(canvas_id, review_data.model_dump(), current_user.id)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     return success_response(ReviewResponse.model_validate(review), 201)
 
 @router.get("/reviews/{review_id}", response_model=dict)
@@ -68,7 +69,6 @@ async def get_review(
     service = ReviewService(db)
     review = await service.get_review(review_id)
     
-    # Verify access to the canvas this review belongs to
     await verify_canvas_access(review.canvas_id, current_user, db)
     
     return success_response(ReviewResponse.model_validate(review))

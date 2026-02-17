@@ -14,6 +14,11 @@ from canvas.models.proof_point import ProofPoint, ProofPointStatus
 class CanvasService:
     async def create_vbu(self, name: str, gm_id: UUID, created_by: UUID, db: AsyncSession) -> VBU:
         """Create VBU with auto-created canvas"""
+        # Verify GM exists
+        gm_result = await db.execute(select(User).where(User.id == gm_id))
+        if not gm_result.scalar_one_or_none():
+            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Invalid gm_id: user not found")
+        
         vbu = VBU(name=name.strip(), gm_id=gm_id, updated_by=created_by)
         db.add(vbu)
         await db.flush()
@@ -21,6 +26,7 @@ class CanvasService:
         canvas = Canvas(vbu_id=vbu.id, lifecycle_lane=LifecycleLane.BUILD, updated_by=created_by)
         db.add(canvas)
         await db.commit()
+        await db.refresh(vbu)
         return vbu
 
     async def update_vbu(self, vbu_id: UUID, name: Optional[str], gm_id: Optional[UUID], updated_by: UUID, db: AsyncSession) -> VBU:
@@ -36,6 +42,7 @@ class CanvasService:
             vbu.gm_id = gm_id
         vbu.updated_by = updated_by
         await db.commit()
+        await db.refresh(vbu)
         return vbu
 
     async def delete_vbu(self, vbu_id: UUID, db: AsyncSession) -> None:
@@ -78,23 +85,33 @@ class CanvasService:
         if not canvas:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Canvas not found")
         
+        # Validate product_name not empty if provided
+        if "product_name" in canvas_data and not canvas_data["product_name"].strip():
+            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="product_name cannot be empty")
+        
         for field, value in canvas_data.items():
             if hasattr(canvas, field):
                 setattr(canvas, field, value)
         canvas.updated_by = updated_by
         await db.commit()
+        await db.refresh(canvas)
         return canvas
 
     async def create_thesis(self, canvas_id: UUID, text: str, order: int, db: AsyncSession) -> Thesis:
         """Create thesis with order validation"""
         result = await db.execute(select(Thesis).where(Thesis.canvas_id == canvas_id))
-        existing_count = len(list(result.scalars().all()))
-        if existing_count >= 5:
+        existing = list(result.scalars().all())
+        if len(existing) >= 5:
             raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Maximum 5 theses per canvas")
+        
+        # Check for duplicate order
+        if any(t.order == order for t in existing):
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"Thesis with order {order} already exists")
         
         thesis = Thesis(canvas_id=canvas_id, text=text.strip(), order=order)
         db.add(thesis)
         await db.commit()
+        await db.refresh(thesis)
         return thesis
 
     async def update_thesis(self, thesis_id: UUID, text: str, db: AsyncSession) -> Thesis:
@@ -106,6 +123,7 @@ class CanvasService:
         
         thesis.text = text.strip()
         await db.commit()
+        await db.refresh(thesis)
         return thesis
 
     async def delete_thesis(self, thesis_id: UUID, db: AsyncSession) -> None:
@@ -119,15 +137,24 @@ class CanvasService:
         await db.commit()
 
     async def reorder_theses(self, canvas_id: UUID, thesis_orders: List[Dict[str, Any]], db: AsyncSession) -> List[Thesis]:
-        """Reorder theses with constraint validation"""
+        """Reorder theses — drop and recreate constraint to allow reorder"""
+        from sqlalchemy import text
+        
+        # Drop the unique constraint, reorder, then recreate
+        await db.execute(text("ALTER TABLE theses DROP CONSTRAINT IF EXISTS uq_theses_canvas_order"))
+        
         for item in thesis_orders:
             await db.execute(
                 update(Thesis)
                 .where(Thesis.id == item["id"])
                 .values(order=item["order"])
             )
-        await db.commit()
         
+        await db.execute(text(
+            "ALTER TABLE theses ADD CONSTRAINT uq_theses_canvas_order UNIQUE (canvas_id, \"order\") DEFERRABLE INITIALLY IMMEDIATE"
+        ))
+        await db.commit()
+
         result = await db.execute(
             select(Thesis)
             .where(Thesis.canvas_id == canvas_id)
@@ -151,6 +178,7 @@ class CanvasService:
         )
         db.add(proof_point)
         await db.commit()
+        await db.refresh(proof_point)
         return proof_point
 
     async def update_proof_point(self, proof_point_id: UUID, description: Optional[str], status: Optional[str], evidence_note: Optional[str], target_review_month: Optional[str], db: AsyncSession) -> ProofPoint:
@@ -171,6 +199,7 @@ class CanvasService:
             proof_point.target_review_month = datetime(int(year), int(month), 1).date()
         
         await db.commit()
+        await db.refresh(proof_point)
         return proof_point
 
     async def delete_proof_point(self, proof_point_id: UUID, db: AsyncSession) -> None:
@@ -256,3 +285,37 @@ class CanvasService:
         vbu = vbu_result.scalar_one()
         if vbu.gm_id != current_user.id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
+    async def verify_proof_point_ownership(self, proof_point_id: UUID, current_user: User, db: AsyncSession) -> None:
+        """Verify user can modify proof point via thesis→canvas→VBU ownership chain"""
+        if current_user.role == UserRole.ADMIN:
+            return
+
+        result = await db.execute(
+            select(ProofPoint)
+            .join(Thesis, ProofPoint.thesis_id == Thesis.id)
+            .join(Canvas, Thesis.canvas_id == Canvas.id)
+            .join(VBU, Canvas.vbu_id == VBU.id)
+            .where(ProofPoint.id == proof_point_id)
+        )
+        proof_point = result.scalar_one_or_none()
+        if not proof_point:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Proof point not found")
+
+        thesis_result = await db.execute(select(Thesis).where(Thesis.id == proof_point.thesis_id))
+        thesis = thesis_result.scalar_one()
+        canvas_result = await db.execute(select(Canvas).where(Canvas.id == thesis.canvas_id))
+        canvas = canvas_result.scalar_one()
+        vbu_result = await db.execute(select(VBU).where(VBU.id == canvas.vbu_id))
+        vbu = vbu_result.scalar_one()
+        if vbu.gm_id != current_user.id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
+    async def get_proof_points_by_thesis(self, thesis_id: UUID, db: AsyncSession) -> List[ProofPoint]:
+        """Get proof points for a thesis ordered by creation date"""
+        result = await db.execute(
+            select(ProofPoint)
+            .where(ProofPoint.thesis_id == thesis_id)
+            .order_by(ProofPoint.created_at)
+        )
+        return list(result.scalars().all())

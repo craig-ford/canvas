@@ -1,0 +1,115 @@
+time="2026-02-15T09:58:09-08:00" level=warning msg="/home/craig/canvas/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+============================= test session starts ==============================
+platform linux -- Python 3.12.12, pytest-8.4.2, pluggy-1.6.0
+rootdir: /app
+configfile: pytest.ini
+plugins: anyio-4.12.1, asyncio-0.24.0
+asyncio: mode=Mode.AUTO, default_loop_scope=None
+collected 51 items
+
+tests/test_portfolio_api.py EEEEFEEEEEFE.F                               [ 27%]
+tests/test_portfolio_service.py .................                        [ 60%]
+tests/test_portfolio_service_impl.py EEEEEEEEEEEE.E                      [ 88%]
+tests/test_rate_limiting_integration.py ......                           [100%]
+
+==================================== ERRORS ====================================
+___ ERROR at setup of TestPortfolioSummaryEndpoint.test_get_summary_success ____
+E   AttributeError: type object 'UserRole' has no attribute 'admin'
+_ ERROR at setup of TestPortfolioSummaryEndpoint.test_get_summary_with_filters _
+E   AttributeError: type object 'UserRole' has no attribute 'admin'
+__ ERROR at setup of TestPortfolioSummaryEndpoint.test_get_summary_gm_access ___
+E   AttributeError: type object 'UserRole' has no attribute 'gm'
+_ ERROR at setup of TestPortfolioSummaryEndpoint.test_get_summary_viewer_access _
+E   AttributeError: type object 'UserRole' has no attribute 'viewer'
+_ ERROR at setup of TestPortfolioSummaryEndpoint.test_get_summary_invalid_uuid_filter _
+E   AttributeError: type object 'UserRole' has no attribute 'admin'
+_ ERROR at setup of TestPortfolioNotesEndpoint.test_update_notes_admin_success _
+E   AttributeError: type object 'UserRole' has no attribute 'admin'
+__ ERROR at setup of TestPortfolioNotesEndpoint.test_update_notes_empty_notes __
+E   AttributeError: type object 'UserRole' has no attribute 'admin'
+_ ERROR at setup of TestPortfolioNotesEndpoint.test_update_notes_gm_forbidden __
+E   AttributeError: type object 'UserRole' has no attribute 'gm'
+_ ERROR at setup of TestPortfolioNotesEndpoint.test_update_notes_viewer_forbidden _
+E   AttributeError: type object 'UserRole' has no attribute 'viewer'
+___ ERROR at setup of TestPortfolioNotesEndpoint.test_update_notes_too_long ____
+E   AttributeError: type object 'UserRole' has no attribute 'admin'
+_ ERROR at setup of TestPortfolioServiceGetSummary.test_get_summary_admin_sees_all _
+E   AttributeError: type object 'UserRole' has no attribute 'admin'
+_ ERROR at setup of TestPortfolioServiceGetSummary.test_get_summary_gm_sees_own_only _
+E   AttributeError: type object 'UserRole' has no attribute 'gm'
+_ ERROR at setup of TestPortfolioServiceGetSummary.test_get_summary_viewer_sees_all _
+E   AttributeError: type object 'UserRole' has no attribute 'viewer'
+_ ERROR at setup of TestPortfolioServiceGetSummary.test_get_summary_with_lane_filter _
+E   AttributeError: type object 'UserRole' has no attribute 'admin'
+_ ERROR at setup of TestPortfolioServiceGetSummary.test_get_summary_with_gm_filter _
+E   AttributeError: type object 'UserRole' has no attribute 'admin'
+_ ERROR at setup of TestPortfolioServiceGetSummary.test_get_summary_with_health_filter _
+E   AttributeError: type object 'UserRole' has no attribute 'admin'
+_ ERROR at setup of TestPortfolioServiceGetSummary.test_get_summary_combined_filters _
+E   AttributeError: type object 'UserRole' has no attribute 'gm'
+_ ERROR at setup of TestPortfolioServiceUpdateNotes.test_update_notes_admin_success _
+E   AttributeError: type object 'UserRole' has no attribute 'admin'
+_ ERROR at setup of TestPortfolioServiceUpdateNotes.test_update_notes_html_escaping _
+E   AttributeError: type object 'UserRole' has no attribute 'admin'
+_ ERROR at setup of TestPortfolioServiceUpdateNotes.test_update_notes_empty_notes _
+E   AttributeError: type object 'UserRole' has no attribute 'admin'
+_ ERROR at setup of TestPortfolioServiceUpdateNotes.test_update_notes_gm_forbidden _
+E   AttributeError: type object 'UserRole' has no attribute 'gm'
+_ ERROR at setup of TestPortfolioServiceUpdateNotes.test_update_notes_viewer_forbidden _
+E   AttributeError: type object 'UserRole' has no attribute 'viewer'
+____ ERROR at setup of TestPortfolioServiceIntegration.test_query_structure ____
+E   AttributeError: type object 'UserRole' has no attribute 'admin'
+=================================== FAILURES ===================================
+/app/tests/test_portfolio_api.py:115: AttributeError: 'coroutine' object has no attribute 'status_code'
+/app/tests/test_portfolio_api.py:189: AttributeError: 'coroutine' object has no attribute 'status_code'
+/app/tests/test_portfolio_api.py:219: AssertionError: assert '/summary' in {'/api/portfolio/notes', '/api/portfolio/summary'}
+=============================== warnings summary ===============================
+../usr/local/lib/python3.12/site-packages/passlib/utils/__init__.py:854
+  /usr/local/lib/python3.12/site-packages/passlib/utils/__init__.py:854: DeprecationWarning: 'crypt' is deprecated and slated for removal in Python 3.13
+    from crypt import crypt as _crypt
+
+tests/test_portfolio_api.py::TestPortfolioSummaryEndpoint::test_get_summary_success
+  /app/canvas/auth/schemas.py:14: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class UserResponse(BaseModel):
+
+tests/test_portfolio_service_impl.py::TestPortfolioServiceGetSummary::test_get_summary_with_gm_filter
+  /usr/local/lib/python3.12/traceback.py:1177: RuntimeWarning: coroutine 'AsyncClient.get' was never awaited
+    insert_delete = min(result, distance) + _MOVE_COST
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/test_portfolio_service_impl.py::TestPortfolioServiceGetSummary::test_get_summary_with_gm_filter
+  /usr/local/lib/python3.12/traceback.py:1177: RuntimeWarning: coroutine 'AsyncClient.patch' was never awaited
+    insert_delete = min(result, distance) + _MOVE_COST
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_portfolio_api.py::TestPortfolioSummaryEndpoint::test_get_summary_unauthorized
+FAILED tests/test_portfolio_api.py::TestPortfolioNotesEndpoint::test_update_notes_unauthorized
+FAILED tests/test_portfolio_api.py::TestPortfolioRouterIntegration::test_endpoints_exist
+ERROR tests/test_portfolio_api.py::TestPortfolioSummaryEndpoint::test_get_summary_success
+ERROR tests/test_portfolio_api.py::TestPortfolioSummaryEndpoint::test_get_summary_with_filters
+ERROR tests/test_portfolio_api.py::TestPortfolioSummaryEndpoint::test_get_summary_gm_access
+ERROR tests/test_portfolio_api.py::TestPortfolioSummaryEndpoint::test_get_summary_viewer_access
+ERROR tests/test_portfolio_api.py::TestPortfolioSummaryEndpoint::test_get_summary_invalid_uuid_filter
+ERROR tests/test_portfolio_api.py::TestPortfolioNotesEndpoint::test_update_notes_admin_success
+ERROR tests/test_portfolio_api.py::TestPortfolioNotesEndpoint::test_update_notes_empty_notes
+ERROR tests/test_portfolio_api.py::TestPortfolioNotesEndpoint::test_update_notes_gm_forbidden
+ERROR tests/test_portfolio_api.py::TestPortfolioNotesEndpoint::test_update_notes_viewer_forbidden
+ERROR tests/test_portfolio_api.py::TestPortfolioNotesEndpoint::test_update_notes_too_long
+ERROR tests/test_portfolio_service_impl.py::TestPortfolioServiceGetSummary::test_get_summary_admin_sees_all
+ERROR tests/test_portfolio_service_impl.py::TestPortfolioServiceGetSummary::test_get_summary_gm_sees_own_only
+ERROR tests/test_portfolio_service_impl.py::TestPortfolioServiceGetSummary::test_get_summary_viewer_sees_all
+ERROR tests/test_portfolio_service_impl.py::TestPortfolioServiceGetSummary::test_get_summary_with_lane_filter
+ERROR tests/test_portfolio_service_impl.py::TestPortfolioServiceGetSummary::test_get_summary_with_gm_filter
+ERROR tests/test_portfolio_service_impl.py::TestPortfolioServiceGetSummary::test_get_summary_with_health_filter
+ERROR tests/test_portfolio_service_impl.py::TestPortfolioServiceGetSummary::test_get_summary_combined_filters
+ERROR tests/test_portfolio_service_impl.py::TestPortfolioServiceUpdateNotes::test_update_notes_admin_success
+ERROR tests/test_portfolio_service_impl.py::TestPortfolioServiceUpdateNotes::test_update_notes_html_escaping
+ERROR tests/test_portfolio_service_impl.py::TestPortfolioServiceUpdateNotes::test_update_notes_empty_notes
+ERROR tests/test_portfolio_service_impl.py::TestPortfolioServiceUpdateNotes::test_update_notes_gm_forbidden
+ERROR tests/test_portfolio_service_impl.py::TestPortfolioServiceUpdateNotes::test_update_notes_viewer_forbidden
+ERROR tests/test_portfolio_service_impl.py::TestPortfolioServiceIntegration::test_query_structure
+============= 3 failed, 25 passed, 4 warnings, 23 errors in 0.63s ==============

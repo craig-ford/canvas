@@ -15,7 +15,7 @@ class TestAttachmentAPI:
         response = await authed_client.get(f"/api/attachments/{fake_id}")
         assert response.status_code == 404
         data = response.json()
-        assert "detail" in data
+        assert "error" in data
 
     @pytest.mark.asyncio
     async def test_download_file_invalid_uuid(self, authed_client: AsyncClient):
@@ -40,7 +40,7 @@ class TestAttachmentAPI:
         response = await authed_client.post("/api/attachments", files=files)
         assert response.status_code == 422
         data = response.json()
-        assert "detail" in data
+        assert "error" in data
 
     @pytest.mark.asyncio
     async def test_upload_nonexistent_proof_point(self, authed_client: AsyncClient):
@@ -51,7 +51,7 @@ class TestAttachmentAPI:
         response = await authed_client.post("/api/attachments", files=files, data=data)
         assert response.status_code == 404
         data = response.json()
-        assert "detail" in data
+        assert "error" in data
 
     @pytest.mark.asyncio
     async def test_delete_not_found(self, authed_client: AsyncClient):
@@ -60,4 +60,4 @@ class TestAttachmentAPI:
         response = await authed_client.delete(f"/api/attachments/{fake_id}")
         assert response.status_code == 404
         data = response.json()
-        assert "detail" in data
+        assert "error" in data

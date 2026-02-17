@@ -31,7 +31,7 @@ class TestProofPointAPI:
         response = await client.get(f"/api/theses/{sample_thesis.id}/proof-points")
         assert response.status_code == 401
         data = response.json()
-        assert "detail" in data
+        assert "error" in data
     
     async def test_create_proof_point_success(self, client: AsyncClient, gm_token: str, sample_thesis: Thesis):
         """Test POST /api/theses/{thesis_id}/proof-points creates proof point"""
@@ -67,7 +67,7 @@ class TestProofPointAPI:
         )
         assert response.status_code == 403
         data = response.json()
-        assert "detail" in data
+        assert "error" in data
     
     async def test_create_proof_point_validation_error(self, client: AsyncClient, gm_token: str, sample_thesis: Thesis):
         """Test POST with invalid data returns 422"""
@@ -83,7 +83,7 @@ class TestProofPointAPI:
         )
         assert response.status_code == 422
         data = response.json()
-        assert "detail" in data
+        assert "error" in data
     
     async def test_update_proof_point_success(self, client: AsyncClient, gm_token: str, sample_proof_point: ProofPoint):
         """Test PATCH /api/proof-points/{id} updates proof point"""
@@ -133,7 +133,7 @@ class TestProofPointAPI:
         )
         assert response.status_code == 403
         data = response.json()
-        assert "detail" in data
+        assert "error" in data
     
     async def test_delete_proof_point_success(self, client: AsyncClient, gm_token: str, sample_proof_point: ProofPoint):
         """Test DELETE /api/proof-points/{id} removes proof point"""
@@ -153,7 +153,7 @@ class TestProofPointAPI:
         )
         assert response.status_code == 404
         data = response.json()
-        assert "detail" in data
+        assert "error" in data
 
 
 # Uses client and db fixtures from conftest.py

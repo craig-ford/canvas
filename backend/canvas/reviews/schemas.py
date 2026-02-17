@@ -36,12 +36,14 @@ class CommitmentResponse(BaseModel):
     id: UUID
     text: str
     order: int
+    model_config = {"from_attributes": True}
 
 class AttachmentResponse(BaseModel):
     id: UUID
     filename: str
     label: Optional[str] = None
     size_bytes: int
+    model_config = {"from_attributes": True}
 
 class ReviewResponse(BaseModel):
     id: UUID
