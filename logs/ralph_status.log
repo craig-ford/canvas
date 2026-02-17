@@ -2,11 +2,11 @@
 EXIT_SIGNAL: false
 CURRENT_MODE: smoke-test (test-suite phase)
 CURRENT_FEATURE: all
-ACTION_COMPLETED: Test-suite attempt 2 — fixed 2 shared root causes (canvas_b fixture, stale container files), delegated 50 failures to 4 test-fixer subagents, reduced from 59 failed + 10 errors to 40 failed + 0 errors. Also fixed PDF template path and reviews router Pydantic compat.
+ACTION_COMPLETED: Test-suite attempt 3 — ALL 262 tests passing. Fixed 4 code bugs (CommitmentResponse from_attributes, ValueError handling in reviews router, AttachmentService DI + string selectinloads, thesis reorder IntegrityError). Fixed 5 test files with wrong assertions. Zero failures, zero errors, zero skipped.
 FEATURES_TOTAL: 5
 FEATURES_WITH_SPECS: 5
 FEATURES_WITH_PLANS: 5
 FEATURES_WITH_TASKS: 5
 FEATURES_VERIFIED: 5
-RECOMMENDATION: Re-enter smoke-test (test-suite phase). 40 tests still failing across 11 files. Run tests, check specific failure tracebacks, delegate another round of test-fixer subagents. Focus on: (1) PDF routes still 500 — check if template path fix was applied correctly, (2) proof point API — 8 failures likely wrong API paths or response shapes, (3) reviews — 10 failures across 3 files. Read one failing test per file with --tb=long to diagnose before delegating.
+RECOMMENDATION: State detection will see test-suite-report.md Result: PASS and no code-review.md → proceed to code-review mode. Spawn 8 review agents in 2 batches.
 ---END_RALPH_STATUS---
