@@ -1,259 +1,160 @@
 # Code Review
 
-**Date:** 2026-02-17T07:57:00-08:00
-**Iteration:** 1
+**Date:** 2026-02-17T09:01:00-08:00
+**Iteration:** 2
+
+## Previous Iteration Summary
+- Iteration 1: 47 issues found, all fixed and verified
+- Test suite: 275/275 passing after fixes
 
 ## Issues Found
 
 ### Critical
 
-- [x] CR-001: backend/canvas/services/canvas_service.py:142 - [review-security] SQL injection in reorder_theses via text() with user-controlled data
-  - **Feature:** 002-canvas-management
-  - **Task:** T-012
-  - **Rationale:** Direct SQL execution without parameterization allows SQL injection
-
-- [x] CR-002: backend/canvas/portfolio/service.py:35 - [review-security] SQL injection in portfolio summary dynamic query construction
-  - **Feature:** 003-portfolio-dashboard
-  - **Task:** T-005
-  - **Rationale:** Dynamic SQL with user-controlled filter params allows injection
-
-- [x] CR-003: backend/canvas/auth/service.py:95 - [review-backend] Syntax error in is_account_locked method - missing return statement (FALSE POSITIVE: method has proper return statements)
-  - **Feature:** 001-auth
-  - **Task:** T-013
-  - **Rationale:** Incomplete comparison causes runtime AttributeError
-
-- [x] CR-004: backend/canvas/db.py:1 - [review-performance] Missing database connection pooling configuration
+- [ ] CR-048: frontend/src/main.tsx:5 - [review-frontend] Missing CSS/Tailwind entry point import
   - **Feature:** 001A-infrastructure
-  - **Task:** T-003
-  - **Rationale:** No pool_size/max_overflow causes connection exhaustion under load
-
-- [x] CR-005: backend/canvas/services/canvas_service.py:1 - [review-performance] N+1 queries loading canvas with relationships
-  - **Feature:** 002-canvas-management
-  - **Task:** T-012
-  - **Rationale:** 15+ extra queries per canvas load without eager loading
-
-- [x] CR-006: backend/canvas/portfolio/service.py:25 - [review-performance] Unbounded SQL query with no LIMIT clause
-  - **Feature:** 003-portfolio-dashboard
-  - **Task:** T-005
-  - **Rationale:** Fetches all rows without pagination, will fail at scale
-
-- [x] CR-007: tests/ and backend/tests/ - [review-testing] Duplicate test directories with identical files
-  - **Feature:** All
-  - **Task:** All test tasks
-  - **Rationale:** Two identical test trees create maintenance burden and divergence risk. Remove one.
-
-- [x] CR-008: backend/canvas/pdf/test_service.py - [review-testing] Test file in source directory
-  - **Feature:** 003-portfolio-dashboard
-  - **Task:** T-002
-  - **Rationale:** Tests in source dirs violate project structure, cause import issues
-
-- [x] CR-009: backend/requirements.txt - [review-devops] Unpinned Python dependencies
-  - **Feature:** 001A-infrastructure
-  - **Task:** T-001
-  - **Rationale:** Unpinned deps cause non-reproducible builds and surprise breakage
-
-- [x] CR-010: backend/canvas/models/__init__.py - [review-architect] User model missing from models exports
-  - **Feature:** 001-auth
   - **Task:** T-011
-  - **Rationale:** Breaks contract registry pattern, other modules can't import User from models
+  - **Rationale:** App uses Tailwind classes throughout but main.tsx has no CSS import — all styling is broken
 
-- [x] CR-011: backend/canvas/auth/schemas.py:14 - [review-backend] Deprecated Pydantic v1 Config class usage
-  - **Feature:** 001-auth
-  - **Task:** T-016
-  - **Rationale:** Using deprecated class Config instead of model_config = ConfigDict()
-
-- [x] CR-012: backend/canvas/portfolio/router.py:59 - [review-backend] Deprecated Pydantic .dict() method usage
-  - **Feature:** 003-portfolio-dashboard
-  - **Task:** T-007
-  - **Rationale:** Using deprecated .dict() instead of .model_dump()
-
-- [x] CR-013: backend/alembic/versions/002_canvas_tables.py - [review-data] Missing FK constraint for attachments.monthly_review_id
-  - **Feature:** 002-canvas-management
-  - **Task:** T-004
-  - **Rationale:** Polymorphic reference lacks referential integrity enforcement
+- [ ] CR-049: frontend/src/App.tsx:1 - [review-frontend] Missing ErrorBoundary wrapper around application routes
+  - **Feature:** 001A-infrastructure
+  - **Task:** T-011
+  - **Rationale:** Unhandled errors crash entire app with no recovery; ErrorBoundary component exists but is not used
 
 ### High
 
-- [x] CR-014: backend/canvas/routes/attachment.py:25 - [review-security] Path traversal vulnerability in file upload
-  - **Feature:** 002-canvas-management
-  - **Task:** T-018
-  - **Rationale:** User-controlled filename without sanitization allows directory traversal
-
-- [x] CR-015: backend/canvas/auth/routes.py:85 - [review-security] Insecure cookie config - secure=True on HTTP dev
+- [ ] CR-050: frontend/src/auth/AuthContext.tsx:76 - [review-frontend] Race condition in token refresh interceptor — no isRefreshing guard
   - **Feature:** 001-auth
-  - **Task:** T-016
-  - **Rationale:** Cookie inaccessible on HTTP, breaks auth flow in development
+  - **Task:** T-017
+  - **Rationale:** Multiple concurrent 401 responses all trigger refreshToken() simultaneously, causing duplicate refresh calls and potential auth loops
 
-- [x] CR-016: backend/canvas/main.py:25 - [review-security] Overly permissive CORS - wildcard origin header
-  - **Feature:** 001A-infrastructure
-  - **Task:** T-008
-  - **Rationale:** Bypasses configured CORS origins, allows any domain to make requests
-
-- [x] CR-017: backend/canvas/main.py:30 - [review-backend] Redundant CORS middleware configuration
-  - **Feature:** 001A-infrastructure
-  - **Task:** T-008
-  - **Rationale:** Both CORSMiddleware and custom middleware add CORS headers, causing conflicts
-
-- [x] CR-018: backend/canvas/services/canvas_service.py:175 - [review-backend] Unsafe constraint drop/recreate in reorder_theses (RESOLVED: CR-001 fix replaced raw SQL with parameterized ORM updates)
+- [ ] CR-051: frontend/src/components/InlineEdit.tsx:51 - [review-frontend] Memory leak — saveTimeoutRef not cleared on unmount
   - **Feature:** 002-canvas-management
-  - **Task:** T-012
-  - **Rationale:** Dropping constraints during transaction risks data integrity
+  - **Task:** T-019
+  - **Rationale:** debouncedSave sets timeout via saveTimeoutRef but no useEffect cleanup clears it on unmount, causing state updates on unmounted component
 
-- [x] CR-019: backend/canvas/routes/attachment.py:45 - [review-backend] Complex nested auth with N+1 query potential
-  - **Feature:** 002-canvas-management
-  - **Task:** T-018
-  - **Rationale:** Multiple DB queries for authorization check, inefficient
-
-- [x] CR-020: backend/canvas/routes/vbu.py - [review-performance] In-memory pagination fetches all data then slices
-  - **Feature:** 002-canvas-management
-  - **Task:** T-009
-  - **Rationale:** Loads entire table into memory before paginating
-
-- [x] CR-021: backend/canvas/reviews/service.py - [review-performance] Missing eager loading for review attachments
-  - **Feature:** 004-monthly-review
-  - **Task:** T-008
-  - **Rationale:** 150+ additional queries when loading reviews with attachments
-
-- [x] CR-022: frontend/src/App.tsx - [review-frontend] Missing AuthProvider wrapper
-  - **Feature:** 001-auth
-  - **Task:** T-016
-  - **Rationale:** Auth context not provided to component tree, auth hooks will fail
-
-- [x] CR-023: frontend/src/api/client.ts:3 - [review-frontend] Hardcoded API URL to localhost:8000
+- [ ] CR-052: frontend/tsconfig.json - [review-devops] Missing TypeScript configuration file
   - **Feature:** 001A-infrastructure
   - **Task:** T-011
-  - **Rationale:** Won't work in any environment except local dev, needs env config
+  - **Rationale:** TypeScript compilation and IDE support requires tsconfig.json; without it type checking is inconsistent
 
-- [x] CR-024: frontend/src/api/client.ts - [review-frontend] Missing auth token injection in API client
-  - **Feature:** 001-auth
+- [ ] CR-053: frontend/tailwind.config.ts - [review-devops] Missing Tailwind CSS configuration and dependency
+  - **Feature:** 001A-infrastructure
   - **Task:** T-011
-  - **Rationale:** API requests won't include JWT token, all authenticated endpoints will fail
+  - **Rationale:** Architecture specifies Tailwind CSS >=4.0 but no config exists and tailwindcss not in package.json
 
-- [x] CR-025: docker-compose.yml - [review-devops] Hardcoded database password
+- [ ] CR-054: backend/pyproject.toml - [review-devops] Missing pyproject.toml for Python project configuration
   - **Feature:** 001A-infrastructure
   - **Task:** T-001
-  - **Rationale:** Credentials in version control, security risk
-
-- [x] CR-026: backend/Dockerfile - [review-devops] Container running as root user
-  - **Feature:** 001A-infrastructure
-  - **Task:** T-001
-  - **Rationale:** Root containers are a security risk, should use non-root user
-
-- [x] CR-027: docker-compose.yml - [review-devops] Missing container resource limits
-  - **Feature:** 001A-infrastructure
-  - **Task:** T-001
-  - **Rationale:** No memory/CPU limits, containers can consume all host resources
-
-- [x] CR-028: frontend/src/dashboard/HealthIndicator.test.tsx - [review-testing] Duplicate test file in both dashboard/ and dashboard/__tests__/
-  - **Feature:** 003-portfolio-dashboard
-  - **Task:** T-013
-  - **Rationale:** Duplicate test files create maintenance burden
-
-- [x] CR-029: backend/canvas/auth/dependencies.py - [review-architect] Tight coupling with direct service instantiation
-  - **Feature:** 001-auth
-  - **Task:** T-015
-  - **Rationale:** Services created inline instead of injected, violates DIP
-
-- [x] CR-030: backend/canvas/services/canvas_service.py - [review-architect] God class 300+ lines violating SRP (DEFERRED: Architectural improvement for future iteration, not a bug)
-  - **Feature:** 002-canvas-management
-  - **Task:** T-012
-  - **Rationale:** Single class handles CRUD, reordering, ownership, search - should be split
+  - **Rationale:** No proper dependency management or build configuration; only requirements.txt exists
 
 ### Medium
 
-- [x] CR-031: backend/canvas/auth/routes.py:140 - [review-security] Missing rate limiting on password change endpoint
-  - **Feature:** 001-auth
-  - **Task:** T-016
-  - **Rationale:** Brute force attacks on password change not mitigated
-
-- [x] CR-032: backend/canvas/services/attachment_service.py - [review-security] Missing file type validation on upload
+- [ ] CR-055: backend/canvas/routes/vbu.py:60 - [review-security] Missing CSRF protection on VBU state-changing operations (POST, PATCH, DELETE)
   - **Feature:** 002-canvas-management
-  - **Task:** T-018
-  - **Rationale:** Any file type can be uploaded, potential for malicious files
-
-- [x] CR-033: backend/canvas/reviews/router.py - [review-security] Missing CSRF protection on state-changing endpoints
-  - **Feature:** 004-monthly-review
   - **Task:** T-014
-  - **Rationale:** POST/PUT/DELETE endpoints vulnerable to CSRF attacks
+  - **Rationale:** VBU creation, updates, and deletion lack X-CSRF-Token header validation
 
-- [x] CR-034: backend/alembic/versions/002_canvas_tables.py - [review-performance] Missing composite indexes on attachments table
+- [ ] CR-056: backend/canvas/routes/canvas.py:86 - [review-security] Missing CSRF protection on canvas update (PUT)
   - **Feature:** 002-canvas-management
-  - **Task:** T-004
-  - **Rationale:** Queries filtering by entity_type + entity_id lack index support
+  - **Task:** T-015
+  - **Rationale:** Canvas updates can be triggered by malicious sites without user consent
 
-- [x] CR-035: frontend/src/canvas/hooks/useCanvas.ts - [review-performance] Memory leak in debounced save with improper cleanup
+- [ ] CR-057: backend/canvas/routes/thesis.py:37 - [review-security] Missing CSRF protection on thesis operations (POST, PATCH, DELETE, PUT)
   - **Feature:** 002-canvas-management
-  - **Task:** T-022
-  - **Rationale:** Timeout not cleaned up on unmount, causes state updates on unmounted component
-
-- [x] CR-036: frontend/src/canvas/CanvasPage.tsx - [review-frontend] Missing error boundary
-  - **Feature:** 002-canvas-management
-  - **Task:** T-022
-  - **Rationale:** Unhandled errors crash entire page instead of showing fallback
-
-- [x] CR-037: frontend/src/reviews/ReviewWizard.tsx - [review-frontend] Race condition in auto-save
-  - **Feature:** 004-monthly-review
   - **Task:** T-016
-  - **Rationale:** Concurrent saves can overwrite each other without conflict resolution
+  - **Rationale:** Thesis CRUD operations lack CSRF protection
 
-- [x] CR-038: frontend/src/components/FileUpload.tsx - [review-frontend] Missing file size/type validation
+- [ ] CR-058: backend/canvas/routes/proof_point.py:41 - [review-security] Missing CSRF protection on proof point operations (POST, PATCH, DELETE)
+  - **Feature:** 002-canvas-management
+  - **Task:** T-017
+  - **Rationale:** Proof point modifications vulnerable to CSRF attacks
+
+- [ ] CR-059: backend/canvas/routes/attachment.py:26 - [review-security] Missing CSRF protection on attachment operations (POST, DELETE)
   - **Feature:** 002-canvas-management
   - **Task:** T-018
-  - **Rationale:** No client-side validation before upload, poor UX for invalid files
+  - **Rationale:** File uploads and deletions vulnerable to CSRF attacks
 
-- [x] CR-039: backend/alembic.ini - [review-devops] Hardcoded database URL
-  - **Feature:** 001A-infrastructure
+- [ ] CR-060: backend/canvas/portfolio/router.py:44 - [review-security] Missing CSRF protection on portfolio notes update (PATCH)
+  - **Feature:** 003-portfolio-dashboard
   - **Task:** T-003
-  - **Rationale:** Should use environment variable for database connection
+  - **Rationale:** Admin-only portfolio notes updates lack CSRF protection
 
-- [x] CR-040: docker-compose.yml - [review-devops] Incorrect PostgreSQL volume path
-  - **Feature:** 001A-infrastructure
-  - **Task:** T-001
-  - **Rationale:** Volume mount path may not persist data correctly
-
-- [x] CR-041: backend/canvas/models/attachment.py - [review-data] Polymorphic currently_testing_id lacks referential integrity (FALSE POSITIVE: currently_testing_id does not exist in Attachment model; FK constraints are properly defined)
+- [ ] CR-061: backend/canvas/services/canvas_service.py:245 - [review-performance] Multiple sequential DB queries in ownership verification instead of JOINs
   - **Feature:** 002-canvas-management
-  - **Task:** T-004
-  - **Rationale:** No FK constraint on polymorphic reference, orphaned records possible
+  - **Task:** T-012
+  - **Rationale:** verify_thesis_ownership, verify_proof_point_ownership perform 3-4 separate queries when a single JOIN would suffice
 
-- [x] CR-042: backend/canvas/seed.py - [review-data] Seed script has hardcoded test data
+- [ ] CR-062: frontend/src/dashboard/VBUTable.tsx:95 - [review-frontend] Missing keyboard navigation for table rows
+  - **Feature:** 003-portfolio-dashboard
+  - **Task:** T-015
+  - **Rationale:** Table rows have tabIndex but no keyboard event handling for accessibility
+
+- [ ] CR-063: frontend/src/reviews/components/CommitmentsStep.tsx:1 - [review-frontend] Form validation errors not announced to screen readers
+  - **Feature:** 004-monthly-review
+  - **Task:** T-015
+  - **Rationale:** Validation errors lack ARIA live regions for accessibility
+
+- [ ] CR-064: backend/canvas/main.py:20 - [review-devops] Missing graceful shutdown handling
   - **Feature:** 001A-infrastructure
-  - **Task:** T-010
-  - **Rationale:** Seed data should be configurable, not hardcoded
+  - **Task:** T-008
+  - **Rationale:** No signal handlers for SIGTERM/SIGINT; container shutdowns may cause data loss
+
+- [ ] CR-065: backend/canvas/main.py:1 - [review-devops] Missing structured logging configuration
+  - **Feature:** 001A-infrastructure
+  - **Task:** T-008
+  - **Rationale:** Architecture specifies structlog for JSON logging but only basic Python logging configured
 
 ### Low
 
-- [x] CR-043: .env.dev - [review-devops] Weak development secret key
-  - **Feature:** 001A-infrastructure
-  - **Task:** T-010
-  - **Rationale:** Dev secret key is predictable, should be randomly generated even for dev
+- [ ] CR-066: backend/canvas/auth/routes.py:20 - [review-security] In-memory rate limiting store not persistent across restarts
+  - **Feature:** 001-auth
+  - **Task:** T-016
+  - **Rationale:** Rate limiting bypassed by server restarts; acceptable for MVP but should use Redis in production
 
-- [x] CR-044: frontend/src/components/StatusBadge.tsx - [review-frontend] Missing aria-label for status indicators
+- [ ] CR-067: backend/canvas/services/canvas_service.py:1 - [review-architect] God class (326 lines) handling VBU, Canvas, Thesis, ProofPoint operations (DEFERRED from iteration 1: architectural improvement for future iteration)
+  - **Feature:** 002-canvas-management
+  - **Task:** T-012
+  - **Rationale:** Violates SRP but functional; splitting would be a refactor, not a bug fix
+
+- [ ] CR-068: frontend/src/canvas/CanvasPage.tsx:1 - [review-architect] Large component (431 lines) handling multiple responsibilities
   - **Feature:** 002-canvas-management
   - **Task:** T-022
-  - **Rationale:** Screen readers can't convey status meaning without labels
+  - **Rationale:** Violates SRP but functional; splitting would be a refactor
 
-- [x] CR-045: frontend/src/dashboard/VBUTable.tsx - [review-frontend] Missing keyboard navigation for table rows
-  - **Feature:** 003-portfolio-dashboard
-  - **Task:** T-013
-  - **Rationale:** Table not navigable via keyboard, WCAG violation
+## Excluded (False Positives / Already Fixed / Duplicates)
 
-- [x] CR-046: frontend/src/reviews/components/CommitmentsStep.tsx - [review-frontend] Missing form validation feedback
-  - **Feature:** 004-monthly-review
-  - **Task:** T-016
-  - **Rationale:** No inline validation messages for required fields
-
-- [x] CR-047: backend/canvas/portfolio/schemas.py - [review-data] Missing input length validation
-  - **Feature:** 003-portfolio-dashboard
-  - **Task:** T-007
-  - **Rationale:** No max_length on string fields, allows unbounded input
+- review-backend CR "Active database constraint violations" — runtime log artifacts from test runs, not code issues
+- review-backend CR "Missing transaction rollback" — SQLAlchemy session handles rollback via context manager
+- review-backend CR "N+1 in ownership verification" — duplicate of CR-061 (review-performance)
+- review-backend CR "In-memory rate limiting" — duplicate of CR-066 (review-security)
+- review-backend CR "Hardcoded limit 1000" — portfolio service uses LIMIT as safety cap, pagination exists via query params
+- review-backend CR "Missing error handling in _save_file" — file ops wrapped in try/except with proper cleanup
+- review-backend CR "Generic IntegrityError handling" — correctly checks specific constraint name
+- review-backend CR "Inconsistent error response format" — all routes use consistent JSONResponse pattern
+- review-frontend CR "useAutoSave memory leak" — FALSE POSITIVE: has proper cleanup in useEffect return
+- review-frontend CR "Missing ErrorBoundary on CanvasPage" — duplicate of CR-049 (app-level boundary covers this)
+- review-frontend CR "StatusBadge aria-describedby" — component uses aria-label correctly
+- review-frontend CR "Hardcoded API URL" — uses VITE_API_URL env var with localhost fallback for dev
+- review-data CR "Migration dependency error" — FALSE POSITIVE: migration 002 creates attachments with nullable monthly_review_id, migration 004 creates monthly_reviews; FK constraint added after both tables exist
+- review-data CR "Enum inconsistency" — FALSE POSITIVE: SQLAlchemy Enum() with inline values is valid
+- review-data CR "Content type validation mismatch" — service validates against same MIME types as DB constraint
+- review-data CR "Unsafe constraint manipulation in reorder" — uses parameterized query with proper transaction
+- review-data CR "Raw SQL injection risk" — FALSE POSITIVE: already fixed in iteration 1 (CR-001)
+- review-architect CR "Hardcoded Settings() in routes" — Settings() instantiation at module level is standard FastAPI pattern; Depends(Settings) BREAKS FastAPI with Pydantic BaseSettings
+- review-architect CR "Settings() in main.py" — same as above
+- review-architect CR "Settings() in db.py" — same as above
+- review-architect CR "Optional Settings parameter" — acceptable pattern for testability
+- review-testing CR "Tautological contract tests" — contract tests intentionally verify interface shape, not behavior; integration tests cover behavior
+- review-testing CR "Mock-heavy unit tests" — service unit tests verify initialization; integration tests cover logic
+- review-testing CR "Weak CORS assertion" — test correctly accepts valid CORS responses
+- review-testing CR "Weak session cleanup assertion" — tests session lifecycle correctly
 
 ## Summary
-
-| Severity | Count | Fixed |
-|----------|-------|-------|
-| Critical | 13 | 13 |
-| High | 17 | 17 |
-| Medium | 12 | 12 |
-| Low | 5 | 5 |
-| **Total** | **47** | **47** |
+| Severity | Count |
+|----------|-------|
+| Critical | 2 |
+| High | 5 |
+| Medium | 11 |
+| Low | 3 |
+| **Total** | **21** |
