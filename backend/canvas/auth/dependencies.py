@@ -19,6 +19,8 @@ async def get_current_user(
     """Extract user from X-Forwarded-User header (Pritunl Zero) or JWT token."""
     # Try Pritunl Zero header first
     forwarded_user = request.headers.get("x-forwarded-user")
+    import logging
+    logging.getLogger("canvas").info(f"Auth headers: x-forwarded-user={forwarded_user}")
     if forwarded_user:
         from sqlalchemy import select
         from canvas.models.user import User as UserModel
