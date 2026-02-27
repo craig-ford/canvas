@@ -25,5 +25,5 @@ class Attachment(Base, TimestampMixin):
         CheckConstraint("size_bytes BETWEEN 1 AND 10485760", name="ck_attachment_size_range"),
         CheckConstraint("label IS NULL OR LENGTH(TRIM(label)) > 0", name="ck_attachment_label_not_empty"),
         CheckConstraint("content_type IN ('image/jpeg','image/png','image/gif','application/pdf','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','application/vnd.openxmlformats-officedocument.wordprocessingml.document','application/vnd.openxmlformats-officedocument.presentationml.presentation')", name="ck_attachment_content_type"),
-        CheckConstraint("(proof_point_id IS NULL) != (monthly_review_id IS NULL)", name="ck_attachment_exactly_one_parent"),
+        CheckConstraint("NOT (proof_point_id IS NOT NULL AND monthly_review_id IS NOT NULL)", name="ck_attachment_at_most_one_parent"),
     )

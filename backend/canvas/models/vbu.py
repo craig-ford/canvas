@@ -8,10 +8,12 @@ class VBU(Base, TimestampMixin):
     
     name = Column(String(255), nullable=False)
     gm_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="RESTRICT"), nullable=False, index=True)
+    group_leader_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True, index=True)
     updated_by = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
     
     # Relationships
     gm = relationship("User", foreign_keys=[gm_id])
+    group_leader = relationship("User", foreign_keys=[group_leader_id])
     canvas = relationship("Canvas", back_populates="vbu", uselist=False, cascade="all, delete-orphan")
     
     __table_args__ = (

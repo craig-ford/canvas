@@ -8,6 +8,7 @@ from uuid import UUID
 from datetime import datetime
 from sqlalchemy import select, update, delete, text
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 from sqlalchemy.orm import selectinload
 from fastapi import HTTPException, status
 from canvas.models.user import User, UserRole
@@ -68,6 +69,10 @@ class CanvasService:
         )
         if current_user.role == UserRole.GM:
             query = query.where(VBU.gm_id == current_user.id)
+        elif current_user.role == UserRole.GROUP_LEADER:
+            query = query.where(VBU.group_leader_id == current_user.id)
+        elif current_user.role == UserRole.VIEWER and current_user.vbu_id:
+            query = query.where(VBU.id == current_user.vbu_id)
         
         result = await db.execute(query.order_by(VBU.name))
         return list(result.scalars().all())
@@ -83,6 +88,12 @@ class CanvasService:
         if current_user.role == UserRole.GM:
             query = query.where(VBU.gm_id == current_user.id)
             count_query = count_query.where(VBU.gm_id == current_user.id)
+        elif current_user.role == UserRole.GROUP_LEADER:
+            query = query.where(VBU.group_leader_id == current_user.id)
+            count_query = count_query.where(VBU.group_leader_id == current_user.id)
+        elif current_user.role == UserRole.VIEWER and current_user.vbu_id:
+            query = query.where(VBU.id == current_user.vbu_id)
+            count_query = count_query.where(VBU.id == current_user.vbu_id)
         
         # Get total count
         total_result = await db.execute(count_query)
@@ -102,7 +113,7 @@ class CanvasService:
         result = await db.execute(
             select(Canvas)
             .options(
-                selectinload(Canvas.theses).selectinload(Thesis.proof_points)
+                selectinload(Canvas.theses).selectinload(Thesis.proof_points).selectinload(ProofPoint.attachments)
             )
             .where(Canvas.vbu_id == vbu_id)
         )
@@ -130,33 +141,38 @@ class CanvasService:
         await db.refresh(canvas)
         return canvas
 
-    async def create_thesis(self, canvas_id: UUID, text: str, order: int, db: AsyncSession) -> Thesis:
+    async def create_thesis(self, canvas_id: UUID, text: str, order: int | None, db: AsyncSession, description: str | None = None, category_id: UUID | None = None) -> Thesis:
         """Create thesis with order validation"""
         result = await db.execute(select(Thesis).where(Thesis.canvas_id == canvas_id))
         existing = list(result.scalars().all())
         if len(existing) >= 5:
             raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Maximum 5 theses per canvas")
         
-        # Check for duplicate order
-        if any(t.order == order for t in existing):
-            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"Thesis with order {order} already exists")
+        # Auto-assign next order if not provided or conflicts
+        if order is None or any(t.order == order for t in existing):
+            order = max((t.order for t in existing), default=0) + 1
         
-        thesis = Thesis(canvas_id=canvas_id, text=text.strip(), order=order)
+        thesis = Thesis(canvas_id=canvas_id, text=text.strip(), order=order, description=description, category_id=category_id)
         db.add(thesis)
         await db.commit()
-        await db.refresh(thesis)
+        await db.refresh(thesis, attribute_names=["category"])
         return thesis
 
-    async def update_thesis(self, thesis_id: UUID, text: str, db: AsyncSession) -> Thesis:
-        """Update thesis text"""
+    async def update_thesis(self, thesis_id: UUID, updates: dict, db: AsyncSession) -> Thesis:
+        """Update thesis fields"""
         result = await db.execute(select(Thesis).where(Thesis.id == thesis_id))
         thesis = result.scalar_one_or_none()
         if not thesis:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Thesis not found")
         
-        thesis.text = text.strip()
+        if 'text' in updates and updates['text'] is not None:
+            thesis.text = updates['text'].strip()
+        if 'description' in updates:
+            thesis.description = updates['description']
+        if 'category_id' in updates:
+            thesis.category_id = updates['category_id']
         await db.commit()
-        await db.refresh(thesis)
+        await db.refresh(thesis, attribute_names=["category"])
         return thesis
 
     async def delete_thesis(self, thesis_id: UUID, db: AsyncSession) -> None:
@@ -173,9 +189,11 @@ class CanvasService:
         """Reorder theses — drop and recreate constraint to allow reorder"""
         if not thesis_orders:
             result = await db.execute(
-                select(Thesis).where(Thesis.canvas_id == canvas_id).order_by(Thesis.order)
+                select(Thesis).where(Thesis.canvas_id == canvas_id)
+                .options(joinedload(Thesis.category))
+                .order_by(Thesis.order)
             )
-            return list(result.scalars().all())
+            return list(result.scalars().unique().all())
 
         await db.execute(text("ALTER TABLE theses DROP CONSTRAINT IF EXISTS uq_theses_canvas_order"))
         for item in thesis_orders:
@@ -193,11 +211,12 @@ class CanvasService:
         result = await db.execute(
             select(Thesis)
             .where(Thesis.canvas_id == canvas_id)
+            .options(joinedload(Thesis.category))
             .order_by(Thesis.order)
         )
-        return list(result.scalars().all())
+        return list(result.scalars().unique().all())
 
-    async def create_proof_point(self, thesis_id: UUID, description: str, status: str, evidence_note: Optional[str], target_review_month: Optional[str], db: AsyncSession) -> ProofPoint:
+    async def create_proof_point(self, thesis_id: UUID, description: str, status: str, evidence_note: Optional[str], target_review_month: Optional[str], db: AsyncSession, notes: Optional[str] = None) -> ProofPoint:
         """Create proof point"""
         target_date = None
         if target_review_month:
@@ -207,6 +226,7 @@ class CanvasService:
         proof_point = ProofPoint(
             thesis_id=thesis_id,
             description=description.strip(),
+            notes=notes,
             status=ProofPointStatus(status),
             evidence_note=evidence_note,
             target_review_month=target_date
@@ -216,22 +236,28 @@ class CanvasService:
         await db.refresh(proof_point)
         return proof_point
 
-    async def update_proof_point(self, proof_point_id: UUID, description: Optional[str], status: Optional[str], evidence_note: Optional[str], target_review_month: Optional[str], db: AsyncSession) -> ProofPoint:
+    async def update_proof_point(self, proof_point_id: UUID, updates: dict, db: AsyncSession) -> ProofPoint:
         """Update proof point fields"""
         result = await db.execute(select(ProofPoint).where(ProofPoint.id == proof_point_id))
         proof_point = result.scalar_one_or_none()
         if not proof_point:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Proof point not found")
         
-        if description is not None:
-            proof_point.description = description.strip()
-        if status is not None:
-            proof_point.status = ProofPointStatus(status)
-        if evidence_note is not None:
-            proof_point.evidence_note = evidence_note
-        if target_review_month is not None:
-            year, month = target_review_month.split('-')
-            proof_point.target_review_month = datetime(int(year), int(month), 1).date()
+        if 'description' in updates and updates['description'] and updates['description'].strip():
+            proof_point.description = updates['description'].strip()
+        if 'notes' in updates:
+            proof_point.notes = updates['notes']
+        if 'status' in updates:
+            proof_point.status = ProofPointStatus(updates['status'])
+        if 'evidence_note' in updates:
+            proof_point.evidence_note = updates['evidence_note']
+        if 'target_review_month' in updates:
+            trm = updates['target_review_month']
+            if trm:
+                year, month = trm.split('-')
+                proof_point.target_review_month = datetime(int(year), int(month), 1).date()
+            else:
+                proof_point.target_review_month = None
         
         await db.commit()
         await db.refresh(proof_point)
@@ -267,6 +293,11 @@ class CanvasService:
             vbu = vbu_result.scalar_one()
             if vbu.gm_id != current_user.id:
                 raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+        elif current_user.role == UserRole.GROUP_LEADER:
+            vbu_result = await db.execute(select(VBU).where(VBU.id == canvas.vbu_id))
+            vbu = vbu_result.scalar_one()
+            if vbu.group_leader_id != current_user.id:
+                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
         
         return canvas
 
@@ -295,7 +326,10 @@ class CanvasService:
         
         vbu_result = await db.execute(select(VBU).where(VBU.id == canvas.vbu_id))
         vbu = vbu_result.scalar_one()
-        if vbu.gm_id != current_user.id:
+        if current_user.role == UserRole.GROUP_LEADER:
+            if vbu.group_leader_id != current_user.id:
+                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+        elif vbu.gm_id != current_user.id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
     async def verify_thesis_ownership(self, thesis_id: UUID, current_user: User, db: AsyncSession) -> None:
@@ -304,17 +338,20 @@ class CanvasService:
             return
         
         result = await db.execute(
-            select(VBU.gm_id)
+            select(VBU.gm_id, VBU.group_leader_id)
             .select_from(Thesis)
             .join(Canvas, Thesis.canvas_id == Canvas.id)
             .join(VBU, Canvas.vbu_id == VBU.id)
             .where(Thesis.id == thesis_id)
         )
-        gm_id = result.scalar_one_or_none()
-        if not gm_id:
+        row = result.one_or_none()
+        if not row:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Thesis not found")
         
-        if gm_id != current_user.id:
+        if current_user.role == UserRole.GROUP_LEADER:
+            if row.group_leader_id != current_user.id:
+                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+        elif row.gm_id != current_user.id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
     async def verify_proof_point_ownership(self, proof_point_id: UUID, current_user: User, db: AsyncSession) -> None:
@@ -323,18 +360,21 @@ class CanvasService:
             return
 
         result = await db.execute(
-            select(VBU.gm_id)
+            select(VBU.gm_id, VBU.group_leader_id)
             .select_from(ProofPoint)
             .join(Thesis, ProofPoint.thesis_id == Thesis.id)
             .join(Canvas, Thesis.canvas_id == Canvas.id)
             .join(VBU, Canvas.vbu_id == VBU.id)
             .where(ProofPoint.id == proof_point_id)
         )
-        gm_id = result.scalar_one_or_none()
-        if not gm_id:
+        row = result.one_or_none()
+        if not row:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Proof point not found")
 
-        if gm_id != current_user.id:
+        if current_user.role == UserRole.GROUP_LEADER:
+            if row.group_leader_id != current_user.id:
+                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+        elif row.gm_id != current_user.id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
     async def get_proof_points_by_thesis(self, thesis_id: UUID, db: AsyncSession) -> List[ProofPoint]:

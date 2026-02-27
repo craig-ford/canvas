@@ -1,10 +1,15 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { 
   getCanvas, 
+  getVbu,
   updateCanvas as apiUpdateCanvas,
+  createThesis as apiCreateThesis,
   updateThesis as apiUpdateThesis,
+  deleteThesis as apiDeleteThesis,
   reorderTheses as apiReorderTheses,
+  createProofPoint as apiCreateProofPoint,
   updateProofPoint as apiUpdateProofPoint,
+  deleteProofPoint as apiDeleteProofPoint,
   uploadAttachment as apiUploadAttachment,
   deleteAttachment as apiDeleteAttachment,
   Canvas,
@@ -20,14 +25,19 @@ interface UseCanvasOptions {
 
 interface UseCanvasReturn {
   canvas: Canvas | null;
+  vbuName: string;
   loading: boolean;
   error: string | null;
   saving: boolean;
   lastSaved: Date | null;
   updateCanvas: (updates: Partial<Canvas>) => Promise<void>;
+  addThesis: (text: string) => Promise<string | undefined>;
   updateThesis: (thesisId: string, updates: Partial<Thesis>) => Promise<void>;
+  removeThesis: (thesisId: string) => Promise<void>;
   reorderTheses: (thesisOrders: Array<{id: string, order: number}>) => Promise<void>;
+  addProofPoint: (thesisId: string, description: string) => Promise<string | undefined>;
   updateProofPoint: (proofPointId: string, updates: Partial<ProofPoint>) => Promise<void>;
+  removeProofPoint: (proofPointId: string) => Promise<void>;
   uploadAttachment: (proofPointId: string, file: File, label?: string) => Promise<void>;
   deleteAttachment: (attachmentId: string) => Promise<void>;
   setCurrentlyTesting: (type: 'thesis' | 'proof_point' | null, id: string | null) => Promise<void>;
@@ -37,6 +47,7 @@ export const useCanvas = (options: UseCanvasOptions): UseCanvasReturn => {
   const { vbuId, autoSave = true, debounceMs = 2000 } = options;
   
   const [canvas, setCanvas] = useState<Canvas | null>(null);
+  const [vbuName, setVbuName] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -44,6 +55,10 @@ export const useCanvas = (options: UseCanvasOptions): UseCanvasReturn => {
   
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const pendingUpdatesRef = useRef<Partial<Canvas>>({});
+  const canvasRef = useRef<Canvas | null>(null);
+
+  // Keep ref in sync
+  useEffect(() => { canvasRef.current = canvas; }, [canvas]);
 
   // Load canvas data on mount
   useEffect(() => {
@@ -51,8 +66,9 @@ export const useCanvas = (options: UseCanvasOptions): UseCanvasReturn => {
       try {
         setLoading(true);
         setError(null);
-        const canvasData = await getCanvas(vbuId);
+        const [canvasData, vbuData] = await Promise.all([getCanvas(vbuId), getVbu(vbuId)]);
         setCanvas(canvasData);
+        setVbuName(vbuData.name);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load canvas');
       } finally {
@@ -63,42 +79,34 @@ export const useCanvas = (options: UseCanvasOptions): UseCanvasReturn => {
     loadCanvas();
   }, [vbuId]);
 
-  // Debounced save function
-  const debouncedSave = useCallback(async (updates: Partial<Canvas>) => {
-    if (!autoSave || !canvas) return;
-
-    // Clear existing timeout
-    if (saveTimeoutRef.current) {
-      clearTimeout(saveTimeoutRef.current);
+  // Flush pending saves
+  const flushSave = useCallback(async () => {
+    const updates = pendingUpdatesRef.current;
+    if (Object.keys(updates).length === 0) return;
+    pendingUpdatesRef.current = {};
+    try {
+      setSaving(true);
+      const updatedCanvas = await apiUpdateCanvas(vbuId, updates);
+      setCanvas(updatedCanvas);
+      setLastSaved(new Date());
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save changes');
+    } finally {
+      setSaving(false);
     }
-
-    // Merge with pending updates
-    pendingUpdatesRef.current = { ...pendingUpdatesRef.current, ...updates };
-
-    // Set new timeout
-    saveTimeoutRef.current = setTimeout(async () => {
-      try {
-        setSaving(true);
-        const updatedCanvas = await apiUpdateCanvas(vbuId, pendingUpdatesRef.current);
-        setCanvas(updatedCanvas);
-        setLastSaved(new Date());
-        pendingUpdatesRef.current = {};
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to save changes');
-      } finally {
-        setSaving(false);
-      }
-    }, debounceMs);
-  }, [vbuId, autoSave, debounceMs, canvas]);
+  }, [vbuId]);
 
   const updateCanvas = useCallback(async (updates: Partial<Canvas>) => {
-    if (!canvas) return;
+    if (!canvasRef.current) return;
 
     // Optimistic update
     setCanvas(prev => prev ? { ...prev, ...updates } : null);
     
     if (autoSave) {
-      await debouncedSave(updates);
+      // Merge with pending
+      pendingUpdatesRef.current = { ...pendingUpdatesRef.current, ...updates };
+      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+      saveTimeoutRef.current = setTimeout(flushSave, debounceMs);
     } else {
       try {
         setSaving(true);
@@ -107,13 +115,12 @@ export const useCanvas = (options: UseCanvasOptions): UseCanvasReturn => {
         setLastSaved(new Date());
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to update canvas');
-        // Revert optimistic update on error
-        setCanvas(canvas);
+        setCanvas(canvasRef.current);
       } finally {
         setSaving(false);
       }
     }
-  }, [canvas, vbuId, autoSave, debouncedSave]);
+  }, [vbuId, autoSave, debounceMs, flushSave]);
 
   const updateThesis = useCallback(async (thesisId: string, updates: Partial<Thesis>) => {
     if (!canvas) return;
@@ -261,6 +268,86 @@ export const useCanvas = (options: UseCanvasOptions): UseCanvasReturn => {
     }
   }, [canvas, vbuId]);
 
+  const addThesis = useCallback(async (text: string): Promise<string | undefined> => {
+    if (!canvas) return;
+    try {
+      setSaving(true);
+      const nextOrder = canvas.theses.length > 0 ? Math.max(...canvas.theses.map(t => t.order)) + 1 : 1;
+      const newThesis = await apiCreateThesis(canvas.id, { text, order: nextOrder });
+      setCanvas(prev => prev ? { ...prev, theses: [...prev.theses, { ...newThesis, proof_points: newThesis.proof_points || [] }] } : null);
+      setLastSaved(new Date());
+      return newThesis.id;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to add thesis');
+    } finally {
+      setSaving(false);
+    }
+  }, [canvas]);
+
+  const removeThesis = useCallback(async (thesisId: string) => {
+    if (!canvas) return;
+    setCanvas(prev => prev ? { ...prev, theses: prev.theses.filter(t => t.id !== thesisId) } : null);
+    try {
+      setSaving(true);
+      await apiDeleteThesis(thesisId);
+      setLastSaved(new Date());
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete thesis');
+      const canvasData = await getCanvas(vbuId);
+      setCanvas(canvasData);
+    } finally {
+      setSaving(false);
+    }
+  }, [canvas, vbuId]);
+
+  const addProofPoint = useCallback(async (thesisId: string, description: string): Promise<string | undefined> => {
+    if (!canvas) return;
+    try {
+      setSaving(true);
+      const newPP = await apiCreateProofPoint(thesisId, { description });
+      setCanvas(prev => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          theses: prev.theses.map(t =>
+            t.id === thesisId ? { ...t, proof_points: [...t.proof_points, { ...newPP, attachments: newPP.attachments || [] }] } : t
+          )
+        };
+      });
+      setLastSaved(new Date());
+      return newPP.id;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to add proof point');
+    } finally {
+      setSaving(false);
+    }
+  }, [canvas]);
+
+  const removeProofPoint = useCallback(async (proofPointId: string) => {
+    if (!canvas) return;
+    setCanvas(prev => {
+      if (!prev) return null;
+      return {
+        ...prev,
+        theses: prev.theses.map(t => ({
+          ...t,
+          proof_points: t.proof_points.filter(pp => pp.id !== proofPointId)
+        }))
+      };
+    });
+    try {
+      setSaving(true);
+      await apiDeleteProofPoint(proofPointId);
+      setLastSaved(new Date());
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete proof point');
+      const canvasData = await getCanvas(vbuId);
+      setCanvas(canvasData);
+    } finally {
+      setSaving(false);
+    }
+  }, [canvas, vbuId]);
+
   const setCurrentlyTesting = useCallback(async (type: 'thesis' | 'proof_point' | null, id: string | null) => {
     if (!canvas) return;
 
@@ -284,14 +371,19 @@ export const useCanvas = (options: UseCanvasOptions): UseCanvasReturn => {
 
   return {
     canvas,
+    vbuName,
     loading,
     error,
     saving,
     lastSaved,
     updateCanvas,
+    addThesis,
     updateThesis,
+    removeThesis,
     reorderTheses,
+    addProofPoint,
     updateProofPoint,
+    removeProofPoint,
     uploadAttachment,
     deleteAttachment,
     setCurrentlyTesting

@@ -9,7 +9,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-canvas_dev}
       POSTGRES_DB: ${POSTGRES_DB:-canvas}
     ports:
-      - "5432:5432"
+      - "7701:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -22,10 +22,10 @@ services:
     build: ./backend
     restart: unless-stopped
     ports:
-      - "8000:8000"
+      - "7700:8000"
     environment:
       - CANVAS_DATABASE_URL=${CANVAS_DATABASE_URL:-postgresql+asyncpg://canvas:canvas_dev@db:5432/canvas}
-      - CANVAS_CORS_ORIGINS=${CANVAS_CORS_ORIGINS:-["http://localhost:5173","http://localhost:3000"]}
+      - CANVAS_CORS_ORIGINS=${CANVAS_CORS_ORIGINS:-["http://localhost:7702","http://localhost:7703"]}
       - CANVAS_SECRET_KEY=${CANVAS_SECRET_KEY:-dev-secret-key-change-in-production}
       - CANVAS_LOG_LEVEL=${CANVAS_LOG_LEVEL:-INFO}
     depends_on:
@@ -49,7 +49,7 @@ services:
     build: ./frontend
     restart: unless-stopped
     ports:
-      - "5173:5173"  # dev profile
+      - "7702:80"  # dev profile
     depends_on:
       backend:
         condition: service_healthy
@@ -70,7 +70,7 @@ services:
       target: production
     restart: unless-stopped
     ports:
-      - "80:80"      # prod profile
+      - "7703:80"      # prod profile
     depends_on:
       backend:
         condition: service_healthy

@@ -70,11 +70,18 @@ def require_role(*roles) -> Callable[[User], User]:
     return role_checker
 
 async def verify_csrf(request: Request) -> None:
-    """Verify CSRF protection by checking Origin header for state-changing requests."""
+    """Verify CSRF protection by checking Origin or Referer header for state-changing requests."""
     settings = Settings()
     
-    # Get Origin header
+    # Try Origin first, fall back to Referer (some browsers omit Origin on same-origin)
     origin = request.headers.get("origin")
+    if not origin:
+        referer = request.headers.get("referer")
+        if referer:
+            from urllib.parse import urlparse
+            parsed = urlparse(referer)
+            origin = f"{parsed.scheme}://{parsed.netloc}"
+    
     if not origin:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,

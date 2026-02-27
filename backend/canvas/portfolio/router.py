@@ -68,7 +68,7 @@ async def get_portfolio_summary(
 @router.patch("/notes")
 async def update_portfolio_notes(
     request: PortfolioNotesRequest,
-    current_user: User = Depends(require_role("admin")),
+    current_user: User = Depends(require_role("admin", "group_leader")),
     db: AsyncSession = Depends(get_db_session),
     _: None = Depends(verify_csrf)
 ) -> dict:
@@ -80,3 +80,13 @@ async def update_portfolio_notes(
         "notes": request.notes,
         "updated_at": datetime.now(timezone.utc).isoformat()
     })
+
+@router.get("/thesis-health")
+async def get_thesis_health(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db_session)
+) -> dict:
+    """Get thesis-level observation health across all visible VBUs"""
+    portfolio_service = PortfolioService(db)
+    data = await portfolio_service.get_thesis_health(current_user)
+    return list_response(data=data, total=len(data), page=1, per_page=len(data))

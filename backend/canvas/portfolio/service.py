@@ -76,6 +76,10 @@ class PortfolioService:
         # Role-based filtering
         if user.role == "gm":
             conditions.append(VBU.gm_id == user.id)
+        elif user.role == "group_leader":
+            conditions.append(VBU.group_leader_id == user.id)
+        elif user.role == "viewer" and user.vbu_id:
+            conditions.append(VBU.id == user.vbu_id)
         
         # Lane filtering
         if filters.lane:
@@ -135,3 +139,70 @@ class PortfolioService:
             )
         )
         await db.commit()
+
+    async def get_thesis_health(self, user: User) -> list[dict]:
+        """Get thesis-level health across all VBUs the user can see.
+        
+        For each thesis, computes an observation ratio from scored proof points
+        (observed=1, not_observed=0). A thesis is 'strengthening' if ratio > 0.5,
+        'weakening' if ratio < 0.5, 'neutral' if exactly 0.5 or no scored points.
+        """
+        if not self.db:
+            async with get_db_session() as db:
+                return await self._get_thesis_health_impl(db, user)
+        return await self._get_thesis_health_impl(self.db, user)
+
+    async def _get_thesis_health_impl(self, db: AsyncSession, user: User) -> list[dict]:
+        query = (
+            select(VBU, Canvas, Thesis)
+            .join(Canvas, Canvas.vbu_id == VBU.id)
+            .join(Thesis, Thesis.canvas_id == Canvas.id)
+            .options(selectinload(Thesis.proof_points), selectinload(Thesis.category))
+            .order_by(VBU.name, Thesis.order)
+        )
+
+        if user.role == "gm":
+            query = query.where(VBU.gm_id == user.id)
+        elif user.role == "group_leader":
+            query = query.where(VBU.group_leader_id == user.id)
+        elif user.role == "viewer" and user.vbu_id:
+            query = query.where(VBU.id == user.vbu_id)
+
+        result = await db.execute(query)
+        rows = result.unique().all()
+
+        out = []
+        for vbu, canvas, thesis in rows:
+            scores = [pp.status.score for pp in thesis.proof_points if pp.status.score is not None]
+            total = len(scores)
+            observed = sum(scores) if scores else 0
+            ratio = observed / total if total else None
+
+            if ratio is None:
+                signal = "neutral"
+            elif ratio > 0.5:
+                signal = "strengthening"
+            elif ratio < 0.5:
+                signal = "weakening"
+            else:
+                signal = "neutral"
+
+            out.append({
+                "vbu_id": str(vbu.id),
+                "vbu_name": vbu.name,
+                "thesis_id": str(thesis.id),
+                "thesis_order": thesis.order,
+                "thesis_text": thesis.text,
+                "category_name": thesis.category.name if thesis.category else None,
+                "category_color": thesis.category.color if thesis.category else None,
+                "observed": observed,
+                "not_observed": total - observed,
+                "total_scored": total,
+                "total_proof_points": len(thesis.proof_points),
+                "signal": signal,
+                "proof_points": [
+                    {"id": str(pp.id), "status": pp.status.value, "description": pp.description}
+                    for pp in thesis.proof_points
+                ],
+            })
+        return out

@@ -5,8 +5,9 @@ interface User {
   id: string;
   email: string;
   name: string;
-  role: 'admin' | 'gm' | 'viewer';
+  role: 'admin' | 'group_leader' | 'gm' | 'viewer';
   is_active: boolean;
+  must_reset_password: boolean;
 }
 
 interface AuthState {

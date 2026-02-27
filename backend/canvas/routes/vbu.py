@@ -90,6 +90,14 @@ async def get_vbu(
     if current_user.role == UserRole.GM and vbu.gm_id != current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
     
+    # Check group leader ownership
+    if current_user.role == UserRole.GROUP_LEADER and vbu.group_leader_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+    
+    # Check viewer scoping
+    if current_user.role == UserRole.VIEWER and current_user.vbu_id != vbu_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+    
     vbu_response = VBUResponse(
         id=vbu.id,
         name=vbu.name,
@@ -121,6 +129,8 @@ async def update_vbu(
     
     # Check authorization
     if current_user.role == UserRole.GM and vbu.gm_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+    if current_user.role == UserRole.GROUP_LEADER and vbu.group_leader_id != current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
     if current_user.role == UserRole.VIEWER:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
@@ -186,6 +196,8 @@ async def export_canvas_pdf(
     
     # Check GM ownership
     if current_user.role == UserRole.GM and vbu.gm_id != current_user.id:
+        raise HTTPException(status_code=404, detail="VBU not found")
+    if current_user.role == UserRole.GROUP_LEADER and vbu.group_leader_id != current_user.id:
         raise HTTPException(status_code=404, detail="VBU not found")
     
     if not vbu.canvas:

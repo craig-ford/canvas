@@ -32,7 +32,7 @@ export const FileUploadStep: React.FC<FileUploadStepProps> = ({
       
       try {
         const promises = attachmentIds.map(id => 
-          apiClient.get(`/api/attachments/${id}`)
+          apiClient.get(`/attachments/${id}`)
         )
         const responses = await Promise.all(promises)
         setAttachments(responses.map(r => r.data.data))
@@ -50,7 +50,7 @@ export const FileUploadStep: React.FC<FileUploadStepProps> = ({
     if (label) formData.append('label', label)
     
     try {
-      const response = await apiClient.post('/api/attachments', formData, {
+      const response = await apiClient.post('/attachments', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
       const newAttachment = response.data.data
@@ -62,7 +62,7 @@ export const FileUploadStep: React.FC<FileUploadStepProps> = ({
   
   const handleFileRemove = async (attachmentId: string) => {
     try {
-      await apiClient.delete(`/api/attachments/${attachmentId}`)
+      await apiClient.delete(`/attachments/${attachmentId}`)
       onAttachmentsChange(attachmentIds.filter(id => id !== attachmentId))
     } catch (error) {
       throw error

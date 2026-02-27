@@ -152,7 +152,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
             <button
               type="button"
               className="text-blue-600 hover:text-blue-500 font-medium"
-              onClick={() => fileInputRef.current?.click()}
+              onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click() }}
             >
               browse
             </button>

@@ -19,7 +19,7 @@ export const useAutoSave = ({ data, canvasId, interval = 30000, onSave }: AutoSa
     
     saveInProgressRef.current = true
     try {
-      await apiClient.post(`/api/canvases/${canvasId}/reviews/draft`, data)
+      await apiClient.post(`/canvases/${canvasId}/reviews/draft`, data)
       lastSavedRef.current = currentData
       onSave?.(true)
     } catch (error) {

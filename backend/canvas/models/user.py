@@ -1,10 +1,12 @@
 import uuid
 from enum import Enum
-from sqlalchemy import Column, String, Enum as SQLEnum, Boolean, Integer, DateTime
+from sqlalchemy import Column, String, Enum as SQLEnum, Boolean, Integer, DateTime, ForeignKey
+from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from canvas.models import Base, TimestampMixin
 
 class UserRole(str, Enum):
     ADMIN = "admin"
+    GROUP_LEADER = "group_leader"
     GM = "gm" 
     VIEWER = "viewer"
 
@@ -19,6 +21,8 @@ class User(Base, TimestampMixin):
     last_login_at = Column(DateTime(timezone=True), nullable=True)
     failed_login_attempts = Column(Integer, nullable=False, default=0, server_default='0')
     locked_until = Column(DateTime(timezone=True), nullable=True)
+    must_reset_password = Column(Boolean, nullable=False, default=False, server_default='false')
+    vbu_id = Column(PGUUID(as_uuid=True), ForeignKey("vbus.id", ondelete="SET NULL"), nullable=True, index=True)
     
     def __init__(self, **kwargs):
         # Set Python-level defaults
@@ -28,6 +32,8 @@ class User(Base, TimestampMixin):
             kwargs['is_active'] = True
         if 'failed_login_attempts' not in kwargs:
             kwargs['failed_login_attempts'] = 0
+        if 'must_reset_password' not in kwargs:
+            kwargs['must_reset_password'] = False
         super().__init__(**kwargs)
         # Ensure id is generated if not provided
         if self.id is None:

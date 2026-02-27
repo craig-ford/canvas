@@ -24,8 +24,15 @@ const InlineEdit: React.FC<InlineEditProps> = ({
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
   const saveTimeoutRef = useRef<NodeJS.Timeout>();
 
+  const currentValueRef = useRef(value);
+  const isEditingRef = useRef(false);
+
   useEffect(() => {
-    setCurrentValue(value);
+    // Only sync from parent when NOT actively editing
+    if (!isEditingRef.current) {
+      setCurrentValue(value);
+      currentValueRef.current = value;
+    }
   }, [value]);
 
   useEffect(() => {
@@ -37,20 +44,21 @@ const InlineEdit: React.FC<InlineEditProps> = ({
   }, []);
 
   const handleSave = useCallback(async () => {
-    if (currentValue === value) return;
+    const val = currentValueRef.current;
+    if (val === value) return;
     
     setSaveStatus('saving');
     setError(null);
     
     try {
-      await onSave(currentValue);
+      await onSave(val);
       setSaveStatus('saved');
       setTimeout(() => setSaveStatus('idle'), 2000);
     } catch (err) {
       setSaveStatus('error');
       setError(err instanceof Error ? err.message : 'Save failed');
     }
-  }, [currentValue, value, onSave]);
+  }, [value, onSave]);
 
   const debouncedSave = useCallback(() => {
     if (saveTimeoutRef.current) {
@@ -61,31 +69,54 @@ const InlineEdit: React.FC<InlineEditProps> = ({
 
   const handleClick = () => {
     if (readonly) return;
+    isEditingRef.current = true;
     setIsEditing(true);
-    setTimeout(() => inputRef.current?.focus(), 0);
+    setTimeout(() => {
+      const el = inputRef.current;
+      if (el) {
+        el.focus();
+        // Select all text so user can immediately type to replace
+        if (!multiline && el instanceof HTMLInputElement) {
+          el.select();
+        }
+      }
+    }, 0);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setCurrentValue(e.target.value);
+    const val = e.target.value;
+    setCurrentValue(val);
+    currentValueRef.current = val;
     debouncedSave();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
       setCurrentValue(value);
+      currentValueRef.current = value;
+      isEditingRef.current = false;
       setIsEditing(false);
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
       }
     } else if (e.key === 'Enter' && !multiline) {
       e.preventDefault();
+      isEditingRef.current = false;
       handleSave();
       setIsEditing(false);
     }
   };
 
   const handleBlur = () => {
+    isEditingRef.current = false;
     setIsEditing(false);
+    // Flush pending save immediately on blur
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+    if (currentValueRef.current !== value) {
+      handleSave();
+    }
   };
 
   const retry = () => {
@@ -117,7 +148,7 @@ const InlineEdit: React.FC<InlineEditProps> = ({
           onBlur={handleBlur}
           placeholder={placeholder}
           aria-label={multiline ? "Edit text content" : "Edit text"}
-          className={`w-full px-2 py-1 border border-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+          className={`w-full px-2 py-1 border border-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white ${
             multiline ? 'min-h-[80px] resize-vertical' : ''
           }`}
           rows={multiline ? 3 : undefined}
@@ -152,7 +183,7 @@ const InlineEdit: React.FC<InlineEditProps> = ({
       className={`px-2 py-1 rounded ${
         readonly 
           ? 'cursor-default' 
-          : 'cursor-pointer hover:bg-gray-50 border border-transparent hover:border-gray-200'
+          : 'cursor-pointer bg-white border border-neutral-200 hover:border-neutral-300'
       } ${currentValue ? '' : 'text-gray-500'}`}
     >
       {currentValue || placeholder}

@@ -31,19 +31,22 @@ class CanvasUpdate(BaseModel):
     currently_testing_type: Optional[CurrentlyTestingType] = None
     currently_testing_id: Optional[UUID] = None
     portfolio_notes: Optional[str] = None
+    health_indicator: Optional[str] = Field(None, pattern="^(Not Started|In Progress|On Track|At Risk)?$")
 
 
 class ThesisCreate(BaseModel):
-    text: str = Field(..., min_length=1, description="Thesis statement")
+    text: str = Field("", description="Thesis statement")
     order: int = Field(..., ge=1, le=5, description="Display order 1-5")
+    description: Optional[str] = None
 
 
 class ThesisUpdate(BaseModel):
-    text: Optional[str] = Field(None, min_length=1)
+    text: Optional[str] = Field(None)
+    description: Optional[str] = None
 
 
 class ProofPointCreate(BaseModel):
-    description: str = Field(..., min_length=1, description="Observable signal description")
+    description: str = Field("", description="Observable signal description")
     status: ProofPointStatus = ProofPointStatus.NOT_STARTED
     evidence_note: Optional[str] = None
     target_review_month: Optional[date] = None
@@ -70,6 +73,7 @@ class AttachmentResponse(BaseModel):
 class ProofPointResponse(BaseModel):
     id: UUID
     description: str
+    notes: Optional[str]
     status: ProofPointStatus
     evidence_note: Optional[str]
     target_review_month: Optional[date]
@@ -82,6 +86,10 @@ class ThesisResponse(BaseModel):
     id: UUID
     order: int
     text: str
+    description: Optional[str]
+    category_id: Optional[UUID]
+    category_name: Optional[str]
+    category_color: Optional[str]
     proof_points: List[ProofPointResponse]
     created_at: datetime
     updated_at: datetime
@@ -101,6 +109,7 @@ class CanvasResponse(BaseModel):
     currently_testing_type: Optional[CurrentlyTestingType]
     currently_testing_id: Optional[UUID]
     portfolio_notes: Optional[str]
+    health_indicator: Optional[str]
     theses: List[ThesisResponse]
     created_at: datetime
     updated_at: datetime

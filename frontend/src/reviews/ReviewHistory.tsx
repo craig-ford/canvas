@@ -3,6 +3,7 @@ import { apiClient } from '../api/client'
 
 interface ReviewHistoryProps {
   canvasId: string
+  vbuId: string
 }
 
 interface ReviewData {
@@ -29,7 +30,7 @@ interface ReviewData {
   }>
 }
 
-const ReviewHistory: React.FC<ReviewHistoryProps> = ({ canvasId }) => {
+const ReviewHistory: React.FC<ReviewHistoryProps> = ({ canvasId, vbuId }) => {
   const [reviews, setReviews] = useState<ReviewData[]>([])
   const [expandedReviews, setExpandedReviews] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
@@ -143,8 +144,8 @@ const ReviewHistory: React.FC<ReviewHistoryProps> = ({ canvasId }) => {
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">Review History</h3>
         <a
-          href={`/vbus/${canvasId}/review/new`}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
+          href={`/vbus/${vbuId}/review/new`}
+          className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark text-sm"
         >
           Start Review
         </a>

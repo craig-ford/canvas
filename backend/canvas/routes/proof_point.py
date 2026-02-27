@@ -12,13 +12,15 @@ from canvas.models.proof_point import ProofPoint, ProofPointStatus
 from canvas import success_response, list_response
 
 class ProofPointCreate(BaseModel):
-    description: str = Field(..., min_length=1, description="Observable signal description")
+    description: str = Field("", description="Observable signal description")
+    notes: str | None = None
     status: ProofPointStatus = ProofPointStatus.NOT_STARTED
     evidence_note: Optional[str] = None
     target_review_month: Optional[str] = Field(None, pattern=r"^\d{4}-\d{2}$", description="YYYY-MM format")
 
 class ProofPointUpdate(BaseModel):
-    description: Optional[str] = Field(None, min_length=1)
+    description: Optional[str] = None
+    notes: str | None = None
     status: Optional[ProofPointStatus] = None
     evidence_note: Optional[str] = None
     target_review_month: Optional[str] = Field(None, pattern=r"^\d{4}-\d{2}$", description="YYYY-MM format")
@@ -42,7 +44,7 @@ async def get_proof_points(
 async def create_proof_point(
     thesis_id: UUID,
     proof_point_data: ProofPointCreate,
-    current_user: User = Depends(require_role([UserRole.ADMIN, UserRole.GM])),
+    current_user: User = Depends(require_role([UserRole.ADMIN, UserRole.GM, UserRole.GROUP_LEADER])),
     db: AsyncSession = Depends(get_db_session),
     _: None = Depends(verify_csrf)
 ):
@@ -54,7 +56,8 @@ async def create_proof_point(
         proof_point_data.status.value,
         proof_point_data.evidence_note,
         proof_point_data.target_review_month,
-        db
+        db,
+        notes=proof_point_data.notes
     )
     return success_response(proof_point, status_code=201)
 
@@ -62,7 +65,7 @@ async def create_proof_point(
 async def update_proof_point(
     proof_point_id: UUID,
     proof_point_data: ProofPointUpdate,
-    current_user: User = Depends(require_role([UserRole.ADMIN, UserRole.GM])),
+    current_user: User = Depends(require_role([UserRole.ADMIN, UserRole.GM, UserRole.GROUP_LEADER])),
     db: AsyncSession = Depends(get_db_session),
     _: None = Depends(verify_csrf)
 ):
@@ -71,10 +74,7 @@ async def update_proof_point(
     await canvas_service.verify_proof_point_ownership(proof_point_id, current_user, db)
     proof_point = await canvas_service.update_proof_point(
         proof_point_id,
-        proof_point_data.description,
-        proof_point_data.status.value if proof_point_data.status else None,
-        proof_point_data.evidence_note,
-        proof_point_data.target_review_month,
+        proof_point_data.model_dump(exclude_unset=True),
         db
     )
     return success_response(proof_point)
@@ -82,7 +82,7 @@ async def update_proof_point(
 @router.delete("/proof-points/{proof_point_id}", status_code=204)
 async def delete_proof_point(
     proof_point_id: UUID,
-    current_user: User = Depends(require_role([UserRole.ADMIN, UserRole.GM])),
+    current_user: User = Depends(require_role([UserRole.ADMIN, UserRole.GM, UserRole.GROUP_LEADER])),
     db: AsyncSession = Depends(get_db_session),
     _: None = Depends(verify_csrf)
 ):

@@ -8,7 +8,7 @@ from sqlalchemy.exc import IntegrityError
 from canvas.auth.service import AuthService
 from canvas.auth.user_service import UserService
 from canvas.auth.dependencies import get_current_user, require_role
-from canvas.auth.schemas import LoginRequest, TokenResponse, UserCreate, UserResponse
+from canvas.auth.schemas import LoginRequest, TokenResponse, UserCreate, UserResponse, ResetPasswordRequest
 from canvas.models.user import User, UserRole
 from canvas.db import get_db_session
 from canvas.config import Settings
@@ -124,7 +124,8 @@ async def login(
         email=user.email,
         name=user.name,
         role=user.role.value,
-        is_active=user.is_active
+        is_active=user.is_active,
+        must_reset_password=user.must_reset_password
     )
     
     return success_response({
@@ -168,6 +169,13 @@ async def refresh_token(
         "token_type": "bearer"
     })
 
+
+@router.post("/logout")
+async def logout(response: Response) -> dict:
+    """Clear refresh token cookie."""
+    response.delete_cookie(key="refresh_token", httponly=True, secure=settings.environment == "production", samesite="strict")
+    return success_response({"message": "Logged out"})
+
 @router.get("/me", response_model=dict)
 async def get_current_user_profile(
     current_user: User = Depends(get_current_user)
@@ -178,7 +186,8 @@ async def get_current_user_profile(
         email=current_user.email,
         name=current_user.name,
         role=current_user.role.value,
-        is_active=current_user.is_active
+        is_active=current_user.is_active,
+        must_reset_password=current_user.must_reset_password
     )
     return success_response(user_response.model_dump())
 
@@ -195,7 +204,8 @@ async def list_users(
             email=user.email,
             name=user.name,
             role=user.role.value,
-            is_active=user.is_active
+            is_active=user.is_active,
+            must_reset_password=user.must_reset_password
         ).model_dump()
         for user in users
     ]
@@ -261,3 +271,45 @@ async def delete_user(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Invalid user ID"
         )
+
+
+@router.post("/reset-password")
+async def reset_password(
+    body: ResetPasswordRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db_session)
+) -> dict:
+    """Reset password for current user. If must_reset_password is true, current_password is optional."""
+    if not current_user.must_reset_password:
+        if not body.current_password or not auth_service._verify_password(body.current_password, current_user.password_hash):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Current password is incorrect")
+    current_user.password_hash = auth_service._hash_password(body.new_password)
+    current_user.must_reset_password = False
+    await db.commit()
+    return success_response({"message": "Password updated"})
+
+
+@router.post("/users/{user_id}/reset-password")
+async def admin_reset_password(
+    user_id: str,
+    db: AsyncSession = Depends(get_db_session),
+    current_user: User = Depends(require_role(UserRole.ADMIN))
+) -> dict:
+    """Admin generates a temporary password for a user."""
+    import secrets
+    try:
+        uid = UUID(user_id)
+    except ValueError:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Invalid user ID")
+    user = await auth_service.get_user_by_id(uid, db)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    if user.role == UserRole.ADMIN:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Cannot reset admin password")
+    temp_password = secrets.token_urlsafe(9)  # ~12 chars
+    user.password_hash = auth_service._hash_password(temp_password)
+    user.must_reset_password = True
+    user.failed_login_attempts = 0
+    user.locked_until = None
+    await db.commit()
+    return success_response({"temporary_password": temp_password})

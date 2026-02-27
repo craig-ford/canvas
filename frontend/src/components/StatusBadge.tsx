@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 
 interface StatusBadgeProps {
-  status: 'not_started' | 'in_progress' | 'observed' | 'stalled';
+  status: 'not_started' | 'in_progress' | 'observed' | 'not_observed' | 'stalled';
   onChange?: (status: string) => void;
   readonly?: boolean;
 }
@@ -15,10 +15,11 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status, onChange, readonly = 
     not_started: { color: 'bg-gray-100 text-gray-800', text: 'Not Started' },
     in_progress: { color: 'bg-teal-100 text-teal-800', text: 'In Progress' },
     observed: { color: 'bg-green-100 text-green-800', text: 'Observed' },
+    not_observed: { color: 'bg-red-100 text-red-800', text: 'Not Observed' },
     stalled: { color: 'bg-yellow-100 text-yellow-800', text: 'Stalled' }
   };
 
-  const allStatuses: Array<keyof typeof statusConfig> = ['not_started', 'in_progress', 'observed', 'stalled'];
+  const allStatuses: Array<keyof typeof statusConfig> = ['not_started', 'in_progress', 'observed', 'not_observed', 'stalled'];
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

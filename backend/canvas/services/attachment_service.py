@@ -26,13 +26,14 @@ class AttachmentService:
             "application/vnd.openxmlformats-officedocument.presentationml.presentation"
         }
     
-    async def upload(self, file: UploadFile, vbu_id: UUID, entity_type: str, entity_id: UUID, uploaded_by: UUID, db: AsyncSession, label: Optional[str] = None) -> Attachment:
+    async def upload(self, file: UploadFile, vbu_id: Optional[UUID], entity_type: str, entity_id: Optional[UUID], uploaded_by: UUID, db: AsyncSession, label: Optional[str] = None) -> Attachment:
         """Upload file with validation and storage"""
         self._validate_file(file)
         
         # Sanitize filename to prevent path traversal
         safe_filename = self._sanitize_filename(file.filename)
-        storage_path = self._generate_storage_path(vbu_id, entity_type, safe_filename)
+        storage_subdir = str(vbu_id) if vbu_id else "standalone"
+        storage_path = self._generate_storage_path(storage_subdir, entity_type, safe_filename)
         await self._save_file(file, storage_path)
         
         # Determine which field to set based on entity_type
@@ -121,7 +122,7 @@ class AttachmentService:
         
         return safe_name
     
-    def _generate_storage_path(self, vbu_id: UUID, entity_type: str, filename: str) -> Path:
+    def _generate_storage_path(self, vbu_id: str, entity_type: str, filename: str) -> Path:
         """Generate storage path: /uploads/{vbu_id}/{entity_type}/{uuid}.{ext}"""
         file_uuid = uuid.uuid4()
         file_ext = Path(filename).suffix

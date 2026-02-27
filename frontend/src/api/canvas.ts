@@ -25,6 +25,7 @@ export interface Canvas {
   currently_testing_type?: 'thesis' | 'proof_point';
   currently_testing_id?: string;
   portfolio_notes?: string;
+  health_indicator?: string;
   theses: Thesis[];
   created_at: string;
   updated_at: string;
@@ -35,6 +36,10 @@ export interface Thesis {
   id: string;
   order: number;
   text: string;
+  description: string | null;
+  category_id: string | null;
+  category_name: string | null;
+  category_color: string | null;
   proof_points: ProofPoint[];
   created_at: string;
   updated_at: string;
@@ -43,7 +48,8 @@ export interface Thesis {
 export interface ProofPoint {
   id: string;
   description: string;
-  status: 'not_started' | 'in_progress' | 'observed' | 'stalled';
+  notes: string | null;
+  status: 'not_started' | 'in_progress' | 'observed' | 'not_observed' | 'stalled';
   evidence_note?: string;
   target_review_month?: string;
   attachments: Attachment[];
@@ -107,6 +113,19 @@ export const updateCanvas = async (vbuId: string, data: Partial<Canvas>): Promis
   return response.data.data;
 };
 
+// Thesis Categories
+export interface ThesisCategory {
+  id: string;
+  name: string;
+  description: string | null;
+  color: string | null;
+}
+
+export const listThesisCategories = async (): Promise<ThesisCategory[]> => {
+  const response = await apiClient.get<{ data: ThesisCategory[] }>('/thesis-categories');
+  return response.data.data;
+};
+
 // Thesis Operations
 export const listTheses = async (canvasId: string): Promise<Thesis[]> => {
   const response = await apiClient.get<ApiResponse<Thesis[]>>(`/canvases/${canvasId}/theses`);
@@ -118,7 +137,7 @@ export const createThesis = async (canvasId: string, data: { text: string; order
   return response.data.data;
 };
 
-export const updateThesis = async (id: string, data: { text: string }): Promise<Thesis> => {
+export const updateThesis = async (id: string, data: { text?: string; description?: string | null; category_id?: string | null }): Promise<Thesis> => {
   const response = await apiClient.patch<ApiResponse<Thesis>>(`/theses/${id}`, data);
   return response.data.data;
 };
@@ -142,7 +161,7 @@ export const listProofPoints = async (thesisId: string): Promise<ProofPoint[]> =
 
 export const createProofPoint = async (thesisId: string, data: {
   description: string;
-  status?: 'not_started' | 'in_progress' | 'observed' | 'stalled';
+  status?: 'not_started' | 'in_progress' | 'observed' | 'not_observed' | 'stalled';
   evidence_note?: string;
   target_review_month?: string;
 }): Promise<ProofPoint> => {
@@ -152,7 +171,8 @@ export const createProofPoint = async (thesisId: string, data: {
 
 export const updateProofPoint = async (id: string, data: {
   description?: string;
-  status?: 'not_started' | 'in_progress' | 'observed' | 'stalled';
+  notes?: string | null;
+  status?: 'not_started' | 'in_progress' | 'observed' | 'not_observed' | 'stalled';
   evidence_note?: string;
   target_review_month?: string;
 }): Promise<ProofPoint> => {

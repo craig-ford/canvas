@@ -160,19 +160,21 @@ const VBUTable: React.FC<VBUTableProps> = ({ vbus, onExportPDF, onViewVBU }) => 
               <td className="px-6 py-4 whitespace-nowrap">
                 <HealthIndicator status={vbu.health_indicator} />
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                <button
-                  onClick={() => onExportPDF(vbu.id)}
-                  className="text-indigo-600 hover:text-indigo-900"
-                >
-                  PDF
-                </button>
-                <button
-                  onClick={() => onViewVBU(vbu.id)}
-                  className="text-indigo-600 hover:text-indigo-900"
-                >
-                  View
-                </button>
+              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => onViewVBU(vbu.id)}
+                    className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg text-white bg-primary hover:bg-primary-dark transition-colors"
+                  >
+                    View
+                  </button>
+                  <button
+                    onClick={() => onExportPDF(vbu.id)}
+                    className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg text-primary border border-primary hover:bg-primary hover:text-white transition-colors"
+                  >
+                    Export PDF
+                  </button>
+                </div>
               </td>
             </tr>
           ))}

@@ -29,7 +29,7 @@ interface CanvasOptions {
 }
 
 export const ReviewWizard: React.FC = () => {
-  const { vbuId } = useParams<{ vbuId: string }>()
+  const { id: vbuId } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const [currentStep, setCurrentStep] = useState(1)
   const [reviewData, setReviewData] = useState<ReviewData>({
@@ -42,13 +42,14 @@ export const ReviewWizard: React.FC = () => {
     attachment_ids: []
   })
   const [canvasOptions, setCanvasOptions] = useState<CanvasOptions | null>(null)
+  const [canvasId, setCanvasId] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
 
   const { saveDraft } = useAutoSave({
     data: reviewData,
-    canvasId: vbuId!,
+    canvasId: canvasId || '',
     onSave: (success) => setSaveStatus(success ? 'saved' : 'error')
   })
 
@@ -60,8 +61,19 @@ export const ReviewWizard: React.FC = () => {
   useEffect(() => {
     const fetchCanvasOptions = async () => {
       try {
-        const response = await apiClient.get(`/canvases/${vbuId}/options`)
-        setCanvasOptions(response.data.data)
+        const response = await apiClient.get(`/vbus/${vbuId}/canvas`)
+        const canvas = response.data.data
+        setCanvasId(canvas.id)
+        setCanvasOptions({
+          theses: (canvas.theses || []).map((t: any) => ({
+            id: t.id,
+            text: t.text,
+            proof_points: (t.proof_points || []).map((pp: any) => ({
+              id: pp.id,
+              description: pp.description
+            }))
+          }))
+        })
       } catch (err) {
         setError('Failed to load canvas options')
       }
@@ -89,7 +101,7 @@ export const ReviewWizard: React.FC = () => {
     setError(null)
     
     try {
-      await apiClient.post(`/canvases/${vbuId}/reviews`, {
+      await apiClient.post(`/canvases/${canvasId}/reviews`, {
         review_date: new Date().toISOString().split('T')[0],
         ...reviewData
       })

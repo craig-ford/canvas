@@ -21,7 +21,7 @@ export const PortfolioNotes: React.FC = () => {
   // Debounced autosave function
   const debouncedSave = useCallback(
     debounce(async (value: string) => {
-      if (user?.role !== 'admin') return;
+      if (user?.role !== 'admin' && user?.role !== 'group_leader') return;
 
       setSaveStatus('saving');
       try {
@@ -40,7 +40,7 @@ export const PortfolioNotes: React.FC = () => {
   };
 
   // Don't render for non-admin users
-  if (user?.role !== 'admin') return null;
+  if (user?.role !== 'admin' && user?.role !== 'group_leader') return null;
 
   return (
     <div className="mt-6" role="region" aria-label="Portfolio notes">

@@ -1,3 +1,56 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700;800&display=swap');
+
+@theme {
+  --font-sans: 'Barlow', sans-serif;
+
+  /* Primary - Teal */
+  --color-primary: #008AB0;
+  --color-primary-light: #33A5C4;
+  --color-primary-dark: #006F8E;
+  --color-primary-pale: #B3E0ED;
+
+  /* Secondary - Green */
+  --color-success: #80C342;
+  --color-success-light: #9DD066;
+  --color-success-dark: #6BA835;
+  --color-success-pale: #E8F4D9;
+
+  /* Accent - Blue */
+  --color-accent: #273691;
+  --color-accent-light: #4A5BAD;
+  --color-accent-pale: #E8EAF5;
+
+  /* Navy */
+  --color-navy: #001641;
+
+  /* Ice */
+  --color-ice: #DDF1F7;
+
+  /* Lime */
+  --color-lime: #C1D82F;
+  --color-lime-light: #D4E35C;
+  --color-lime-dark: #A8B826;
+
+  /* Yellow / Warning */
+  --color-warning: #F3EA00;
+  --color-warning-light: #F7F066;
+  --color-warning-dark: #C9BC00;
+  --color-warning-pale: #FFFBE6;
+
+  /* Neutrals */
+  --color-neutral-900: #0D0D0D;
+  --color-neutral-800: #1A1A1A;
+  --color-neutral-500: #737373;
+  --color-neutral-300: #A6A6A6;
+  --color-neutral-100: #DFDFDF;
+  --color-neutral-50: #F5F5F5;
+}
+
+/* TipTap editor styles */
+.tiptap ul { list-style: disc; padding-left: 1.5em; }
+.tiptap ol { list-style: decimal; padding-left: 1.5em; }
+.tiptap p { margin: 0.25em 0; }
+.tiptap strong { font-weight: 600; }
+.ProseMirror:focus { outline: none; }
+.ProseMirror { min-height: 80px; }

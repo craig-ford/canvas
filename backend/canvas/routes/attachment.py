@@ -29,27 +29,27 @@ async def upload_attachment(
     proof_point_id: Optional[UUID] = Form(None),
     monthly_review_id: Optional[UUID] = Form(None),
     label: Optional[str] = Form(None),
-    current_user: User = Depends(require_role(["admin", "gm"])),
+    current_user: User = Depends(require_role(["admin", "gm", "group_leader"])),
     db: AsyncSession = Depends(get_db_session),
     attachment_service: AttachmentService = Depends(get_attachment_service),
     _: None = Depends(verify_csrf)
 ) -> dict:
     """Upload file attachment to proof point or monthly review"""
-    # Validate exactly one parent is provided
-    if not (proof_point_id or monthly_review_id) or (proof_point_id and monthly_review_id):
+    # At least one parent OR standalone (for review wizard pre-upload)
+    if proof_point_id and monthly_review_id:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail={"code": "VALIDATION_ERROR", "message": "Exactly one of proof_point_id or monthly_review_id must be provided"}
+            detail={"code": "VALIDATION_ERROR", "message": "Cannot specify both proof_point_id and monthly_review_id"}
         )
     
     # Get VBU for authorization with single query
     vbu_id = None
-    entity_type = None
+    entity_type = "standalone"
     entity_id = None
     
     if proof_point_id:
         result = await db.execute(
-            select(VBU.id, VBU.gm_id)
+            select(VBU.id, VBU.gm_id, VBU.group_leader_id)
             .select_from(ProofPoint)
             .join(Thesis, ProofPoint.thesis_id == Thesis.id)
             .join(Canvas, Thesis.canvas_id == Canvas.id)
@@ -64,13 +64,14 @@ async def upload_attachment(
         entity_type = "proof_point"
         entity_id = proof_point_id
         
-        # Check GM ownership
         if current_user.role == UserRole.GM and row.gm_id != current_user.id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+        if current_user.role == UserRole.GROUP_LEADER and row.group_leader_id != current_user.id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
     
     elif monthly_review_id:
         result = await db.execute(
-            select(VBU.id, VBU.gm_id)
+            select(VBU.id, VBU.gm_id, VBU.group_leader_id)
             .select_from(MonthlyReview)
             .join(Canvas, MonthlyReview.canvas_id == Canvas.id)
             .join(VBU, Canvas.vbu_id == VBU.id)
@@ -84,8 +85,9 @@ async def upload_attachment(
         entity_type = "monthly_review"
         entity_id = monthly_review_id
         
-        # Check GM ownership
         if current_user.role == UserRole.GM and row.gm_id != current_user.id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+        if current_user.role == UserRole.GROUP_LEADER and row.group_leader_id != current_user.id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
     
     # Upload file
@@ -113,11 +115,12 @@ async def download_attachment(
     if current_user.role == UserRole.ADMIN:
         return await attachment_service.download(attachment_id, db)
     
-    # For GM, check ownership with single query
-    if current_user.role == UserRole.GM:
-        # Check if attachment belongs to GM's VBU via proof point
+    # For GM or group_leader, check ownership with single query
+    if current_user.role in (UserRole.GM, UserRole.GROUP_LEADER):
+        fk_col = VBU.gm_id if current_user.role == UserRole.GM else VBU.group_leader_id
+        # Check if attachment belongs to user's VBU via proof point
         pp_result = await db.execute(
-            select(VBU.gm_id)
+            select(fk_col)
             .select_from(Attachment)
             .join(ProofPoint, Attachment.proof_point_id == ProofPoint.id)
             .join(Thesis, ProofPoint.thesis_id == Thesis.id)
@@ -127,9 +130,9 @@ async def download_attachment(
         )
         pp_row = pp_result.first()
         
-        # Check if attachment belongs to GM's VBU via monthly review
+        # Check if attachment belongs to user's VBU via monthly review
         mr_result = await db.execute(
-            select(VBU.gm_id)
+            select(fk_col)
             .select_from(Attachment)
             .join(MonthlyReview, Attachment.monthly_review_id == MonthlyReview.id)
             .join(Canvas, MonthlyReview.canvas_id == Canvas.id)
@@ -141,8 +144,8 @@ async def download_attachment(
         if not (pp_row or mr_row):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Attachment not found")
         
-        gm_id = pp_row.gm_id if pp_row else mr_row.gm_id
-        if gm_id != current_user.id:
+        owner_id = pp_row[0] if pp_row else mr_row[0]
+        if owner_id != current_user.id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
     
     # For viewer, verify attachment exists before allowing access
@@ -158,7 +161,7 @@ async def download_attachment(
 @router.delete("/{attachment_id}", status_code=204)
 async def delete_attachment(
     attachment_id: UUID,
-    current_user: User = Depends(require_role(["admin", "gm"])),
+    current_user: User = Depends(require_role(["admin", "gm", "group_leader"])),
     db: AsyncSession = Depends(get_db_session),
     attachment_service: AttachmentService = Depends(get_attachment_service),
     _: None = Depends(verify_csrf)
@@ -182,7 +185,6 @@ async def delete_attachment(
     if attachment.proof_point:
         vbu = attachment.proof_point.thesis.canvas.vbu
     elif attachment.monthly_review_id:
-        # Need to load monthly review relationship
         result = await db.execute(
             select(MonthlyReview)
             .options(selectinload(MonthlyReview.canvas).selectinload(Canvas.vbu))
@@ -195,8 +197,9 @@ async def delete_attachment(
     if not vbu:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Associated VBU not found")
     
-    # Check GM ownership
     if current_user.role == UserRole.GM and vbu.gm_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+    if current_user.role == UserRole.GROUP_LEADER and vbu.group_leader_id != current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
     
     await attachment_service.delete(attachment_id, db)

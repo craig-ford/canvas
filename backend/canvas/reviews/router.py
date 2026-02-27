@@ -32,10 +32,16 @@ async def verify_canvas_access(canvas_id: UUID, current_user, db: AsyncSession):
     if not canvas:
         raise HTTPException(status_code=404, detail="Canvas not found")
     
-    if current_user.role in ["admin", "viewer"]:
+    if current_user.role == "admin":
         return canvas
     
+    if current_user.role == "viewer" and current_user.vbu_id != canvas.vbu_id:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
     if current_user.role == "gm" and canvas.vbu.gm_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    if current_user.role == "group_leader" and canvas.vbu.group_leader_id != current_user.id:
         raise HTTPException(status_code=403, detail="Access denied")
     
     return canvas
@@ -57,7 +63,7 @@ async def create_review(
     canvas_id: UUID, 
     review_data: ReviewCreateSchema, 
     request: Request,
-    current_user=Depends(require_role("admin", "gm")), 
+    current_user=Depends(require_role("admin", "gm", "group_leader")), 
     db: AsyncSession = Depends(get_db_session)
 ):
     """Create new review"""

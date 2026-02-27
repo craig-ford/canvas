@@ -8,7 +8,7 @@ from canvas.auth.dependencies import get_current_user, verify_csrf
 from canvas.models.user import User, UserRole
 from canvas.models.vbu import VBU
 from canvas.services.canvas_service import CanvasService
-from canvas.schemas import CanvasUpdate, CanvasResponse, ThesisResponse, ProofPointResponse
+from canvas.schemas import CanvasUpdate, CanvasResponse, ThesisResponse, ProofPointResponse, AttachmentResponse
 from canvas import success_response
 
 router = APIRouter(prefix="/api/vbus", tags=["canvas"])
@@ -30,6 +30,14 @@ async def get_canvas(
     if current_user.role == UserRole.GM and vbu.gm_id != current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
     
+    # Check group leader ownership
+    if current_user.role == UserRole.GROUP_LEADER and vbu.group_leader_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+    
+    # Check viewer scoping
+    if current_user.role == UserRole.VIEWER and current_user.vbu_id != vbu_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+    
     service = CanvasService()
     canvas = await service.get_canvas_by_vbu(vbu_id, db)
     
@@ -40,10 +48,21 @@ async def get_canvas(
             ProofPointResponse(
                 id=pp.id,
                 description=pp.description,
+                notes=pp.notes,
                 status=pp.status,
                 evidence_note=pp.evidence_note,
                 target_review_month=pp.target_review_month,
-                attachments=[],  # Attachments loaded separately
+                attachments=[
+                    AttachmentResponse(
+                        id=a.id,
+                        filename=a.filename,
+                        content_type=a.content_type,
+                        size_bytes=a.size_bytes,
+                        label=a.label,
+                        uploaded_by=a.uploaded_by,
+                        created_at=a.created_at
+                    ) for a in pp.attachments
+                ],
                 created_at=pp.created_at,
                 updated_at=pp.updated_at
             ) for pp in thesis.proof_points
@@ -53,13 +72,17 @@ async def get_canvas(
             id=thesis.id,
             order=thesis.order,
             text=thesis.text,
+            description=thesis.description,
+            category_id=thesis.category_id,
+            category_name=thesis.category.name if thesis.category else None,
+            category_color=thesis.category.color if thesis.category else None,
             proof_points=proof_points_data,
             created_at=thesis.created_at,
             updated_at=thesis.updated_at
         ))
     
-    # Filter portfolio_notes for non-admin users
-    portfolio_notes = canvas.portfolio_notes if current_user.role == UserRole.ADMIN else None
+    # Filter portfolio_notes for non-admin/non-group-leader users
+    portfolio_notes = canvas.portfolio_notes if current_user.role in (UserRole.ADMIN, UserRole.GROUP_LEADER) else None
     
     canvas_response = CanvasResponse(
         id=canvas.id,
@@ -75,6 +98,7 @@ async def get_canvas(
         currently_testing_type=canvas.currently_testing_type,
         currently_testing_id=canvas.currently_testing_id,
         portfolio_notes=portfolio_notes,
+        health_indicator=canvas.health_indicator_cache,
         theses=theses_data,
         created_at=canvas.created_at,
         updated_at=canvas.updated_at,
@@ -101,15 +125,21 @@ async def update_canvas(
     # Check authorization for updates
     if current_user.role == UserRole.GM and vbu.gm_id != current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+    if current_user.role == UserRole.GROUP_LEADER and vbu.group_leader_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
     if current_user.role == UserRole.VIEWER:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
     
     # Filter update data based on role
     update_data = canvas_data.model_dump(exclude_unset=True)
     
-    # Remove portfolio_notes for non-admin users
-    if current_user.role != UserRole.ADMIN and "portfolio_notes" in update_data:
+    # Remove portfolio_notes for non-admin/non-group-leader users
+    if current_user.role not in (UserRole.ADMIN, UserRole.GROUP_LEADER) and "portfolio_notes" in update_data:
         del update_data["portfolio_notes"]
+    
+    # Map health_indicator to DB column name
+    if "health_indicator" in update_data:
+        update_data["health_indicator_cache"] = update_data.pop("health_indicator")
     
     service = CanvasService()
     updated_canvas = await service.update_canvas(
@@ -136,6 +166,7 @@ async def update_canvas(
         currently_testing_type=updated_canvas.currently_testing_type,
         currently_testing_id=updated_canvas.currently_testing_id,
         portfolio_notes=portfolio_notes,
+        health_indicator=updated_canvas.health_indicator_cache,
         theses=[],  # Empty for update response
         created_at=updated_canvas.created_at,
         updated_at=updated_canvas.updated_at,

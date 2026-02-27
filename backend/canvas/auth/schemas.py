@@ -19,6 +19,11 @@ class UserResponse(BaseModel):
     name: str
     role: str
     is_active: bool
+    must_reset_password: bool = False
+
+class ResetPasswordRequest(BaseModel):
+    current_password: str | None = None
+    new_password: str = Field(min_length=8, max_length=128)
 
 class TokenResponse(BaseModel):
     access_token: str

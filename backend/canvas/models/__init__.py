@@ -17,6 +17,7 @@ from canvas.models.user import User, UserRole
 from canvas.models.vbu import VBU
 from canvas.models.canvas import Canvas, LifecycleLane, CurrentlyTestingType
 from canvas.models.thesis import Thesis
+from canvas.models.thesis_category import ThesisCategory
 from canvas.models.proof_point import ProofPoint, ProofPointStatus
 from canvas.models.attachment import Attachment
 from canvas.models.monthly_review import MonthlyReview
@@ -29,6 +30,7 @@ __all__ = [
     "VBU",
     "Canvas", "LifecycleLane", "CurrentlyTestingType",
     "Thesis",
+    "ThesisCategory",
     "ProofPoint", "ProofPointStatus",
     "Attachment",
     "MonthlyReview",

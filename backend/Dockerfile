@@ -21,11 +21,8 @@ RUN apt-get update && apt-get install -y \
 COPY pyproject.toml* ./
 COPY requirements.txt* ./
 
-# Switch to non-root user
-USER canvas
-
-# Install Python dependencies as non-root user
-RUN pip install --user --no-cache-dir \
+# Install Python dependencies
+RUN pip install --no-cache-dir \
     fastapi \
     uvicorn[standard] \
     sqlalchemy[asyncio] \
@@ -40,6 +37,7 @@ RUN pip install --user --no-cache-dir \
     python-multipart \
     weasyprint \
     jinja2 \
+    structlog \
     pytest \
     "pytest-asyncio==0.24.0" \
     httpx
@@ -49,7 +47,7 @@ COPY . .
 
 # Change ownership to non-root user
 USER root
-RUN chown -R canvas:canvas /app
+RUN mkdir -p /uploads && chown -R canvas:canvas /app /uploads
 USER canvas
 
 # Expose port
