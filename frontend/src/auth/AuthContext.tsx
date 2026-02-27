@@ -126,12 +126,18 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
   useEffect(() => {
     const restoreSession = async () => {
       try {
-        await refreshToken();
-        // Get current user profile
-        const response = await api.get('/auth/me');
-        setUser(response.data.data);
+        // Try header-based auth first (Pritunl Zero sets X-Forwarded-User)
+        const meResponse = await api.get('/auth/me');
+        setUser(meResponse.data.data);
       } catch {
-        // No valid session
+        // No header auth — try JWT refresh
+        try {
+          await refreshToken();
+          const response = await api.get('/auth/me');
+          setUser(response.data.data);
+        } catch {
+          // No valid session
+        }
       } finally {
         setIsLoading(false);
       }

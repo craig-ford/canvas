@@ -8,4 +8,16 @@ __pycache__/
 *.log
 uploads/
 *.egg-info
-.coverage
+.coverage.call_count
+.circuit_breaker_state
+.env.dev
+.env.prod
+.exit_signals
+.last_output_length
+.ralph_session
+.ralph_session_history
+.response_analysis
+logs/
+progress.json
+status.json
+.kiro/

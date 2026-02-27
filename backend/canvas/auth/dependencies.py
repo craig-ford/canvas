@@ -8,40 +8,42 @@ from canvas.auth.service import AuthService
 from canvas.db import get_db_session
 from canvas.config import Settings
 
-security = HTTPBearer()
+security = HTTPBearer(auto_error=False)
 auth_service = AuthService()
 
 async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
+    request: Request,
+    credentials: HTTPAuthorizationCredentials | None = Depends(security),
     db: AsyncSession = Depends(get_db_session)
 ) -> User:
-    """Extract and validate user from JWT token."""
-    token = credentials.credentials
+    """Extract user from X-Forwarded-User header (Pritunl Zero) or JWT token."""
+    # Try Pritunl Zero header first
+    forwarded_user = request.headers.get("x-forwarded-user")
+    if forwarded_user:
+        from sqlalchemy import select
+        from canvas.models.user import User as UserModel
+        result = await db.execute(select(UserModel).where(UserModel.email == forwarded_user))
+        user = result.scalar_one_or_none()
+        if user and user.is_active:
+            return user
+
+    # Fall back to JWT
+    if not credentials:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
     
-    # Verify token using AuthService
+    token = credentials.credentials
     payload = await auth_service.verify_token(token)
     if not payload:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token"
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
     
-    # Extract user ID from token payload
     try:
         user_id = UUID(payload["sub"])
     except (KeyError, ValueError):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token"
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
     
-    # Get user from database
     user = await auth_service.get_user_by_id(user_id, db)
     if not user or not user.is_active:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not found"
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
     
     return user
 
